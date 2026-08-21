@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}New Gen | Admin{% endblock %}
+
+{% block content %}
+<main class="page-main admin-page">
+  <section class="page-hero reveal admin-header">
+    <div class="container admin-shell">
+      <div class="admin-hero-copy">
+        <span class="eyebrow">Admin dashboard</span>
+        <h1>Plan the next New Gen moment.</h1>
+        <p>Create standout events, shape the community calendar, and keep every creative session organized.</p>
+      </div>
+
+      <div class="admin-header-actions">
+        <a href="{{ url_for('calendar') }}" class="btn btn-secondary">Preview calendar</a>
+        <a href="{{ url_for('admin_logout') }}" class="btn btn-danger">Log out</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="container content-section reveal">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-list">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="admin-layout">
+      <div class="admin-panel admin-create-panel">
+        <div class="panel-topline">
+          <span class="panel-kicker">{{ mode }} event</span>
+          <span class="panel-badge">Live editor</span>
+        </div>
+
+        <form method="post" action="{% if event %}{{ url_for('admin', event_id=event.id) }}{% else %}{{ url_for('admin') }}{% endif %}" class="event-form">
+          <input type="hidden" name="event_id" value="{{ event.id if event else '' }}" />
+
+          <div class="form-row">
+            <label for="title">Event title</label>
+            <input id="title" name="title" type="text" value="{{ event.title if event else '' }}" placeholder="Creative Showcase Night" required />
+          </div>
+
+          <div class="form-row three-col">
+            <div>
+              <label for="day">Day</label>
+              <input id="day" name="day" type="number" min="1" max="31" value="{{ event.date[8:10] if event and event.date else '' }}" required />
+            </div>
+            <div>
+              <label for="month">Month</label>
+              <input id="month" name="month" type="number" min="1" max="12" value="{{ event.date[5:7] if event and event.date else '' }}" required />
+            </div>
+            <div>
+              <label for="year">Year</label>
+              <input id="year" name="year" type="number" min="2024" step="1" value="{{ event.date[:4] if event and event.date else '' }}" required />
+            </div>
+          </div>
+
+          <div class="form-row two-col">
+            <div>
+              <label for="category">Category</label>
+              <select id="category" name="category">
+                <option value="">Select a category</option>
+                <option value="Music" {% if event and event.category == 'Music' %}selected{% endif %}>Music</option>
+                <option value="Dance" {% if event and event.category == 'Dance' %}selected{% endif %}>Dance</option>
+                <option value="Art" {% if event and event.category == 'Art' %}selected{% endif %}>Art</option>
+                <option value="Poetry" {% if event and event.category == 'Poetry' %}selected{% endif %}>Poetry</option>
+                <option value="Tech" {% if event and event.category == 'Tech' %}selected{% endif %}>Tech</option>
+                <option value="Workshop" {% if event and event.category == 'Workshop' %}selected{% endif %}>Workshop</option>
+                <option value="Showcase" {% if event and event.category == 'Showcase' %}selected{% endif %}>Showcase</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="location">Location</label>
+              <input id="location" name="location" type="text" value="{{ event.location if event else '' }}" placeholder="School Auditorium" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="6" placeholder="Tell students what this event is about, who it is for, and why it matters.">{{ event.description if event else '' }}</textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save event</button>
+            {% if event %}
+              <a href="{{ url_for('admin') }}" class="btn btn-secondary">Cancel</a>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+
+      <aside class="admin-panel admin-list-panel">
+        <div class="panel-topline">
+          <span class="panel-kicker">Upcoming</span>
+          <span class="panel-badge soft">{{ events|length }} items</span>
+        </div>
+
+        <div class="event-rail">
+          {% if events %}
+            {% for item in events %}
+              <div class="admin-event-item">
+                <div class="event-mini-date">
+                  <strong>{{ item.date[8:10] }}</strong>
+                  <span>{{ item.date[5:7] }}/{{ item.date[:4] }}</span>
+                </div>
+
+                <div class="event-mini-copy">
+                  <strong>{{ item.title }}</strong>
+                  <p>{{ item.category or 'Club Event' }}</p>
+                </div>
+
+                <div class="admin-actions">
+                  <a href="{{ url_for('admin', event_id=item.id) }}" class="mini-link">Edit</a>
+                  <form method="post" action="{{ url_for('delete_event', event_id=item.id) }}" onsubmit="return confirm('Delete this event?');">
+                    <button type="submit" class="mini-delete">Delete</button>
+                  </form>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="empty-admin-text">No events available yet.</p>
+          {% endif %}
+        </div>
+      </aside>
+    </div>
+  </section>
+</main>
+{% endblock %}

@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Gen | School Club</title>
+    <meta
+      name="description"
+      content="New Gen is a vibrant school club where music, dance, art, poetry, and technology come together to inspire creativity and community."
+    />
+    <style>
+      :root {
+        --bg: #0a0d17;
+        --bg-soft: #121a2e;
+        --panel: rgba(18, 26, 46, 0.8);
+        --panel-strong: rgba(12, 18, 32, 0.96);
+        --card: rgba(255, 255, 255, 0.05);
+        --text: #ecf3ff;
+        --muted: #b2bfd9;
+        --line: rgba(255, 255, 255, 0.08);
+        --pink: #ff5edb;
+        --purple: #8b5cf6;
+        --blue: #45d0ff;
+        --mint: #73f0c0;
+        --gold: #ffd166;
+        --orange: #ff8a65;
+      }
+
+      * { box-sizing: border-box; }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(139, 92, 246, 0.35), transparent 30%),
+          radial-gradient(circle at top right, rgba(69, 208, 255, 0.25), transparent 28%),
+          linear-gradient(180deg, #060a12 0%, #0d1320 100%);
+        color: var(--text);
+      }
+
+      img {
+        max-width: 100%;
+        display: block;
+      }
+
+      a { color: inherit; text-decoration: none; }
+
+      .container {
+        width: min(1180px, calc(100% - 36px));
+        margin: 0 auto;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        backdrop-filter: blur(18px);
+        background: rgba(10, 13, 23, 0.7);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 78px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, var(--pink), var(--purple), var(--blue));
+        box-shadow: 0 18px 35px rgba(139, 92, 246, 0.35);
+        font-size: 1.1rem;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 26px;
+        color: var(--muted);
+        font-size: 0.96rem;
+      }
+
+      .nav-links a {
+        transition: color 0.25s ease;
+      }
+
+      .nav-links a:hover { color: var(--text); }
+
+      .nav-cta {
+        padding: 12px 20px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--pink), var(--purple));
+        color: white;
+        font-weight: 700;
+        box-shadow: 0 18px 28px rgba(139, 92, 246, 0.35);
+      }
+
+      .menu-toggle {
+        display: none;
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,0.04);
+        color: var(--text);
+        border-radius: 12px;
+        padding: 10px 12px;
+      }
+
+      .hero {
+        padding: 82px 0 36px;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        align-items: center;
+        gap: 48px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 14px;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 999px;
+        background: rgba(255,255,255,0.04);
+        color: var(--muted);
+        font-size: 0.82rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--mint), var(--blue));
+        box-shadow: 0 0 18px rgba(115, 240, 192, 0.8);
+      }
+
+      h1 {
+        margin: 20px 0 18px;
+        font-size: clamp(2.8rem, 6vw, 5.4rem);
+        line-height: 0.98;
+        letter-spacing: -0.06em;
+      }
+
+      .gradient-text {
+        background: linear-gradient(135deg, var(--pink), var(--purple), var(--blue), var(--mint));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .hero-copy p {
+        font-size: 1.08rem;
+        line-height: 1.75;
+        color: var(--muted);
+        max-width: 610px;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 16px;
+        margin-top: 28px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        padding: 15px 22px;
+        font-weight: 700;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, var(--pink), var(--purple));
+        box-shadow: 0 18px 32px rgba(139, 92, 246, 0.35);
+      }
+
+      .btn-secondary {
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.04);
+      }
+
+      .hero-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 32px;
+      }
+
+      .metric {
+        padding: 18px 16px;
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,0.03);
+        border-radius: 18px;
+      }
+
+      .metric strong {
+        display: block;
+        font-size: 1.7rem;
+        line-height: 1;
+        margin-bottom: 8px;
+      }
+
+      .metric span {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .showcase {
+        position: relative;
+        min-height: 560px;
+      }
+
+      .spotlight {
+        position: absolute;
+        inset: 26px auto auto 44px;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(139, 92, 246, 0.5), transparent 60%);
+        filter: blur(20px);
+      }
+
+      .art-card {
+        position: absolute;
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+        box-shadow: 0 30px 60px rgba(7, 10, 18, 0.5);
+        backdrop-filter: blur(18px);
+      }
+
+      .main-visual {
+        position: absolute;
+        inset: 30px 40px 60px 65px;
+        border-radius: 30px;
+        overflow: hidden;
+        background:
+          linear-gradient(135deg, rgba(17, 24, 39, 0.4), rgba(17, 24, 39, 0.15)),
+          url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop stop-color="%23ff5edb"/><stop offset="0.5" stop-color="%238b5cf6"/><stop offset="1" stop-color="%2345d0ff"/></linearGradient></defs><rect width="800" height="1000" fill="%230b1020"/><circle cx="610" cy="180" r="180" fill="%23ff5edb" fill-opacity="0.35"/><circle cx="180" cy="730" r="210" fill="%2345d0ff" fill-opacity="0.28"/><rect x="120" y="120" width="530" height="610" rx="36" fill="%23182335" stroke="rgba(255,255,255,0.3)"/><circle cx="360" cy="320" r="130" fill="url(%23g)" opacity="0.95"/><path d="M240 760C310 640 420 600 520 700C600 780 620 860 620 860H220C220 820 230 780 240 760Z" fill="%23a78bfa" opacity="0.75"/><path d="M130 660C210 610 270 520 330 440C390 360 470 320 550 320" stroke="%23dbeafe" stroke-width="14" stroke-linecap="round" fill="none" opacity="0.85"/></svg>') center/cover no-repeat;
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+
+      .floating-tag {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        color: var(--text);
+        background: rgba(7,11,18,0.78);
+        border: 1px solid rgba(255,255,255,0.08);
+        box-shadow: 0 22px 36px rgba(0,0,0,0.25);
+      }
+
+      .tag-a { top: 0; right: 10px; }
+      .tag-b { bottom: 60px; left: 0; }
+      .tag-c { bottom: 10px; right: 50px; }
+
+      .tag-b, .tag-c {
+        background: rgba(17, 26, 45, 0.86);
+      }
+
+      .tag-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-size: 1.15rem;
+        background: linear-gradient(135deg, var(--gold), var(--orange));
+        color: #1b1421;
+      }
+
+      .section {
+        padding: 110px 0 0;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 20px;
+        margin-bottom: 28px;
+      }
+
+      .section-header h2 {
+        margin: 0;
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        letter-spacing: -0.05em;
+      }
+
+      .section-header p {
+        margin: 0;
+        color: var(--muted);
+        max-width: 560px;
+        line-height: 1.7;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 26px;
+      }
+
+      .feature-card {
+        position: relative;
+        overflow: hidden;
+        min-height: 350px;
+        padding: 28px;
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      }
+
+      .feature-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top right, rgba(255,255,255,0.12), transparent 32%);
+        pointer-events: none;
+      }
+
+      .feature-card h3 {
+        margin: 16px 0 12px;
+        font-size: 2rem;
+        letter-spacing: -0.04em;
+      }
+
+      .feature-card p {
+        color: var(--muted);
+        line-height: 1.75;
+        margin: 0 0 20px;
+      }
+
+      .mini-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .mini-badges span {
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: rgba(255,255,255,0.02);
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      .feature-visual {
+        height: 160px;
+        border-radius: 20px;
+        margin-top: 22px;
+        border: 1px solid rgba(255,255,255,0.08);
+        background:
+          linear-gradient(135deg, rgba(255,94,219,0.22), rgba(139,92,246,0.18), rgba(69,208,255,0.2)),
+          linear-gradient(135deg, #0e1423, #181f2f);
+      }
+
+      .music-visual {
+        background:
+          linear-gradient(135deg, rgba(255,94,219,0.18), rgba(139,92,246,0.18)),
+          repeating-linear-gradient(90deg, rgba(255,255,255,0.08) 0 2px, transparent 2px 32px),
+          linear-gradient(135deg, #101827, #171f2d);
+      }
+
+      .art-visual {
+        background:
+          linear-gradient(135deg, rgba(255,138,101,0.2), rgba(255,209,102,0.15)),
+          radial-gradient(circle at 20% 30%, rgba(255,255,255,0.21), transparent 14%),
+          linear-gradient(135deg, #151c2d, #0d1420);
+      }
+
+      .poetry-visual {
+        background:
+          linear-gradient(135deg, rgba(115,240,192,0.22), rgba(69,208,255,0.18)),
+          linear-gradient(135deg, #0d1622, #0f1d29);
+      }
+
+      .tech-visual {
+        background:
+          linear-gradient(135deg, rgba(69,208,255,0.18), rgba(139,92,246,0.2)),
+          linear-gradient(135deg, #0c1522, #101d2d);
+      }
+
+      .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px;
+      }
+
+      .gallery-item {
+        position: relative;
+        min-height: 260px;
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      }
+
+      .gallery-item:nth-child(1) { background: linear-gradient(135deg, rgba(255,94,219,0.28), rgba(139,92,246,0.25)), linear-gradient(135deg, #171a2d, #101928); }
+      .gallery-item:nth-child(2) { background: linear-gradient(135deg, rgba(93, 226, 255, 0.24), rgba(115, 240, 192, 0.2)), linear-gradient(135deg, #111a2c, #111827); }
+      .gallery-item:nth-child(3) { background: linear-gradient(135deg, rgba(255, 209, 102, 0.22), rgba(255, 138, 101, 0.18)), linear-gradient(135deg, #1b1928, #111827); }
+
+      .gallery-overlay {
+        position: absolute;
+        inset: auto 0 0 0;
+        padding: 22px 20px 18px;
+        background: linear-gradient(180deg, transparent 0%, rgba(7, 11, 18, 0.9) 100%);
+      }
+
+      .gallery-overlay strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 1.2rem;
+      }
+
+      .gallery-overlay span {
+        color: var(--muted);
+      }
+
+      .cta-band {
+        margin-top: 90px;
+        padding: 32px 28px;
+        border: 1px solid var(--line);
+        border-radius: 30px;
+        background: linear-gradient(135deg, rgba(139,92,246,0.18), rgba(69,208,255,0.12), rgba(255,94,219,0.12));
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+      }
+
+      .cta-band h3 {
+        margin: 0 0 8px;
+        font-size: clamp(1.8rem, 3vw, 2.8rem);
+        letter-spacing: -0.04em;
+      }
+
+      .cta-band p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      footer {
+        padding: 80px 0 50px;
+      }
+
+      .footer-wrap {
+        display: flex;
+        justify-content: space-between;
+        gap: 28px;
+        border-top: 1px solid var(--line);
+        padding-top: 34px;
+        color: var(--muted);
+      }
+
+      .footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+      }
+
+      @media (max-width: 940px) {
+        .hero-grid,
+        .feature-grid,
+        .gallery-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .section-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .cta-band,
+        .footer-wrap {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .nav-links {
+          display: none;
+        }
+
+        .menu-toggle {
+          display: inline-flex;
+        }
+
+        .hero {
+          padding-top: 60px;
+        }
+
+        .hero-metrics {
+          grid-template-columns: 1fr;
+        }
+
+        .showcase {
+          min-height: 460px;
+        }
+
+        .main-visual {
+          inset: 20px 20px 56px 28px;
+        }
+
+        .tag-a {
+          right: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container nav">
+        <a href="#home" class="brand" aria-label="New Gen home">
+          <span class="brand-mark">N</span>
+          <span>New Gen</span>
+        </a>
+
+        <nav class="nav-links" aria-label="Main navigation">
+          <a href="#about">About</a>
+          <a href="#music-dance">Music & Dance</a>
+          <a href="#art">Art</a>
+          <a href="#poetry">Poetry</a>
+          <a href="#tech">Tech</a>
+        </nav>
+
+        <a href="#join" class="nav-cta">Join the Club</a>
+        <button class="menu-toggle" aria-label="Open menu">Menu</button>
+      </div>
+    </header>
+
+    <main id="home">
+      <section class="hero">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <span class="eyebrow">School creative club</span>
+            <h1>
+              <span>Make</span>
+              <span class="gradient-text">magic</span>
+              <span>with your voice, your art, and your ideas.</span>
+            </h1>
+            <p>
+              New Gen is where students turn passion into performance. From soulful music and dynamic dance to stunning art, powerful poetry, and bold tech innovation, we bring every creative spark to life.
+            </p>
+
+            <div class="cta-row">
+              <a href="#join" class="btn btn-primary">Become a member</a>
+              <a href="#about" class="btn btn-secondary">Discover more</a>
+            </div>
+
+            <div class="hero-metrics">
+              <div class="metric">
+                <strong>5+</strong>
+                <span>Creative spaces</span>
+              </div>
+              <div class="metric">
+                <strong>200+</strong>
+                <span>Active students</span>
+              </div>
+              <div class="metric">
+                <strong>24/7</strong>
+                <span>Creative energy</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="showcase" aria-label="Creative club highlights">
+            <div class="spotlight"></div>
+            <div class="main-visual"></div>
+
+            <div class="floating-tag tag-a">
+              <span class="tag-icon">♫</span>
+              <div>
+                <strong>Rhythm</strong><br />
+                <small>Live sessions</small>
+              </div>
+            </div>
+
+            <div class="floating-tag tag-b">
+              <span class="tag-icon">✦</span>
+              <div>
+                <strong>Art</strong><br />
+                <small>We paint stories</small>
+              </div>
+            </div>
+
+            <div class="floating-tag tag-c">
+              <span class="tag-icon">⌘</span>
+              <div>
+                <strong>Tech</strong><br />
+                <small>Build the future</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" class="section">
+        <div class="container">
+          <div class="section-header">
+            <h2>One club. Endless creativity.</h2>
+            <p>
+              New Gen is a community where students explore talents, celebrate culture, and build confidence through expression, collaboration, and innovation.
+            </p>
+          </div>
+
+          <div class="feature-grid">
+            <article id="music-dance" class="feature-card">
+              <span class="eyebrow">Music & Dance</span>
+              <h3>Move the room.</h3>
+              <p>
+                We sing, dance, choreograph, and perform with energy that connects hearts and brings our school together through rhythm and movement.
+              </p>
+              <div class="mini-badges">
+                <span>Choir</span>
+                <span>Dance Crew</span>
+                <span>Open Mic</span>
+              </div>
+              <div class="feature-visual music-visual"></div>
+            </article>
+
+            <article id="art" class="feature-card">
+              <span class="eyebrow">Art</span>
+              <h3>Color outside the lines.</h3>
+              <p>
+                We explore drawing, painting, digital design, and visual storytelling to create bold ideas, beautiful work, and unforgettable exhibitions.
+              </p>
+              <div class="mini-badges">
+                <span>Illustration</span>
+                <span>Canvas</span>
+                <span>Design</span>
+              </div>
+              <div class="feature-visual art-visual"></div>
+            </article>
+
+            <article id="poetry" class="feature-card">
+              <span class="eyebrow">Poetry</span>
+              <h3>Write the words that stay.</h3>
+              <p>
+                Poetry nights, spoken word, and storytelling sessions give students a voice to express emotion, identity, and imagination with impact.
+              </p>
+              <div class="mini-badges">
+                <span>Spoken word</span>
+                <span>Storytelling</span>
+                <span>Open readings</span>
+              </div>
+              <div class="feature-visual poetry-visual"></div>
+            </article>
+
+            <article id="tech" class="feature-card">
+              <span class="eyebrow">Tech</span>
+              <h3>Build the next big idea.</h3>
+              <p>
+                We learn coding, digital media, problem solving, and creative tech skills that help students design, innovate, and lead in the digital world.
+              </p>
+              <div class="mini-badges">
+                <span>Coding</span>
+                <span>Robotics</span>
+                <span>Creative media</span>
+              </div>
+              <div class="feature-visual tech-visual"></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <div class="section-header">
+            <h2>Our creative highlights</h2>
+            <p>
+              From stage performances to digital projects, New Gen lives in every form of expression and every student who dares to be bold.
+            </p>
+          </div>
+
+          <div class="gallery-grid">
+            <div class="gallery-item">
+              <div class="gallery-overlay">
+                <strong>Dance showcases</strong>
+                <span>Energy, rhythm, expression</span>
+              </div>
+            </div>
+            <div class="gallery-item">
+              <div class="gallery-overlay">
+                <strong>Art exhibitions</strong>
+                <span>Original works and stories</span>
+              </div>
+            </div>
+            <div class="gallery-item">
+              <div class="gallery-overlay">
+                <strong>Poetry nights</strong>
+                <span>Heartfelt words and voice</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="join" class="section">
+        <div class="container">
+          <div class="cta-band">
+            <div>
+              <h3>Join the New Gen family.</h3>
+              <p>Bring your talent. Share your imagination. Grow with us.</p>
+            </div>
+            <a href="mailto:hello@newgen.club" class="btn btn-primary">Get involved</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container footer-wrap">
+        <div>
+          <strong>New Gen</strong><br />
+          Creativity that moves, inspires, and connects.
+        </div>
+
+        <div class="footer-links">
+          <a href="#music-dance">Music & Dance</a>
+          <a href="#art">Art</a>
+          <a href="#poetry">Poetry</a>
+          <a href="#tech">Tech</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const menuButton = document.querySelector('.menu-toggle');
+      const navLinks = document.querySelector('.nav-links');
+
+      if (menuButton && navLinks) {
+        menuButton.addEventListener('click', () => {
+          const visible = navLinks.style.display === 'flex';
+          navLinks.style.display = visible ? 'none' : 'flex';
+          navLinks.style.position = 'absolute';
+          navLinks.style.top = '78px';
+          navLinks.style.left = '18px';
+          navLinks.style.right = '18px';
+          navLinks.style.flexDirection = 'column';
+          navLinks.style.padding = '18px';
+          navLinks.style.background = 'rgba(12, 18, 32, 0.96)';
+          navLinks.style.border = '1px solid rgba(255,255,255,0.08)';
+          navLinks.style.borderRadius = '18px';
+        });
+      }
+    </script>
+  </body>
+</html>

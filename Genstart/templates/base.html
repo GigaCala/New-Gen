@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}New Gen{% endblock %}</title>
+    <meta name="description" content="New Gen school club: music, dance, art, poetry, and tech." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body>
+    <div class="theme-toggle-wrap">
+      <button class="theme-toggle" aria-label="Open theme settings">Theme</button>
+      <div class="theme-panel" id="themePanel" aria-label="Theme settings">
+        <p>Choose a mode</p>
+        <div class="theme-options">
+          <button class="theme-option active" data-theme-option="dark" type="button">Dark</button>
+          <button class="theme-option" data-theme-option="clean" type="button">Clean</button>
+          <button class="theme-option" data-theme-option="luxury" type="button">Luxury</button>
+        </div>
+      </div>
+    </div>
+
+    <header class="topbar">
+      <div class="container nav">
+        <a href="{{ url_for('home') }}" class="brand" aria-label="New Gen home">
+          <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="New Gen logo" class="brand-logo" />
+          <span class="brand-text">New Gen</span>
+        </a>
+
+        <nav class="nav-links" aria-label="Main navigation">
+          <a href="{{ url_for('home') }}">Home</a>
+          <a href="{{ url_for('music_dance') }}">Music & Dance</a>
+          <a href="{{ url_for('art') }}">Art</a>
+          <a href="{{ url_for('poetry') }}">Poetry</a>
+          <a href="{{ url_for('tech') }}">Tech</a>
+          <a href="{{ url_for('calendar') }}">Calendar</a>
+          <a href="{{ url_for('admin_login') }}">Admin</a>
+        </nav>
+
+        <a href="{{ url_for('home') }}#join" class="nav-cta">Join the Club</a>
+        <button class="menu-toggle" aria-label="Open menu">Menu</button>
+      </div>
+    </header>
+
+    {% block content %}{% endblock %}
+
+    <footer class="site-footer">
+      <div class="container footer-wrap">
+        <div>
+          <strong>New Gen</strong><br />
+          Creativity that moves, inspires, and connects.
+        </div>
+
+        <div class="footer-links">
+          <a href="{{ url_for('music_dance') }}">Music & Dance</a>
+          <a href="{{ url_for('art') }}">Art</a>
+          <a href="{{ url_for('poetry') }}">Poetry</a>
+          <a href="{{ url_for('tech') }}">Tech</a>
+          <a href="{{ url_for('calendar') }}">Calendar</a>
+          <a href="{{ url_for('admin_login') }}">Admin</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>

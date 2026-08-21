@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}New Gen | Admin Login{% endblock %}
+
+{% block content %}
+<main class="page-main admin-login-page">
+  <section class="container content-section reveal">
+    <div class="auth-card">
+      <span class="eyebrow">Restricted access</span>
+      <h1>Admin login</h1>
+      <p>Only authorized club leaders can update events and calendar content.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-list">
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="post" action="{{ url_for('admin_login') }}" class="auth-form">
+        <div class="form-row">
+          <label for="username">Username</label>
+          <input id="username" name="username" type="text" required />
+        </div>
+
+        <div class="form-row">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Log in</button>
+      </form>
+    </div>
+  </section>
+</main>
+{% endblock %}

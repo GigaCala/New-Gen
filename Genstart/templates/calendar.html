@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}New Gen | Calendar{% endblock %}
+
+{% block content %}
+<main class="page-main calendar-page">
+  <section class="page-hero reveal">
+    <div class="container hero-split">
+      <div>
+        <span class="eyebrow">Calendar</span>
+        <h1>Club moments to remember.</h1>
+        <p>From performances and showcases to workshops and creative labs, this is where New Gen comes alive.</p>
+      </div>
+      <div class="calendar-summary">
+        <div class="summary-pill">
+          <strong>{{ events|length }}</strong>
+          <span>scheduled events</span>
+        </div>
+        <a href="{{ url_for('admin') }}" class="btn btn-primary">Manage</a>
+      </div>
+    </div>
+  </section>
+
+  {% if featured_event %}
+  <section class="container content-section reveal">
+    <div class="featured-event">
+      <div class="featured-date">
+        <span>{{ featured_event.date[8:10] }}</span>
+        <small>{{ format_display_date(featured_event.date) }}</small>
+      </div>
+      <div class="featured-body">
+        <span class="event-tag">Featured event</span>
+        <h2>{{ featured_event.title }}</h2>
+        <p>{{ featured_event.description or 'A New Gen event for students to create, connect, and celebrate.' }}</p>
+        <div class="event-meta-row">
+          <span>{{ featured_event.category or 'Club Event' }}</span>
+          <span>{{ featured_event.location or 'School campus' }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="container content-section reveal">
+    {% if events %}
+      <div class="event-grid">
+        {% for event in events %}
+          <article class="event-card">
+            <div class="event-date">
+              <span>{{ event.date[8:10] }}</span>
+              <small>{{ format_display_date(event.date) }}</small>
+            </div>
+            <div class="event-body">
+              <span class="event-tag">{{ event.category or 'Club Event' }}</span>
+              <h2>{{ event.title }}</h2>
+              <p>{{ event.description or 'A New Gen event for students to create, connect, and celebrate.' }}</p>
+              <div class="event-meta">
+                <strong>Location:</strong> {{ event.location or 'School campus' }}
+              </div>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <h2>No events yet</h2>
+        <p>Use the admin page to add your first club event.</p>
+      </div>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}

@@ -85,6 +85,7 @@ html {
 }
 
 body {
+  position: relative;
   margin: 0;
   min-height: 100vh;
   font-family: 'Inter', sans-serif;
@@ -94,6 +95,96 @@ body {
     linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%);
   color: var(--text);
   transition: background 0.25s ease, color 0.25s ease;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 18px;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.9;
+  background-color: var(--pattern-base);
+  background-image:
+    linear-gradient(135deg, transparent 0 34%, var(--pattern-accent) 35% 48%, transparent 49% 100%),
+    linear-gradient(45deg, transparent 0 34%, var(--pattern-highlight) 35% 48%, transparent 49% 100%),
+    repeating-linear-gradient(
+      0deg,
+      var(--pattern-primary) 0 10px,
+      var(--pattern-secondary) 10px 14px,
+      var(--pattern-primary) 14px 24px
+    );
+  background-size: 18px 24px, 18px 24px, 18px 48px;
+  box-shadow: 0 0 28px var(--pattern-glow);
+}
+
+body::before {
+  left: 0;
+}
+
+body::after {
+  right: 0;
+  transform: scaleX(-1);
+}
+
+body[data-theme="clean"]::before,
+body[data-theme="clean"]::after {
+  background-color: #dff5ee;
+  background-image:
+    radial-gradient(circle at 50% 22%, var(--pattern-highlight) 0 3px, transparent 3.5px),
+    linear-gradient(45deg, transparent 0 42%, var(--pattern-accent) 43% 56%, transparent 57%),
+    repeating-linear-gradient(
+      0deg,
+      var(--pattern-primary) 0 8px,
+      var(--pattern-secondary) 8px 12px,
+      var(--pattern-primary) 12px 22px
+    );
+  background-size: 18px 28px, 18px 28px, 18px 44px;
+}
+
+body[data-theme="luxury"]::before,
+body[data-theme="luxury"]::after {
+  background-color: #261b0d;
+  background-image:
+    radial-gradient(circle at 50% 50%, var(--pattern-highlight) 0 2px, transparent 2.5px),
+    linear-gradient(135deg, transparent 0 42%, var(--pattern-accent) 43% 56%, transparent 57%),
+    repeating-linear-gradient(
+      0deg,
+      var(--pattern-primary) 0 9px,
+      var(--pattern-secondary) 9px 13px,
+      var(--pattern-primary) 13px 25px
+    );
+  background-size: 18px 24px, 18px 24px, 18px 50px;
+}
+
+body[data-theme="dark"] {
+  --pattern-base: #151334;
+  --pattern-primary: #ff5edb;
+  --pattern-secondary: #45d0ff;
+  --pattern-accent: #ffd166;
+  --pattern-highlight: #7df3c7;
+  --pattern-glow: rgba(139, 92, 246, 0.28);
+}
+
+body[data-theme="clean"] {
+  --pattern-base: #dff5ee;
+  --pattern-primary: #197f75;
+  --pattern-secondary: #f07f4f;
+  --pattern-accent: #553c9a;
+  --pattern-highlight: #e8ad35;
+  --pattern-glow: rgba(44, 204, 163, 0.2);
+}
+
+body[data-theme="luxury"] {
+  --pattern-base: #261b0d;
+  --pattern-primary: #b3772b;
+  --pattern-secondary: #5f3b1f;
+  --pattern-accent: #e7c477;
+  --pattern-highlight: #f5dfaa;
+  --pattern-glow: rgba(217, 177, 90, 0.2);
 }
 
 .theme-toggle-wrap {
@@ -773,6 +864,12 @@ h1 {
 }
 
 @media (max-width: 720px) {
+  body::before,
+  body::after {
+    width: 10px;
+    background-size: 10px 20px, 10px 20px, 10px 40px;
+  }
+
   .nav-links { display: none; }
   .menu-toggle { display: inline-flex; }
   .hero { padding-top: 60px; }

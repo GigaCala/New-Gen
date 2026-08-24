@@ -19,5 +19,6 @@ when running it on another port.
 - `SESSION_SECRET` is required for Flask sessions. `NEWGEN_SECRET_KEY` can be
   be used instead when an explicitly dedicated session secret is preferred.
 - `NEWGEN_ADMIN_USER` and `NEWGEN_ADMIN_PASS` are required for the admin login.
-  Configure them as protected Replit Secrets before starting the app.
+  Configure them as protected Replit Secrets before enabling admin access. The
+  public pages remain available while admin access is disabled.
 - Events are stored in `events.json`.

@@ -12,8 +12,7 @@ app.secret_key = SESSION_SECRET
 
 ADMIN_USERNAME = os.environ.get('NEWGEN_ADMIN_USER')
 ADMIN_PASSWORD = os.environ.get('NEWGEN_ADMIN_PASS')
-if not ADMIN_USERNAME or not ADMIN_PASSWORD:
-    raise RuntimeError('NEWGEN_ADMIN_USER and NEWGEN_ADMIN_PASS must be configured.')
+ADMIN_CREDENTIALS_CONFIGURED = bool(ADMIN_USERNAME and ADMIN_PASSWORD)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 EVENTS_FILE = os.path.join(BASE_DIR, 'events.json')
@@ -76,6 +75,10 @@ def calendar():
 def admin_login():
     if is_admin_logged_in():
         return redirect(url_for('admin'))
+
+    if not ADMIN_CREDENTIALS_CONFIGURED:
+        flash('Admin access is unavailable until secure credentials are configured.', 'error')
+        return render_template('admin_login.html'), 503
 
     if request.method == 'POST':
         username = request.form.get('username', '').strip()

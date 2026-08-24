@@ -5,10 +5,15 @@ import uuid
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('NEWGEN_SECRET_KEY', 'newgen-secret-key-2026')
+SESSION_SECRET = os.environ.get('NEWGEN_SECRET_KEY') or os.environ.get('SESSION_SECRET')
+if not SESSION_SECRET:
+    raise RuntimeError('SESSION_SECRET or NEWGEN_SECRET_KEY must be configured.')
+app.secret_key = SESSION_SECRET
 
-ADMIN_USERNAME = os.environ.get('NEWGEN_ADMIN_USER', 'newgenadmin')
-ADMIN_PASSWORD = os.environ.get('NEWGEN_ADMIN_PASS', 'NewGen2026!')
+ADMIN_USERNAME = os.environ.get('NEWGEN_ADMIN_USER')
+ADMIN_PASSWORD = os.environ.get('NEWGEN_ADMIN_PASS')
+if not ADMIN_USERNAME or not ADMIN_PASSWORD:
+    raise RuntimeError('NEWGEN_ADMIN_USER and NEWGEN_ADMIN_PASS must be configured.')
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 EVENTS_FILE = os.path.join(BASE_DIR, 'events.json')
@@ -177,4 +182,8 @@ def build_iso_date(day, month, year):
 app.jinja_env.globals['format_display_date'] = format_display_date
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8000)
+    app.run(
+        debug=os.environ.get('FLASK_DEBUG') == '1',
+        host='0.0.0.0',
+        port=int(os.environ.get('PORT', '5000')),
+    )

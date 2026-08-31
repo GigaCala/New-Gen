@@ -1,13 +1,9 @@
-```python
 import json
 import os
 import uuid
-import random
-import sqlite3
 import secrets
-import smtplib
-from email.message import EmailMessage
-from datetime import datetime, timedelta
+import sqlite3
+from datetime import datetime, timezone
 
 from flask import (
     Flask,
@@ -17,17 +13,16 @@ from flask import (
     request,
     session,
     url_for,
-    jsonify,
 )
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-app = Flask(__name__)
+# ============================================================
+# APP SETUP
+# ============================================================
 
-# ============================================================
-# SECURITY
-# ============================================================
+app = Flask(__name__)
 
 SESSION_SECRET = (
     os.environ.get("NEWGEN_SECRET_KEY")
@@ -41,10 +36,6 @@ if not SESSION_SECRET:
 
 app.secret_key = SESSION_SECRET
 
-# ============================================================
-# ADMIN
-# ============================================================
-
 ADMIN_USERNAME = os.environ.get("NEWGEN_ADMIN_USER")
 ADMIN_PASSWORD = os.environ.get("NEWGEN_ADMIN_PASS")
 
@@ -52,32 +43,10 @@ ADMIN_CREDENTIALS_CONFIGURED = bool(
     ADMIN_USERNAME and ADMIN_PASSWORD
 )
 
-# ============================================================
-# EMAIL SETTINGS
-# ============================================================
-
-EMAIL_HOST = os.environ.get("EMAIL_HOST")
-EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
-EMAIL_USERNAME = os.environ.get("EMAIL_USERNAME")
-EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
-EMAIL_FROM = os.environ.get("EMAIL_FROM") or EMAIL_USERNAME
-
-
-# ============================================================
-# FILE LOCATIONS
-# ============================================================
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-EVENTS_FILE = os.path.join(
-    BASE_DIR,
-    "events.json"
-)
-
-DATABASE_FILE = os.path.join(
-    BASE_DIR,
-    "users.db"
-)
+EVENTS_FILE = os.path.join(BASE_DIR, "events.json")
+DATABASE_FILE = os.path.join(BASE_DIR, "users.db")
 
 
 # ============================================================
@@ -91,24 +60,34 @@ def get_db():
 
 
 def init_database():
-
     connection = get_db()
 
-    connection.execute("""
+    connection.execute(
+        """
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            phone TEXT,
+
+            first_name TEXT NOT NULL,
+            last_name TEXT NOT NULL,
+            username TEXT NOT NULL UNIQUE,
+
+            email TEXT NOT NULL UNIQUE,
+            phone TEXT NOT NULL,
+
+            school TEXT NOT NULL,
+            class_name TEXT NOT NULL,
+            group_name TEXT NOT NULL,
+
             password_hash TEXT NOT NULL,
-            verified INTEGER DEFAULT 0,
-            verification_code TEXT,
-            verification_expires TEXT,
-            reset_code TEXT,
-            reset_expires TEXT,
+
+            email_verified INTEGER NOT NULL DEFAULT 0,
+            phone_verified INTEGER NOT NULL DEFAULT 0,
+
+            verification_token TEXT,
             created_at TEXT NOT NULL
         )
-    """)
+        """
+    )
 
     connection.commit()
     connection.close()
@@ -118,107 +97,24 @@ init_database()
 
 
 # ============================================================
-# EMAIL
-# ============================================================
-
-def send_email(to_email, subject, body):
-
-    if not EMAIL_HOST or not EMAIL_USERNAME or not EMAIL_PASSWORD:
-        print("EMAIL SETTINGS ARE NOT CONFIGURED.")
-        print("Email would have been sent to:", to_email)
-        print("Subject:", subject)
-        print("Message:", body)
-        return False
-
-    message = EmailMessage()
-
-    message["Subject"] = subject
-    message["From"] = EMAIL_FROM
-    message["To"] = to_email
-
-    message.set_content(body)
-
-    try:
-
-        with smtplib.SMTP(
-            EMAIL_HOST,
-            EMAIL_PORT
-        ) as server:
-
-            server.starttls()
-
-            server.login(
-                EMAIL_USERNAME,
-                EMAIL_PASSWORD
-            )
-
-            server.send_message(message)
-
-        return True
-
-    except Exception as error:
-
-        print("EMAIL ERROR:", error)
-
-        return False
-
-
-# ============================================================
-# OTP
-# ============================================================
-
-def generate_otp():
-
-    return f"{random.randint(0, 999999):06d}"
-
-
-def otp_expiration():
-
-    return (
-        datetime.utcnow()
-        + timedelta(minutes=10)
-    ).isoformat()
-
-
-# ============================================================
 # EVENTS
 # ============================================================
 
 def load_events():
-
     if not os.path.exists(EVENTS_FILE):
         return []
 
-    with open(
-        EVENTS_FILE,
-        "r",
-        encoding="utf-8"
-    ) as file:
-
+    with open(EVENTS_FILE, "r", encoding="utf-8") as file:
         try:
-
             data = json.load(file)
-
             return data if isinstance(data, list) else []
-
         except json.JSONDecodeError:
-
             return []
 
 
 def save_events(events):
-
-    with open(
-        EVENTS_FILE,
-        "w",
-        encoding="utf-8"
-    ) as file:
-
-        json.dump(
-            events,
-            file,
-            indent=2
-        )
+    with open(EVENTS_FILE, "w", encoding="utf-8") as file:
+        json.dump(events, file, indent=2)
 
 
 # ============================================================
@@ -226,10 +122,33 @@ def save_events(events):
 # ============================================================
 
 def is_admin_logged_in():
+    return session.get("admin_logged_in") is True
 
-    return session.get(
-        "admin_logged_in"
-    ) is True
+
+# ============================================================
+# MEMBER AUTHENTICATION
+# ============================================================
+
+def is_member_logged_in():
+    return session.get("member_logged_in") is True
+
+
+def get_current_member():
+    user_id = session.get("member_id")
+
+    if not user_id:
+        return None
+
+    connection = get_db()
+
+    user = connection.execute(
+        "SELECT * FROM users WHERE id = ?",
+        (user_id,),
+    ).fetchone()
+
+    connection.close()
+
+    return user
 
 
 # ============================================================
@@ -238,7 +157,6 @@ def is_admin_logged_in():
 
 @app.route("/")
 def home():
-
     events = sorted(
         load_events(),
         key=lambda event: event.get("date", "")
@@ -246,434 +164,328 @@ def home():
 
     return render_template(
         "index.html",
-        events=events
+        events=events,
+        member=get_current_member(),
     )
 
 
 # ============================================================
-# CLUB PAGES
+# CREATIVE PAGES
 # ============================================================
 
 @app.route("/music-dance")
 def music_dance():
-
-    return render_template(
-        "music_dance.html"
-    )
+    return render_template("music_dance.html")
 
 
 @app.route("/art")
 def art():
-
-    return render_template(
-        "art.html"
-    )
+    return render_template("art.html")
 
 
 @app.route("/poetry")
 def poetry():
-
-    return render_template(
-        "poetry.html"
-    )
+    return render_template("poetry.html")
 
 
 @app.route("/tech")
 def tech():
+    return render_template("tech.html")
 
-    return render_template(
-        "tech.html"
-    )
 
+# ============================================================
+# CALENDAR
+# ============================================================
 
 @app.route("/calendar")
 def calendar():
-
     events = sorted(
         load_events(),
         key=lambda event: event.get("date", "")
     )
 
-    featured_event = (
-        events[0]
-        if events
-        else None
-    )
+    featured_event = events[0] if events else None
 
     return render_template(
         "calendar.html",
         events=events,
-        featured_event=featured_event
+        featured_event=featured_event,
     )
 
 
 # ============================================================
-# MEMBER REGISTRATION
+# MEMBER SIGNUP
 # ============================================================
 
-@app.route(
-    "/register",
-    methods=["GET", "POST"]
-)
-def register():
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
 
-    if session.get("user_id"):
-
-        return redirect(
-            url_for("dashboard")
-        )
+    if is_member_logged_in():
+        return redirect(url_for("home"))
 
     if request.method == "POST":
 
-        name = request.form.get(
-            "name",
-            ""
+        first_name = request.form.get(
+            "first_name", ""
+        ).strip()
+
+        last_name = request.form.get(
+            "last_name", ""
+        ).strip()
+
+        username = request.form.get(
+            "username", ""
         ).strip()
 
         email = request.form.get(
-            "email",
-            ""
+            "email", ""
         ).strip().lower()
 
         phone = request.form.get(
-            "phone",
-            ""
+            "phone", ""
+        ).strip()
+
+        school = request.form.get(
+            "school", ""
+        ).strip()
+
+        class_name = request.form.get(
+            "class_name", ""
+        ).strip()
+
+        group_name = request.form.get(
+            "group_name", ""
         ).strip()
 
         password = request.form.get(
-            "password",
-            ""
+            "password", ""
         )
 
-        if not name or not email or not password:
+        confirm_password = request.form.get(
+            "confirm_password", ""
+        )
 
+        # ----------------------------------------------------
+        # BASIC VALIDATION
+        # ----------------------------------------------------
+
+        if not all([
+            first_name,
+            last_name,
+            username,
+            email,
+            phone,
+            school,
+            class_name,
+            group_name,
+            password,
+            confirm_password,
+        ]):
             flash(
-                "Please complete all required fields.",
+                "Please complete every field.",
                 "error"
             )
 
-            return render_template(
-                "register.html"
-            )
+            return render_template("signup.html")
 
-        if "@" not in email or "." not in email:
-
+        if password != confirm_password:
             flash(
-                "Please enter a valid email address.",
+                "Passwords do not match.",
                 "error"
             )
 
-            return render_template(
-                "register.html"
-            )
+            return render_template("signup.html")
 
         if len(password) < 8:
-
             flash(
-                "Password must contain at least 8 characters.",
+                "Password must be at least 8 characters.",
                 "error"
             )
 
-            return render_template(
-                "register.html"
+            return render_template("signup.html")
+
+        allowed_classes = {
+            "Form 1",
+            "Form 2",
+            "Form 3",
+        }
+
+        allowed_groups = {
+            "Music & Dance",
+            "Tech",
+            "Art",
+            "Poetry",
+            "Fashion",
+        }
+
+        if class_name not in allowed_classes:
+            flash(
+                "Please select a valid class.",
+                "error"
             )
+
+            return render_template("signup.html")
+
+        if group_name not in allowed_groups:
+            flash(
+                "Please select a valid New Gen group.",
+                "error"
+            )
+
+            return render_template("signup.html")
+
+        # ----------------------------------------------------
+        # CHECK EXISTING ACCOUNT
+        # ----------------------------------------------------
 
         connection = get_db()
 
-        existing = connection.execute(
-            "SELECT id FROM users WHERE email = ?",
-            (email,)
+        existing_user = connection.execute(
+            """
+            SELECT id
+            FROM users
+            WHERE email = ? OR username = ?
+            """,
+            (email, username),
         ).fetchone()
 
-        if existing:
-
+        if existing_user:
             connection.close()
 
             flash(
-                "An account with this email already exists.",
+                "That email or username is already registered.",
                 "error"
             )
 
-            return render_template(
-                "register.html"
-            )
+            return render_template("signup.html")
 
-        verification_code = generate_otp()
+        # ----------------------------------------------------
+        # HASH PASSWORD
+        # ----------------------------------------------------
 
-        expiration = otp_expiration()
+        password_hash = generate_password_hash(password)
 
-        password_hash = generate_password_hash(
-            password
-        )
+        # ----------------------------------------------------
+        # EMAIL VERIFICATION TOKEN
+        # ----------------------------------------------------
+
+        verification_token = secrets.token_urlsafe(32)
+
+        created_at = datetime.now(
+            timezone.utc
+        ).isoformat()
+
+        # ----------------------------------------------------
+        # SAVE MEMBER
+        # ----------------------------------------------------
 
         connection.execute(
             """
-            INSERT INTO users
-            (
-                name,
+            INSERT INTO users (
+                first_name,
+                last_name,
+                username,
                 email,
                 phone,
+                school,
+                class_name,
+                group_name,
                 password_hash,
-                verified,
-                verification_code,
-                verification_expires,
+                email_verified,
+                phone_verified,
+                verification_token,
                 created_at
             )
-            VALUES (?, ?, ?, ?, 0, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
-                name,
+                first_name,
+                last_name,
+                username,
                 email,
                 phone,
+                school,
+                class_name,
+                group_name,
                 password_hash,
-                verification_code,
-                expiration,
-                datetime.utcnow().isoformat()
-            )
+                0,
+                0,
+                verification_token,
+                created_at,
+            ),
         )
 
         connection.commit()
-
-        user = connection.execute(
-            "SELECT id FROM users WHERE email = ?",
-            (email,)
-        ).fetchone()
-
         connection.close()
-
-        send_email(
-            email,
-            "Verify your New Gen account",
-            f"""
-Welcome to New Gen!
-
-Your verification code is:
-
-{verification_code}
-
-This code expires in 10 minutes.
-
-If you did not create this account, you can ignore this email.
-"""
-        )
-
-        session["verification_user_id"] = user["id"]
-
-        return redirect(
-            url_for("verify")
-        )
-
-    return render_template(
-        "register.html"
-    )
-
-
-# ============================================================
-# EMAIL VERIFICATION
-# ============================================================
-
-@app.route(
-    "/verify",
-    methods=["GET", "POST"]
-)
-def verify():
-
-    user_id = session.get(
-        "verification_user_id"
-    )
-
-    if not user_id:
-
-        return redirect(
-            url_for("register")
-        )
-
-    connection = get_db()
-
-    user = connection.execute(
-        "SELECT * FROM users WHERE id = ?",
-        (user_id,)
-    ).fetchone()
-
-    if not user:
-
-        connection.close()
-
-        session.pop(
-            "verification_user_id",
-            None
-        )
-
-        return redirect(
-            url_for("register")
-        )
-
-    if request.method == "POST":
-
-        code = request.form.get(
-            "code",
-            ""
-        ).strip()
-
-        if user["verification_expires"]:
-
-            expires = datetime.fromisoformat(
-                user["verification_expires"]
-            )
-
-            if datetime.utcnow() > expires:
-
-                connection.close()
-
-                flash(
-                    "That verification code has expired.",
-                    "error"
-                )
-
-                return render_template(
-                    "verify.html",
-                    email=user["email"]
-                )
-
-        if code != user["verification_code"]:
-
-            connection.close()
-
-            flash(
-                "Incorrect verification code.",
-                "error"
-            )
-
-            return render_template(
-                "verify.html",
-                email=user["email"]
-            )
-
-        connection.execute(
-            """
-            UPDATE users
-            SET verified = 1,
-                verification_code = NULL,
-                verification_expires = NULL
-            WHERE id = ?
-            """,
-            (user_id,)
-        )
-
-        connection.commit()
-
-        connection.close()
-
-        session.pop(
-            "verification_user_id",
-            None
-        )
-
-        session["user_id"] = user_id
 
         flash(
-            "Email verified successfully!",
+            "Account created successfully. "
+            "Email verification will be sent next.",
             "success"
         )
 
-        return redirect(
-            url_for("dashboard")
-        )
+        return redirect(url_for("login"))
 
-    connection.close()
-
-    return render_template(
-        "verify.html",
-        email=user["email"]
-    )
+    return render_template("signup.html")
 
 
 # ============================================================
-# LOGIN
+# MEMBER LOGIN
 # ============================================================
 
-@app.route(
-    "/login",
-    methods=["GET", "POST"]
-)
+@app.route("/login", methods=["GET", "POST"])
 def login():
 
-    if session.get("user_id"):
-
-        return redirect(
-            url_for("dashboard")
-        )
+    if is_member_logged_in():
+        return redirect(url_for("home"))
 
     if request.method == "POST":
 
-        email = request.form.get(
-            "email",
-            ""
-        ).strip().lower()
+        login_value = request.form.get(
+            "login", ""
+        ).strip()
 
         password = request.form.get(
-            "password",
-            ""
+            "password", ""
         )
 
         connection = get_db()
 
         user = connection.execute(
-            "SELECT * FROM users WHERE email = ?",
-            (email,)
+            """
+            SELECT *
+            FROM users
+            WHERE email = ? OR username = ?
+            """,
+            (login_value.lower(), login_value),
         ).fetchone()
 
         connection.close()
 
-        if not user:
-
-            flash(
-                "Incorrect email or password.",
-                "error"
-            )
-
-            return render_template(
-                "login.html"
-            )
-
-        if not check_password_hash(
+        if not user or not check_password_hash(
             user["password_hash"],
             password
         ):
-
             flash(
-                "Incorrect email or password.",
+                "Incorrect username/email or password.",
                 "error"
             )
 
-            return render_template(
-                "login.html"
-            )
-
-        if not user["verified"]:
-
-            session["verification_user_id"] = user["id"]
-
-            flash(
-                "Please verify your email first.",
-                "error"
-            )
-
-            return redirect(
-                url_for("verify")
-            )
+            return render_template("login.html")
 
         session.clear()
 
-        session["user_id"] = user["id"]
+        session["member_logged_in"] = True
+        session["member_id"] = user["id"]
 
-        return redirect(
-            url_for("dashboard")
+        flash(
+            f"Welcome back, {user['first_name']}!",
+            "success"
         )
 
-    return render_template(
-        "login.html"
-    )
+        return redirect(url_for("home"))
+
+    return render_template("login.html")
 
 
 # ============================================================
@@ -683,124 +495,73 @@ def login():
 @app.route("/logout")
 def logout():
 
-    session.pop(
-        "user_id",
-        None
-    )
+    session.pop("member_logged_in", None)
+    session.pop("member_id", None)
 
     flash(
         "You have been logged out.",
         "success"
     )
 
-    return redirect(
-        url_for("home")
-    )
+    return redirect(url_for("home"))
 
 
 # ============================================================
-# DASHBOARD
+# EMAIL VERIFICATION
 # ============================================================
 
-@app.route("/dashboard")
-def dashboard():
-
-    user_id = session.get(
-        "user_id"
-    )
-
-    if not user_id:
-
-        return redirect(
-            url_for("login")
-        )
+@app.route("/verify-email/<token>")
+def verify_email(token):
 
     connection = get_db()
 
     user = connection.execute(
         """
-        SELECT id, name, email, phone, verified
+        SELECT *
         FROM users
-        WHERE id = ?
+        WHERE verification_token = ?
         """,
-        (user_id,)
+        (token,),
     ).fetchone()
 
-    connection.close()
-
     if not user:
+        connection.close()
 
-        session.clear()
-
-        return redirect(
-            url_for("login")
+        return render_template(
+            "verify_email.html",
+            success=False,
+            message="This verification link is invalid or has expired."
         )
+
+    connection.execute(
+        """
+        UPDATE users
+        SET email_verified = 1,
+            verification_token = NULL
+        WHERE id = ?
+        """,
+        (user["id"],),
+    )
+
+    connection.commit()
+    connection.close()
 
     return render_template(
-        "dashboard.html",
-        user=user
+        "verify_email.html",
+        success=True,
+        message="Your email has been successfully verified!"
     )
-
-
-# ============================================================
-# CURRENT USER API
-# ============================================================
-
-@app.route("/api/me")
-def api_me():
-
-    user_id = session.get(
-        "user_id"
-    )
-
-    if not user_id:
-
-        return jsonify({
-            "logged_in": False
-        })
-
-    connection = get_db()
-
-    user = connection.execute(
-        """
-        SELECT id, name, email
-        FROM users
-        WHERE id = ?
-        """,
-        (user_id,)
-    ).fetchone()
-
-    connection.close()
-
-    if not user:
-
-        return jsonify({
-            "logged_in": False
-        })
-
-    return jsonify({
-        "logged_in": True,
-        "id": user["id"],
-        "name": user["name"],
-        "email": user["email"]
-    })
 
 
 # ============================================================
 # ADMIN LOGIN
 # ============================================================
 
-@app.route(
-    "/admin/login",
-    methods=["GET", "POST"]
-)
+@app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
 
     if is_admin_logged_in():
-
-        return redirect(
-            url_for("admin")
-        )
+        return redirect(url_for("admin"))
 
     if not ADMIN_CREDENTIALS_CONFIGURED:
 
@@ -816,20 +577,17 @@ def admin_login():
     if request.method == "POST":
 
         username = request.form.get(
-            "username",
-            ""
+            "username", ""
         ).strip()
 
         password = request.form.get(
-            "password",
-            ""
+            "password", ""
         ).strip()
 
         if (
             username == ADMIN_USERNAME
             and password == ADMIN_PASSWORD
         ):
-
             session["admin_logged_in"] = True
 
             flash(
@@ -837,9 +595,7 @@ def admin_login():
                 "success"
             )
 
-            return redirect(
-                url_for("admin")
-            )
+            return redirect(url_for("admin"))
 
         flash(
             "Incorrect username or password.",
@@ -858,33 +614,22 @@ def admin_login():
 @app.route("/admin/logout")
 def admin_logout():
 
-    session.pop(
-        "admin_logged_in",
-        None
-    )
+    session.pop("admin_logged_in", None)
 
     flash(
         "You have been logged out.",
         "success"
     )
 
-    return redirect(
-        url_for("admin_login")
-    )
+    return redirect(url_for("admin_login"))
 
 
 # ============================================================
 # ADMIN EVENT MANAGEMENT
 # ============================================================
 
-@app.route(
-    "/admin",
-    methods=["GET", "POST"]
-)
-@app.route(
-    "/admin/edit/<event_id>",
-    methods=["GET", "POST"]
-)
+@app.route("/admin", methods=["GET", "POST"])
+@app.route("/admin/edit/<event_id>", methods=["GET", "POST"])
 def admin(event_id=None):
 
     if not is_admin_logged_in():
@@ -894,22 +639,16 @@ def admin(event_id=None):
             "error"
         )
 
-        return redirect(
-            url_for("admin_login")
-        )
+        return redirect(url_for("admin_login"))
 
     events = sorted(
         load_events(),
-        key=lambda event: event.get(
-            "date",
-            ""
-        )
+        key=lambda event: event.get("date", "")
     )
 
     current_event = next(
         (
-            event
-            for event in events
+            event for event in events
             if event.get("id") == event_id
         ),
         None
@@ -923,38 +662,31 @@ def admin(event_id=None):
         )
 
         title = request.form.get(
-            "title",
-            ""
+            "title", ""
         ).strip()
 
         day = request.form.get(
-            "day",
-            ""
+            "day", ""
         ).strip()
 
         month = request.form.get(
-            "month",
-            ""
+            "month", ""
         ).strip()
 
         year = request.form.get(
-            "year",
-            ""
+            "year", ""
         ).strip()
 
         category = request.form.get(
-            "category",
-            ""
+            "category", ""
         ).strip()
 
         location = request.form.get(
-            "location",
-            ""
+            "location", ""
         ).strip()
 
         description = request.form.get(
-            "description",
-            ""
+            "description", ""
         ).strip()
 
         date_value = build_iso_date(
@@ -994,54 +726,39 @@ def admin(event_id=None):
         ):
 
             updated_events = [
-                (
-                    event_data
-                    if item.get("id") == event_id_value
-                    else item
-                )
+                event_data
+                if item.get("id") == event_id_value
+                else item
                 for item in existing_events
             ]
 
         else:
-
             updated_events = (
-                existing_events
-                + [event_data]
+                existing_events + [event_data]
             )
 
-        save_events(
-            updated_events
-        )
+        save_events(updated_events)
 
         flash(
             "Event saved successfully.",
             "success"
         )
 
-        return redirect(
-            url_for("admin")
-        )
+        return redirect(url_for("admin"))
 
     return render_template(
         "admin.html",
         events=events,
         event=current_event,
-        mode=(
-            "Edit"
-            if current_event
-            else "Create"
-        )
+        mode="Edit" if current_event else "Create"
     )
 
 
 # ============================================================
-# DELETE EVENT
+# ADMIN DELETE EVENT
 # ============================================================
 
-@app.route(
-    "/admin/delete/<event_id>",
-    methods=["POST"]
-)
+@app.route("/admin/delete/<event_id>", methods=["POST"])
 def delete_event(event_id):
 
     if not is_admin_logged_in():
@@ -1051,29 +768,68 @@ def delete_event(event_id):
             "error"
         )
 
-        return redirect(
-            url_for("admin_login")
-        )
+        return redirect(url_for("admin_login"))
 
     events = load_events()
 
     remaining = [
-        event
-        for event in events
+        event for event in events
         if event.get("id") != event_id
     ]
 
-    save_events(
-        remaining
-    )
+    save_events(remaining)
 
     flash(
         "Event deleted successfully.",
         "success"
     )
 
-    return redirect(
-        url_for("admin")
+    return redirect(url_for("admin"))
+
+
+# ============================================================
+# ADMIN MEMBER LIST
+# ============================================================
+
+@app.route("/admin/members")
+def admin_members():
+
+    if not is_admin_logged_in():
+
+        flash(
+            "Please log in as an administrator.",
+            "error"
+        )
+
+        return redirect(url_for("admin_login"))
+
+    connection = get_db()
+
+    members = connection.execute(
+        """
+        SELECT
+            id,
+            first_name,
+            last_name,
+            username,
+            email,
+            phone,
+            school,
+            class_name,
+            group_name,
+            email_verified,
+            phone_verified,
+            created_at
+        FROM users
+        ORDER BY created_at DESC
+        """
+    ).fetchall()
+
+    connection.close()
+
+    return render_template(
+        "members.html",
+        members=members
     )
 
 
@@ -1087,30 +843,21 @@ def format_display_date(value):
         return ""
 
     try:
-
         year, month, day = value.split("-")
 
         return f"{day}/{month}/{year}"
 
     except ValueError:
-
         return value
 
 
-def build_iso_date(
-    day,
-    month,
-    year
-):
+def build_iso_date(day, month, year):
 
     day = str(day).strip().zfill(2)
-
     month = str(month).strip().zfill(2)
-
     year = str(year).strip()
 
     if not day or not month or not year:
-
         return ""
 
     return f"{year}-{month}-{day}"
@@ -1122,23 +869,15 @@ app.jinja_env.globals[
 
 
 # ============================================================
-# RUN SERVER
+# RUN
 # ============================================================
 
 if __name__ == "__main__":
 
     app.run(
-        debug=(
-            os.environ.get(
-                "FLASK_DEBUG"
-            ) == "1"
-        ),
+        debug=os.environ.get("FLASK_DEBUG") == "1",
         host="0.0.0.0",
         port=int(
-            os.environ.get(
-                "PORT",
-                "5000"
-            )
+            os.environ.get("PORT", "5000")
         ),
     )
-```

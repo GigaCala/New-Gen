@@ -557,7 +557,16 @@
           <a href="#tech">Tech</a>
         </nav>
 
-        <a href="#join" class="nav-cta">Join the Club</a>
+        <div id="authButtons" style="display:flex; gap:10px; align-items:center;">
+          <a href="/login" class="btn btn-secondary">Login</a>
+          <a href="/register" class="nav-cta">Sign Up</a>
+        </div>
+
+        <div id="userPanel" style="display:none; gap:10px; align-items:center;">
+          <span id="username" style="color:white; font-weight:600;"></span>
+          <a href="/dashboard" class="btn btn-secondary">Dashboard</a>
+          <a href="/logout" class="nav-cta" style="background:#ef4444;">Logout</a>
+        </div>
         <button class="menu-toggle" aria-label="Open menu">Menu</button>
       </div>
     </header>
@@ -577,7 +586,7 @@
             </p>
 
             <div class="cta-row">
-              <a href="#join" class="btn btn-primary">Become a member</a>
+              <a href="/register" class="btn btn-primary">Become a Member</a>
               <a href="#about" class="btn btn-secondary">Discover more</a>
             </div>
 
@@ -759,24 +768,37 @@
     </footer>
 
     <script>
-      const menuButton = document.querySelector('.menu-toggle');
-      const navLinks = document.querySelector('.nav-links');
+const menuButton = document.querySelector('.menu-toggle');
+const navLinks = document.querySelector('.nav-links');
 
-      if (menuButton && navLinks) {
-        menuButton.addEventListener('click', () => {
-          const visible = navLinks.style.display === 'flex';
-          navLinks.style.display = visible ? 'none' : 'flex';
-          navLinks.style.position = 'absolute';
-          navLinks.style.top = '78px';
-          navLinks.style.left = '18px';
-          navLinks.style.right = '18px';
-          navLinks.style.flexDirection = 'column';
-          navLinks.style.padding = '18px';
-          navLinks.style.background = 'rgba(12, 18, 32, 0.96)';
-          navLinks.style.border = '1px solid rgba(255,255,255,0.08)';
-          navLinks.style.borderRadius = '18px';
-        });
-      }
-    </script>
+if (menuButton && navLinks) {
+    menuButton.addEventListener('click', () => {
+        const visible = navLinks.style.display === 'flex';
+
+        navLinks.style.display = visible ? 'none' : 'flex';
+        navLinks.style.position = 'absolute';
+        navLinks.style.top = '78px';
+        navLinks.style.left = '18px';
+        navLinks.style.right = '18px';
+        navLinks.style.flexDirection = 'column';
+        navLinks.style.padding = '18px';
+        navLinks.style.background = 'rgba(12,18,32,.96)';
+        navLinks.style.border = '1px solid rgba(255,255,255,.08)';
+        navLinks.style.borderRadius = '18px';
+    });
+}
+
+// Check if user is logged in
+fetch("/api/me")
+.then(res => res.json())
+.then(user => {
+    if(user.logged_in){
+        document.getElementById("authButtons").style.display = "none";
+        document.getElementById("userPanel").style.display = "flex";
+        document.getElementById("username").textContent = user.name;
+    }
+})
+.catch(()=>{});
+</script>
   </body>
 </html>

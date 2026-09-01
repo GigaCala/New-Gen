@@ -62,6 +62,7 @@ def get_db():
 def init_database():
     connection = get_db()
 
+    # Main members table
     connection.execute(
         """
         CREATE TABLE IF NOT EXISTS users (
@@ -78,16 +79,88 @@ def init_database():
             class_name TEXT NOT NULL,
             group_name TEXT NOT NULL,
 
+            reason_for_joining TEXT NOT NULL DEFAULT '',
+
             password_hash TEXT NOT NULL,
 
             email_verified INTEGER NOT NULL DEFAULT 0,
             phone_verified INTEGER NOT NULL DEFAULT 0,
 
             verification_token TEXT,
+
+            role TEXT NOT NULL DEFAULT 'member',
+
             created_at TEXT NOT NULL
         )
         """
     )
+
+    # Executive applications
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS executive_applications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            user_id INTEGER NOT NULL,
+
+            position TEXT NOT NULL,
+            reason TEXT NOT NULL,
+
+            status TEXT NOT NULL DEFAULT 'pending',
+
+            created_at TEXT NOT NULL,
+
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+        """
+    )
+
+    # --------------------------------------------------------
+    # DATABASE MIGRATION
+    # --------------------------------------------------------
+    # This allows an older users.db to receive new columns
+    # without destroying existing members.
+    # --------------------------------------------------------
+
+    columns = connection.execute(
+        "PRAGMA table_info(users)"
+    ).fetchall()
+
+    existing_columns = {
+        column["name"] for column in columns
+    }
+
+    if "reason_for_joining" not in existing_columns:
+        connection.execute(
+            """
+            ALTER TABLE users
+            ADD COLUMN reason_for_joining TEXT NOT NULL DEFAULT ''
+            """
+        )
+
+    if "role" not in existing_columns:
+        connection.execute(
+            """
+            ALTER TABLE users
+            ADD COLUMN role TEXT NOT NULL DEFAULT 'member'
+            """
+        )
+
+    if "phone_verified" not in existing_columns:
+        connection.execute(
+            """
+            ALTER TABLE users
+            ADD COLUMN phone_verified INTEGER NOT NULL DEFAULT 0
+            """
+        )
+
+    if "verification_token" not in existing_columns:
+        connection.execute(
+            """
+            ALTER TABLE users
+            ADD COLUMN verification_token TEXT
+            """
+        )
 
     connection.commit()
     connection.close()
@@ -118,16 +191,12 @@ def save_events(events):
 
 
 # ============================================================
-# ADMIN AUTHENTICATION
+# SESSION / AUTH HELPERS
 # ============================================================
 
 def is_admin_logged_in():
     return session.get("admin_logged_in") is True
 
-
-# ============================================================
-# MEMBER AUTHENTICATION
-# ============================================================
 
 def is_member_logged_in():
     return session.get("member_logged_in") is True
@@ -142,13 +211,26 @@ def get_current_member():
     connection = get_db()
 
     user = connection.execute(
-        "SELECT * FROM users WHERE id = ?",
+        """
+        SELECT *
+        FROM users
+        WHERE id = ?
+        """,
         (user_id,),
     ).fetchone()
 
     connection.close()
 
     return user
+
+
+def is_executive():
+    user = get_current_member()
+
+    if not user:
+        return False
+
+    return user["role"] == "executive"
 
 
 # ============================================================
@@ -191,6 +273,20 @@ def poetry():
 @app.route("/tech")
 def tech():
     return render_template("tech.html")
+
+
+@app.route("/fashion")
+def fashion():
+    return render_template("fashion.html")
+
+
+# ============================================================
+# CONTACT
+# ============================================================
+
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
 
 
 # ============================================================
@@ -257,6 +353,10 @@ def signup():
             "group_name", ""
         ).strip()
 
+        reason_for_joining = request.form.get(
+            "reason_for_joining", ""
+        ).strip()
+
         password = request.form.get(
             "password", ""
         )
@@ -266,7 +366,7 @@ def signup():
         )
 
         # ----------------------------------------------------
-        # BASIC VALIDATION
+        # REQUIRED FIELDS
         # ----------------------------------------------------
 
         if not all([
@@ -278,6 +378,7 @@ def signup():
             school,
             class_name,
             group_name,
+            reason_for_joining,
             password,
             confirm_password,
         ]):
@@ -287,6 +388,10 @@ def signup():
             )
 
             return render_template("signup.html")
+
+        # ----------------------------------------------------
+        # PASSWORD
+        # ----------------------------------------------------
 
         if password != confirm_password:
             flash(
@@ -303,6 +408,10 @@ def signup():
             )
 
             return render_template("signup.html")
+
+        # ----------------------------------------------------
+        # VALID OPTIONS
+        # ----------------------------------------------------
 
         allowed_classes = {
             "Form 1",
@@ -390,13 +499,15 @@ def signup():
                 school,
                 class_name,
                 group_name,
+                reason_for_joining,
                 password_hash,
                 email_verified,
                 phone_verified,
                 verification_token,
+                role,
                 created_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 first_name,
@@ -407,10 +518,12 @@ def signup():
                 school,
                 class_name,
                 group_name,
+                reason_for_joining,
                 password_hash,
                 0,
                 0,
                 verification_token,
+                "member",
                 created_at,
             ),
         )
@@ -420,7 +533,7 @@ def signup():
 
         flash(
             "Account created successfully. "
-            "Email verification will be sent next.",
+            "Please verify your email before using all member features.",
             "success"
         )
 
@@ -457,7 +570,10 @@ def login():
             FROM users
             WHERE email = ? OR username = ?
             """,
-            (login_value.lower(), login_value),
+            (
+                login_value.lower(),
+                login_value,
+            ),
         ).fetchone()
 
         connection.close()
@@ -473,6 +589,18 @@ def login():
 
             return render_template("login.html")
 
+        # ----------------------------------------------------
+        # EMAIL VERIFICATION CHECK
+        # ----------------------------------------------------
+
+        if not user["email_verified"]:
+            flash(
+                "Please verify your email before logging in.",
+                "error"
+            )
+
+            return render_template("login.html")
+
         session.clear()
 
         session["member_logged_in"] = True
@@ -483,9 +611,42 @@ def login():
             "success"
         )
 
-        return redirect(url_for("home"))
+        return redirect(url_for("member_dashboard"))
 
     return render_template("login.html")
+
+
+# ============================================================
+# MEMBER DASHBOARD
+# ============================================================
+
+@app.route("/dashboard")
+def member_dashboard():
+
+    if not is_member_logged_in():
+        flash(
+            "Please log in to access your dashboard.",
+            "error"
+        )
+
+        return redirect(url_for("login"))
+
+    member = get_current_member()
+
+    if not member:
+        session.clear()
+
+        flash(
+            "Your account could not be found.",
+            "error"
+        )
+
+        return redirect(url_for("login"))
+
+    return render_template(
+        "member_dashboard.html",
+        member=member,
+    )
 
 
 # ============================================================
@@ -530,7 +691,7 @@ def verify_email(token):
         return render_template(
             "verify_email.html",
             success=False,
-            message="This verification link is invalid or has expired."
+            message="This verification link is invalid or has expired.",
         )
 
     connection.execute(
@@ -549,7 +710,193 @@ def verify_email(token):
     return render_template(
         "verify_email.html",
         success=True,
-        message="Your email has been successfully verified!"
+        message="Your email has been successfully verified!",
+    )
+
+
+# ============================================================
+# EXECUTIVE APPLICATION
+# ============================================================
+
+@app.route("/executive/apply", methods=["GET", "POST"])
+def executive_apply():
+
+    if not is_member_logged_in():
+        flash(
+            "You must have a New Gen member account before applying to become an executive.",
+            "error"
+        )
+
+        return redirect(url_for("login"))
+
+    member = get_current_member()
+
+    if not member:
+        session.clear()
+        return redirect(url_for("login"))
+
+    if member["role"] == "executive":
+        return redirect(url_for("executive_dashboard"))
+
+    if request.method == "POST":
+
+        position = request.form.get(
+            "position",
+            ""
+        ).strip()
+
+        reason = request.form.get(
+            "reason",
+            ""
+        ).strip()
+
+        if not position or not reason:
+            flash(
+                "Please complete the executive application.",
+                "error"
+            )
+
+            return render_template(
+                "executive_apply.html",
+                member=member,
+            )
+
+        connection = get_db()
+
+        existing_application = connection.execute(
+            """
+            SELECT id
+            FROM executive_applications
+            WHERE user_id = ?
+            AND status = 'pending'
+            """,
+            (member["id"],),
+        ).fetchone()
+
+        if existing_application:
+            connection.close()
+
+            flash(
+                "You already have a pending executive application.",
+                "error"
+            )
+
+            return redirect(url_for("member_dashboard"))
+
+        created_at = datetime.now(
+            timezone.utc
+        ).isoformat()
+
+        connection.execute(
+            """
+            INSERT INTO executive_applications (
+                user_id,
+                position,
+                reason,
+                status,
+                created_at
+            )
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                member["id"],
+                position,
+                reason,
+                "pending",
+                created_at,
+            ),
+        )
+
+        connection.commit()
+        connection.close()
+
+        flash(
+            "Your executive application has been submitted for review.",
+            "success"
+        )
+
+        return redirect(url_for("member_dashboard"))
+
+    return render_template(
+        "executive_apply.html",
+        member=member,
+    )
+
+
+# ============================================================
+# EXECUTIVE DASHBOARD
+# ============================================================
+
+@app.route("/executive")
+def executive_dashboard():
+
+    if not is_member_logged_in():
+        flash(
+            "Please log in first.",
+            "error"
+        )
+
+        return redirect(url_for("login"))
+
+    member = get_current_member()
+
+    if not member or member["role"] != "executive":
+        flash(
+            "Executive access is restricted to approved New Gen executives.",
+            "error"
+        )
+
+        return redirect(url_for("member_dashboard"))
+
+    connection = get_db()
+
+    applications = connection.execute(
+        """
+        SELECT
+            ea.*,
+            u.first_name,
+            u.last_name,
+            u.username,
+            u.email,
+            u.school,
+            u.class_name,
+            u.group_name
+        FROM executive_applications ea
+        JOIN users u
+            ON ea.user_id = u.id
+        ORDER BY ea.created_at DESC
+        """
+    ).fetchall()
+
+    members = connection.execute(
+        """
+        SELECT
+            id,
+            first_name,
+            last_name,
+            username,
+            email,
+            phone,
+            school,
+            class_name,
+            group_name,
+            reason_for_joining,
+            role,
+            email_verified,
+            phone_verified,
+            created_at
+        FROM users
+        ORDER BY created_at DESC
+        """
+    ).fetchall()
+
+    connection.close()
+
+    return render_template(
+        "executive_dashboard.html",
+        member=member,
+        applications=applications,
+        members=members,
     )
 
 
@@ -577,17 +924,21 @@ def admin_login():
     if request.method == "POST":
 
         username = request.form.get(
-            "username", ""
+            "username",
+            ""
         ).strip()
 
         password = request.form.get(
-            "password", ""
+            "password",
+            ""
         ).strip()
 
         if (
             username == ADMIN_USERNAME
             and password == ADMIN_PASSWORD
         ):
+            session.clear()
+
             session["admin_logged_in"] = True
 
             flash(
@@ -648,7 +999,8 @@ def admin(event_id=None):
 
     current_event = next(
         (
-            event for event in events
+            event
+            for event in events
             if event.get("id") == event_id
         ),
         None
@@ -662,31 +1014,38 @@ def admin(event_id=None):
         )
 
         title = request.form.get(
-            "title", ""
+            "title",
+            ""
         ).strip()
 
         day = request.form.get(
-            "day", ""
+            "day",
+            ""
         ).strip()
 
         month = request.form.get(
-            "month", ""
+            "month",
+            ""
         ).strip()
 
         year = request.form.get(
-            "year", ""
+            "year",
+            ""
         ).strip()
 
         category = request.form.get(
-            "category", ""
+            "category",
+            ""
         ).strip()
 
         location = request.form.get(
-            "location", ""
+            "location",
+            ""
         ).strip()
 
         description = request.form.get(
-            "description", ""
+            "description",
+            ""
         ).strip()
 
         date_value = build_iso_date(
@@ -733,6 +1092,7 @@ def admin(event_id=None):
             ]
 
         else:
+
             updated_events = (
                 existing_events + [event_data]
             )
@@ -773,7 +1133,8 @@ def delete_event(event_id):
     events = load_events()
 
     remaining = [
-        event for event in events
+        event
+        for event in events
         if event.get("id") != event_id
     ]
 
@@ -817,6 +1178,8 @@ def admin_members():
             school,
             class_name,
             group_name,
+            reason_for_joining,
+            role,
             email_verified,
             phone_verified,
             created_at
@@ -825,12 +1188,209 @@ def admin_members():
         """
     ).fetchall()
 
+    applications = connection.execute(
+        """
+        SELECT
+            ea.id,
+            ea.user_id,
+            ea.position,
+            ea.reason,
+            ea.status,
+            ea.created_at,
+
+            u.first_name,
+            u.last_name,
+            u.username,
+            u.email,
+            u.school,
+            u.class_name,
+            u.group_name
+
+        FROM executive_applications ea
+
+        JOIN users u
+            ON ea.user_id = u.id
+
+        ORDER BY ea.created_at DESC
+        """
+    ).fetchall()
+
     connection.close()
 
     return render_template(
         "members.html",
-        members=members
+        members=members,
+        applications=applications,
     )
+
+
+# ============================================================
+# ADMIN APPROVE EXECUTIVE
+# ============================================================
+
+@app.route(
+    "/admin/executive/<int:application_id>/approve",
+    methods=["POST"]
+)
+def approve_executive(application_id):
+
+    if not is_admin_logged_in():
+        flash(
+            "Administrator access required.",
+            "error"
+        )
+
+        return redirect(url_for("admin_login"))
+
+    connection = get_db()
+
+    application = connection.execute(
+        """
+        SELECT *
+        FROM executive_applications
+        WHERE id = ?
+        """,
+        (application_id,),
+    ).fetchone()
+
+    if not application:
+        connection.close()
+
+        flash(
+            "Executive application not found.",
+            "error"
+        )
+
+        return redirect(url_for("admin_members"))
+
+    connection.execute(
+        """
+        UPDATE executive_applications
+        SET status = 'approved'
+        WHERE id = ?
+        """,
+        (application_id,),
+    )
+
+    connection.execute(
+        """
+        UPDATE users
+        SET role = 'executive'
+        WHERE id = ?
+        """,
+        (application["user_id"],),
+    )
+
+    connection.commit()
+    connection.close()
+
+    flash(
+        "Executive application approved.",
+        "success"
+    )
+
+    return redirect(url_for("admin_members"))
+
+
+# ============================================================
+# ADMIN REJECT EXECUTIVE
+# ============================================================
+
+@app.route(
+    "/admin/executive/<int:application_id>/reject",
+    methods=["POST"]
+)
+def reject_executive(application_id):
+
+    if not is_admin_logged_in():
+        flash(
+            "Administrator access required.",
+            "error"
+        )
+
+        return redirect(url_for("admin_login"))
+
+    connection = get_db()
+
+    connection.execute(
+        """
+        UPDATE executive_applications
+        SET status = 'rejected'
+        WHERE id = ?
+        """,
+        (application_id,),
+    )
+
+    connection.commit()
+    connection.close()
+
+    flash(
+        "Executive application rejected.",
+        "success"
+    )
+
+    return redirect(url_for("admin_members"))
+
+
+# ============================================================
+# ADMIN CHANGE ROLE
+# ============================================================
+
+@app.route(
+    "/admin/member/<int:user_id>/role",
+    methods=["POST"]
+)
+def change_member_role(user_id):
+
+    if not is_admin_logged_in():
+        flash(
+            "Administrator access required.",
+            "error"
+        )
+
+        return redirect(url_for("admin_login"))
+
+    role = request.form.get(
+        "role",
+        "member"
+    ).strip().lower()
+
+    allowed_roles = {
+        "member",
+        "executive",
+    }
+
+    if role not in allowed_roles:
+        flash(
+            "Invalid role.",
+            "error"
+        )
+
+        return redirect(url_for("admin_members"))
+
+    connection = get_db()
+
+    connection.execute(
+        """
+        UPDATE users
+        SET role = ?
+        WHERE id = ?
+        """,
+        (
+            role,
+            user_id,
+        ),
+    )
+
+    connection.commit()
+    connection.close()
+
+    flash(
+        "Member role updated.",
+        "success"
+    )
+
+    return redirect(url_for("admin_members"))
 
 
 # ============================================================

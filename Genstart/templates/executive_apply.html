@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Executive Application | New Gen{% endblock %}
+
+{% block content %}
+
+<section class="auth-page">
+    <div class="auth-card">
+
+        <div class="auth-header">
+            <h1>Executive <span>Application</span></h1>
+            <p>Leadership isn't a title. It's responsibility.</p>
+        </div>
+
+        <form method="POST">
+
+            <div class="form-group">
+                <label>Position You Are Interested In</label>
+
+                <select name="position" required>
+                    <option value="">Select a position</option>
+                    <option>President</option>
+                    <option>Vice President</option>
+                    <option>Secretary</option>
+                    <option>Assistant Secretary</option>
+                    <option>Treasurer</option>
+                    <option>Organizer</option>
+                    <option>Public Relations Officer</option>
+                    <option>Group Leader</option>
+                    <option>Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Why should you be considered?</label>
+
+                <textarea
+                    name="reason"
+                    placeholder="Tell us about your leadership experience, ideas and what you want to accomplish for New Gen."
+                    required
+                ></textarea>
+            </div>
+
+            <button class="submit-btn" type="submit">
+                Submit Application
+            </button>
+
+        </form>
+
+        <div class="auth-footer">
+            Applications are reviewed by the New Gen administrator.
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

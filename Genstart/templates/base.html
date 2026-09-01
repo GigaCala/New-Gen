@@ -1,70 +1,1170 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>{% block title %}New Gen{% endblock %}</title>
-    <meta name="description" content="New Gen school club: music, dance, art, poetry, and tech." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-  </head>
-  <body>
-    <div class="theme-toggle-wrap">
-      <button class="theme-toggle" aria-label="Open theme settings">Theme</button>
-      <div class="theme-panel" id="themePanel" aria-label="Theme settings">
-        <p>Choose a mode</p>
-        <div class="theme-options">
-          <button class="theme-option active" data-theme-option="dark" type="button">Dark</button>
-          <button class="theme-option" data-theme-option="clean" type="button">Clean</button>
-          <button class="theme-option" data-theme-option="luxury" type="button">Luxury</button>
-        </div>
-      </div>
-    </div>
+
+    <meta
+        name="description"
+        content="New Gen — a student community for creativity, technology, art, music, dance, poetry and fashion."
+    >
+
+    <style>
+        :root {
+            --bg: #080a10;
+            --bg-soft: #101522;
+            --panel: rgba(18, 23, 38, 0.88);
+            --text: #f5f7ff;
+            --muted: #aab3c7;
+            --line: rgba(255,255,255,0.09);
+
+            --pink: #ff5edb;
+            --purple: #8b5cf6;
+            --blue: #45d0ff;
+            --mint: #73f0c0;
+            --gold: #ffd166;
+            --orange: #ff8a65;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family:
+                "Segoe UI",
+                Tahoma,
+                Geneva,
+                Verdana,
+                sans-serif;
+
+            color: var(--text);
+
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(139,92,246,.25),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at top right,
+                    rgba(69,208,255,.18),
+                    transparent 28%
+                ),
+                linear-gradient(
+                    180deg,
+                    #060811 0%,
+                    #0c111d 100%
+                );
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button,
+        input,
+        textarea,
+        select {
+            font: inherit;
+        }
+
+        .container {
+            width: min(1180px, calc(100% - 36px));
+            margin: 0 auto;
+        }
+
+        /* =====================================================
+           NAVIGATION
+        ===================================================== */
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+
+            backdrop-filter: blur(18px);
+
+            background: rgba(6,8,17,.78);
+
+            border-bottom:
+                1px solid var(--line);
+        }
+
+        .nav {
+            min-height: 76px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+
+            font-weight: 900;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 14px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--pink),
+                    var(--purple),
+                    var(--blue)
+                );
+
+            box-shadow:
+                0 15px 35px
+                rgba(139,92,246,.35);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+
+            color: var(--muted);
+
+            font-size: .94rem;
+        }
+
+        .nav-links a {
+            transition:
+                color .2s ease,
+                transform .2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text);
+            transform: translateY(-1px);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-button {
+            padding: 10px 16px;
+
+            border-radius: 999px;
+
+            border:
+                1px solid var(--line);
+
+            background:
+                rgba(255,255,255,.04);
+
+            font-weight: 700;
+
+            transition:
+                transform .2s ease,
+                background .2s ease;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-1px);
+            background: rgba(255,255,255,.08);
+        }
+
+        .nav-primary {
+            border: none;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--pink),
+                    var(--purple)
+                );
+
+            box-shadow:
+                0 12px 25px
+                rgba(139,92,246,.25);
+        }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 8px 13px;
+
+            border-radius: 999px;
+
+            background:
+                rgba(255,255,255,.05);
+
+            border:
+                1px solid var(--line);
+
+            color: var(--muted);
+
+            font-size: .86rem;
+        }
+
+        .user-dot {
+            width: 8px;
+            height: 8px;
+
+            border-radius: 50%;
+
+            background: var(--mint);
+
+            box-shadow:
+                0 0 12px
+                rgba(115,240,192,.7);
+        }
+
+        .menu-toggle {
+            display: none;
+
+            padding: 9px 12px;
+
+            border:
+                1px solid var(--line);
+
+            border-radius: 12px;
+
+            background:
+                rgba(255,255,255,.04);
+
+            color: var(--text);
+
+            cursor: pointer;
+        }
+
+        /* =====================================================
+           FLASH MESSAGES
+        ===================================================== */
+
+        .flash-area {
+            position: fixed;
+
+            top: 90px;
+            right: 20px;
+
+            z-index: 2000;
+
+            width: min(390px, calc(100% - 40px));
+        }
+
+        .flash {
+            margin-bottom: 10px;
+
+            padding: 15px 17px;
+
+            border-radius: 15px;
+
+            border:
+                1px solid var(--line);
+
+            background:
+                rgba(15,20,32,.96);
+
+            box-shadow:
+                0 20px 45px
+                rgba(0,0,0,.3);
+
+            animation:
+                slideIn .3s ease;
+        }
+
+        .flash.success {
+            border-color:
+                rgba(115,240,192,.35);
+        }
+
+        .flash.error {
+            border-color:
+                rgba(255,94,219,.35);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        main {
+            min-height: calc(100vh - 150px);
+        }
+
+        /* =====================================================
+           COMMON BUTTONS
+        ===================================================== */
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            min-height: 48px;
+
+            padding:
+                12px 20px;
+
+            border-radius: 999px;
+
+            border: none;
+
+            cursor: pointer;
+
+            font-weight: 800;
+
+            color: white;
+
+            transition:
+                transform .2s ease,
+                box-shadow .2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--pink),
+                    var(--purple)
+                );
+
+            box-shadow:
+                0 16px 30px
+                rgba(139,92,246,.3);
+        }
+
+        .btn-secondary {
+            border:
+                1px solid var(--line);
+
+            background:
+                rgba(255,255,255,.05);
+        }
+
+        /* =====================================================
+           AUTH PAGES
+        ===================================================== */
+
+        .auth-page {
+            min-height: calc(100vh - 150px);
+
+            display: grid;
+            place-items: center;
+
+            padding: 70px 0;
+        }
+
+        .auth-card {
+            width: min(560px, 100%);
+
+            padding: 36px;
+
+            border-radius: 28px;
+
+            border:
+                1px solid var(--line);
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(255,255,255,.065),
+                    rgba(255,255,255,.025)
+                );
+
+            box-shadow:
+                0 30px 80px
+                rgba(0,0,0,.3);
+
+            backdrop-filter: blur(18px);
+        }
+
+        .auth-header {
+            margin-bottom: 28px;
+        }
+
+        .auth-header h1 {
+            margin-bottom: 10px;
+
+            font-size:
+                clamp(2rem, 5vw, 3.2rem);
+
+            letter-spacing: -.05em;
+        }
+
+        .auth-header p {
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .gradient-text {
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--pink),
+                    var(--purple),
+                    var(--blue)
+                );
+
+            -webkit-background-clip: text;
+            background-clip: text;
+
+            color: transparent;
+        }
+
+        .form-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 17px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+
+            gap: 8px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: .88rem;
+
+            color: #dce3f3;
+
+            font-weight: 700;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+
+            padding:
+                13px 14px;
+
+            border-radius: 13px;
+
+            border:
+                1px solid rgba(255,255,255,.1);
+
+            outline: none;
+
+            color: var(--text);
+
+            background:
+                rgba(255,255,255,.045);
+
+            transition:
+                border-color .2s ease,
+                box-shadow .2s ease;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color:
+                rgba(69,208,255,.65);
+
+            box-shadow:
+                0 0 0 3px
+                rgba(69,208,255,.08);
+        }
+
+        .form-group select option {
+            background: #111522;
+            color: white;
+        }
+
+        .form-help {
+            color: var(--muted);
+            font-size: .78rem;
+            line-height: 1.5;
+        }
+
+        .form-submit {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .auth-footer {
+            margin-top: 24px;
+
+            padding-top: 20px;
+
+            border-top:
+                1px solid var(--line);
+
+            color: var(--muted);
+
+            text-align: center;
+        }
+
+        .auth-footer a {
+            color: var(--blue);
+            font-weight: 700;
+        }
+
+        /* =====================================================
+           DASHBOARD
+        ===================================================== */
+
+        .dashboard {
+            padding: 70px 0;
+        }
+
+        .dashboard-header {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+
+            gap: 25px;
+
+            margin-bottom: 30px;
+        }
+
+        .dashboard-header h1 {
+            font-size:
+                clamp(2rem, 5vw, 3.7rem);
+
+            letter-spacing: -.05em;
+        }
+
+        .dashboard-header p {
+            margin-top: 8px;
+
+            color: var(--muted);
+
+            line-height: 1.6;
+        }
+
+        .dashboard-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 20px;
+        }
+
+        .dashboard-card {
+            padding: 25px;
+
+            border-radius: 23px;
+
+            border:
+                1px solid var(--line);
+
+            background:
+                rgba(255,255,255,.035);
+        }
+
+        .dashboard-card h2 {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .profile-info {
+            display: grid;
+            gap: 11px;
+        }
+
+        .profile-row {
+            display: flex;
+            justify-content: space-between;
+
+            gap: 15px;
+
+            padding-bottom: 10px;
+
+            border-bottom:
+                1px solid rgba(255,255,255,.06);
+        }
+
+        .profile-row span:first-child {
+            color: var(--muted);
+        }
+
+        .profile-row span:last-child {
+            text-align: right;
+            font-weight: 700;
+        }
+
+        .badge {
+            display: inline-flex;
+
+            padding: 7px 11px;
+
+            border-radius: 999px;
+
+            font-size: .76rem;
+
+            font-weight: 800;
+
+            background:
+                rgba(139,92,246,.14);
+
+            border:
+                1px solid rgba(139,92,246,.25);
+        }
+
+        .badge.executive {
+            background:
+                rgba(255,209,102,.12);
+
+            border-color:
+                rgba(255,209,102,.3);
+
+            color: var(--gold);
+        }
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        footer {
+            margin-top: 70px;
+
+            padding: 40px 0;
+
+            border-top:
+                1px solid var(--line);
+        }
+
+        .footer-wrap {
+            display: flex;
+
+            justify-content: space-between;
+
+            gap: 25px;
+
+            color: var(--muted);
+
+            line-height: 1.6;
+        }
+
+        .footer-brand {
+            color: var(--text);
+            font-weight: 900;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+
+            gap: 18px;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 950px) {
+
+            .nav-links {
+                display: none;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-actions {
+                margin-left: auto;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+
+            .container {
+                width:
+                    min(
+                        100% - 26px,
+                        1180px
+                    );
+            }
+
+            .nav {
+                min-height: 68px;
+            }
+
+            .nav-actions .user-pill {
+                display: none;
+            }
+
+            .nav-actions .nav-button {
+                display: none;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full {
+                grid-column: auto;
+            }
+
+            .auth-card {
+                padding: 25px 20px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .footer-wrap {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
 
     <header class="topbar">
-      <div class="container nav">
-        <a href="{{ url_for('home') }}" class="brand" aria-label="New Gen home">
-          <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="New Gen logo" class="brand-logo" />
-          <span class="brand-text">New Gen</span>
-        </a>
 
-        <nav class="nav-links" aria-label="Main navigation">
-          <a href="{{ url_for('home') }}">Home</a>
-          <a href="{{ url_for('music_dance') }}">Music & Dance</a>
-          <a href="{{ url_for('art') }}">Art</a>
-          <a href="{{ url_for('poetry') }}">Poetry</a>
-          <a href="{{ url_for('tech') }}">Tech</a>
-          <a href="{{ url_for('calendar') }}">Calendar</a>
-          <a href="{{ url_for('admin_login') }}">Admin</a>
-        </nav>
+        <div class="container nav">
 
-        <a href="{{ url_for('home') }}#join" class="nav-cta">Join the Club</a>
-        <button class="menu-toggle" aria-label="Open menu">Menu</button>
-      </div>
+            <a href="{{ url_for('home') }}" class="brand">
+
+                <span class="brand-mark">N</span>
+
+                <span>New Gen</span>
+
+            </a>
+
+
+            <nav class="nav-links">
+
+                <a href="{{ url_for('home') }}">
+                    Home
+                </a>
+
+                <a href="{{ url_for('music_dance') }}">
+                    Music & Dance
+                </a>
+
+                <a href="{{ url_for('art') }}">
+                    Art
+                </a>
+
+                <a href="{{ url_for('poetry') }}">
+                    Poetry
+                </a>
+
+                <a href="{{ url_for('tech') }}">
+                    Tech
+                </a>
+
+                <a href="{{ url_for('fashion') }}">
+                    Fashion
+                </a>
+
+                <a href="{{ url_for('calendar') }}">
+                    Calendar
+                </a>
+
+                <a href="{{ url_for('contact') }}">
+                    Contact
+                </a>
+
+            </nav>
+
+
+            <div class="nav-actions">
+
+                {% if session.get('member_logged_in') %}
+
+                    {% if session.get('member_id') %}
+
+                        <a
+                            href="{{ url_for('member_dashboard') }}"
+                            class="user-pill"
+                        >
+                            <span class="user-dot"></span>
+                            Dashboard
+                        </a>
+
+                    {% endif %}
+
+                    <a
+                        href="{{ url_for('logout') }}"
+                        class="nav-button"
+                    >
+                        Log out
+                    </a>
+
+                {% else %}
+
+                    <a
+                        href="{{ url_for('login') }}"
+                        class="nav-button"
+                    >
+                        Log in
+                    </a>
+
+                    <a
+                        href="{{ url_for('signup') }}"
+                        class="nav-button nav-primary"
+                    >
+                        Join New Gen
+                    </a>
+
+                {% endif %}
+
+                <button
+                    class="menu-toggle"
+                    id="menuToggle"
+                    aria-label="Open navigation menu"
+                >
+                    ☰
+                </button>
+
+            </div>
+
+        </div>
+
     </header>
 
-    {% block content %}{% endblock %}
 
-    <footer class="site-footer">
-      <div class="container footer-wrap">
-        <div>
-          <strong>New Gen</strong><br />
-          Creativity that moves, inspires, and connects.
+    <!-- =====================================================
+         MOBILE NAVIGATION
+    ====================================================== -->
+
+    <div
+        id="mobileMenu"
+        style="
+            display:none;
+            position:fixed;
+            top:68px;
+            left:13px;
+            right:13px;
+            z-index:1500;
+            padding:18px;
+            border:1px solid rgba(255,255,255,.09);
+            border-radius:18px;
+            background:rgba(12,17,29,.97);
+            backdrop-filter:blur(18px);
+            box-shadow:0 25px 60px rgba(0,0,0,.35);
+        "
+    >
+
+        <div
+            style="
+                display:flex;
+                flex-direction:column;
+                gap:5px;
+            "
+        >
+
+            <a
+                href="{{ url_for('home') }}"
+                class="mobile-link"
+                style="padding:13px;"
+            >
+                Home
+            </a>
+
+            <a
+                href="{{ url_for('music_dance') }}"
+                class="mobile-link"
+                style="padding:13px;"
+            >
+                Music & Dance
+            </a>
+
+            <a
+                href="{{ url_for('art') }}"
+                class="mobile-link"
+                style="padding:13px;"
+            >
+                Art
+            </a>
+
+            <a
+                href="{{ url_for('poetry') }}"
+                class="mobile-link"
+                style="padding:13px;"
+            >
+                Poetry
+            </a>
+
+            <a
+                href="{{ url_for('tech') }}"
+                class="mobile-link"
+                style="padding:13px;"
+            >
+                Tech
+            </a>
+
+            <a
+                href="{{ url_for('fashion') }}"
+                class="mobile-link"
+                style="padding:13px;"
+            >
+                Fashion
+            </a>
+
+            <a
+                href="{{ url_for('calendar') }}"
+                class="mobile-link"
+                style="padding:13px;"
+            >
+                Calendar
+            </a>
+
+            <a
+                href="{{ url_for('contact') }}"
+                class="mobile-link"
+                style="padding:13px;"
+            >
+                Contact
+            </a>
+
         </div>
 
-        <div class="footer-links">
-          <a href="{{ url_for('music_dance') }}">Music & Dance</a>
-          <a href="{{ url_for('art') }}">Art</a>
-          <a href="{{ url_for('poetry') }}">Poetry</a>
-          <a href="{{ url_for('tech') }}">Tech</a>
-          <a href="{{ url_for('calendar') }}">Calendar</a>
-          <a href="{{ url_for('admin_login') }}">Admin</a>
+    </div>
+
+
+    <!-- =====================================================
+         FLASH MESSAGES
+    ====================================================== -->
+
+    <div class="flash-area">
+
+        {% with messages = get_flashed_messages(
+            with_categories=true
+        ) %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div class="flash {{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main>
+
+        {% block content %}{% endblock %}
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer>
+
+        <div class="container footer-wrap">
+
+            <div>
+
+                <div class="footer-brand">
+                    New Gen
+                </div>
+
+                <div>
+                    Creativity that moves,
+                    inspires, and connects.
+                </div>
+
+                <div>
+                    Made in Africa.
+                </div>
+
+            </div>
+
+
+            <div class="footer-links">
+
+                <a href="{{ url_for('music_dance') }}">
+                    Music & Dance
+                </a>
+
+                <a href="{{ url_for('art') }}">
+                    Art
+                </a>
+
+                <a href="{{ url_for('poetry') }}">
+                    Poetry
+                </a>
+
+                <a href="{{ url_for('tech') }}">
+                    Tech
+                </a>
+
+                <a href="{{ url_for('fashion') }}">
+                    Fashion
+                </a>
+
+                <a href="{{ url_for('contact') }}">
+                    Contact
+                </a>
+
+            </div>
+
         </div>
-      </div>
+
     </footer>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-  </body>
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script>
+
+        const menuToggle =
+            document.getElementById("menuToggle");
+
+        const mobileMenu =
+            document.getElementById("mobileMenu");
+
+
+        if (menuToggle && mobileMenu) {
+
+            menuToggle.addEventListener(
+                "click",
+                function () {
+
+                    const isOpen =
+                        mobileMenu.style.display === "block";
+
+                    mobileMenu.style.display =
+                        isOpen ? "none" : "block";
+
+                }
+            );
+
+
+            document
+                .querySelectorAll(".mobile-link")
+                .forEach(function(link) {
+
+                    link.addEventListener(
+                        "click",
+                        function() {
+
+                            mobileMenu.style.display =
+                                "none";
+
+                        }
+                    );
+
+                });
+
+        }
+
+
+        /* Automatically hide flash messages */
+
+        setTimeout(function() {
+
+            document
+                .querySelectorAll(".flash")
+                .forEach(function(message) {
+
+                    message.style.opacity = "0";
+
+                    message.style.transform =
+                        "translateX(20px)";
+
+                    message.style.transition =
+                        "all .4s ease";
+
+                    setTimeout(function() {
+                        message.remove();
+                    }, 400);
+
+                });
+
+        }, 5000);
+
+    </script>
+
+
+    {% block scripts %}{% endblock %}
+
+</body>
 </html>

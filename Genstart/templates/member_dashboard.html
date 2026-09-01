@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}My Dashboard | New Gen{% endblock %}
+
+{% block content %}
+
+<section class="dashboard">
+
+<div class="container">
+
+<div class="dashboard-header">
+
+<div>
+<h1>Welcome, {{ member["first_name"] }} 👋</h1>
+
+<p>
+Your creative journey begins here. Track your profile,
+events, and club activities.
+</p>
+</div>
+
+{% if member["role"] == "executive" %}
+<span class="badge executive">EXECUTIVE</span>
+{% else %}
+<span class="badge">MEMBER</span>
+{% endif %}
+
+</div>
+
+<div class="dashboard-grid">
+
+<div class="dashboard-card">
+
+<h2>👤 My Profile</h2>
+
+<div class="profile-info">
+
+<div class="profile-row">
+<span>Name</span>
+<span>{{ member["first_name"] }} {{ member["last_name"] }}</span>
+</div>
+
+<div class="profile-row">
+<span>Username</span>
+<span>@{{ member["username"] }}</span>
+</div>
+
+<div class="profile-row">
+<span>Email</span>
+<span>{{ member["email"] }}</span>
+</div>
+
+<div class="profile-row">
+<span>Phone</span>
+<span>{{ member["phone"] }}</span>
+</div>
+
+</div>
+
+</div>
+
+<div class="dashboard-card">
+
+<h2>🏫 School</h2>
+
+<div class="profile-info">
+
+<div class="profile-row">
+<span>School</span>
+<span>{{ member["school"] }}</span>
+</div>
+
+<div class="profile-row">
+<span>Form</span>
+<span>{{ member["class_name"] }}</span>
+</div>
+
+<div class="profile-row">
+<span>Group</span>
+<span>{{ member["group_name"] }}</span>
+</div>
+
+<div class="profile-row">
+<span>Email</span>
+
+{% if member["email_verified"] %}
+<span style="color:#73f0c0;">Verified</span>
+{% else %}
+<span style="color:#ff8a65;">Pending</span>
+{% endif %}
+
+</div>
+
+</div>
+
+</div>
+
+<div class="dashboard-card">
+
+<h2>🌍 My Mission</h2>
+
+<p style="line-height:1.8;color:#d9e3ff;">
+{{ member["reason_for_joining"] }}
+</p>
+
+</div>
+
+<div class="dashboard-card">
+
+<h2>🎭 My Department</h2>
+
+<h3 style="margin:12px 0;font-size:1.5rem;">
+{{ member["group_name"] }}
+</h3>
+
+<p style="color:#b8c4dc;line-height:1.7;">
+
+{% if member["group_name"] == "Tech" %}
+Building apps, AI, websites and robotics.
+
+{% elif member["group_name"] == "Music & Dance" %}
+Creating performances that inspire the school.
+
+{% elif member["group_name"] == "Art" %}
+Designing visual stories and creative exhibitions.
+
+{% elif member["group_name"] == "Poetry" %}
+Using words to move hearts and minds.
+
+{% elif member["group_name"] == "Fashion" %}
+Designing the future of African style.
+
+{% endif %}
+
+</p>
+
+</div>
+
+<div class="dashboard-card">
+
+<h2>📅 Upcoming Events</h2>
+
+{% if member %}
+
+<p style="color:#b8c4dc;line-height:1.8;">
+Check the New Gen Calendar for workshops,
+performances and competitions.
+</p>
+
+<a href="/calendar" class="btn btn-secondary">
+Open Calendar
+</a>
+
+{% endif %}
+
+</div>
+
+<div class="dashboard-card">
+
+<h2>⭐ Executive Portal</h2>
+
+{% if member["role"] == "executive" %}
+
+<p style="color:#b8c4dc;">
+You are an approved executive of New Gen.
+</p>
+
+<a href="/executive" class="btn btn-primary">
+Executive Dashboard
+</a>
+
+{% else %}
+
+<p style="color:#b8c4dc;">
+Want to help lead the club? Apply to become an executive.
+</p>
+
+<a href="/executive/apply" class="btn btn-primary">
+Apply Now
+</a>
+
+{% endif %}
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+{% endblock %}

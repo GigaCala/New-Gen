@@ -1,0 +1,295 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Join New Gen</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Segoe UI,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:linear-gradient(135deg,#060a12,#111827,#1e1b4b);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px 15px;
+    color:white;
+}
+
+.container{
+    width:100%;
+    max-width:760px;
+    background:rgba(255,255,255,.05);
+    backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:28px;
+    padding:35px;
+    box-shadow:0 30px 60px rgba(0,0,0,.45);
+}
+
+.logo{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.logo h1{
+    font-size:2.5rem;
+    background:linear-gradient(90deg,#ff5edb,#8b5cf6,#45d0ff);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+.logo p{
+    color:#b8c4dc;
+    margin-top:8px;
+}
+
+.flash{
+    background:#16a34a33;
+    border:1px solid #22c55e55;
+    padding:12px;
+    border-radius:12px;
+    margin-bottom:20px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+
+.full{
+    grid-column:1/-1;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    font-size:.9rem;
+    color:#d6e2ff;
+}
+
+input,select,textarea{
+    width:100%;
+    padding:14px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.06);
+    color:white;
+    outline:none;
+}
+
+input::placeholder,
+textarea::placeholder{
+    color:#94a3b8;
+}
+
+textarea{
+    resize:vertical;
+    min-height:120px;
+}
+
+.group-cards{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+
+.group-cards label{
+    margin:0;
+    cursor:pointer;
+}
+
+.group-cards input{
+    display:none;
+}
+
+.card{
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+    padding:16px;
+    text-align:center;
+    transition:.25s;
+    background:rgba(255,255,255,.03);
+}
+
+.group-cards input:checked + .card{
+    border-color:#8b5cf6;
+    background:rgba(139,92,246,.18);
+}
+
+button{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:999px;
+    background:linear-gradient(90deg,#ff5edb,#8b5cf6,#45d0ff);
+    color:white;
+    font-weight:bold;
+    font-size:1rem;
+    cursor:pointer;
+    margin-top:10px;
+}
+
+.bottom{
+    text-align:center;
+    margin-top:20px;
+    color:#b8c4dc;
+}
+
+.bottom a{
+    color:#45d0ff;
+    text-decoration:none;
+}
+
+@media(max-width:700px){
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .group-cards{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="logo">
+<h1>NEW GEN</h1>
+<p>African Children Must Speak</p>
+</div>
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="flash">
+{{ messages[0] }}
+</div>
+{% endif %}
+{% endwith %}
+
+<form action="/signup" method="POST">
+
+<div class="grid">
+
+<div>
+<label>First Name</label>
+<input type="text" name="first_name" required>
+</div>
+
+<div>
+<label>Last Name</label>
+<input type="text" name="last_name" required>
+</div>
+
+<div>
+<label>Username</label>
+<input type="text" name="username" required>
+</div>
+
+<div>
+<label>Phone Number</label>
+<input type="tel" name="phone" placeholder="+233..." required>
+</div>
+
+<div class="full">
+<label>Email Address</label>
+<input type="email" name="email" required>
+</div>
+
+<div>
+<label>School</label>
+<input type="text" name="school" required>
+</div>
+
+<div>
+<label>Class / Form</label>
+<select name="class_name" required>
+<option value="">Select</option>
+<option>Form 1</option>
+<option>Form 2</option>
+<option>Form 3</option>
+</select>
+</div>
+
+<div class="full">
+<label>Select Your Group</label>
+
+<div class="group-cards">
+
+<label>
+<input type="radio" name="group_name" value="Music & Dance" required>
+<div class="card">🎵 Music & Dance</div>
+</label>
+
+<label>
+<input type="radio" name="group_name" value="Tech">
+<div class="card">💻 Tech</div>
+</label>
+
+<label>
+<input type="radio" name="group_name" value="Art">
+<div class="card">🎨 Art</div>
+</label>
+
+<label>
+<input type="radio" name="group_name" value="Poetry">
+<div class="card">✍ Poetry</div>
+</label>
+
+<label class="full">
+<input type="radio" name="group_name" value="Fashion">
+<div class="card">👗 Fashion</div>
+</label>
+
+</div>
+</div>
+
+<div class="full">
+<label>Why do you want to join New Gen?</label>
+<textarea
+name="reason"
+placeholder="Tell us your passion, goals, and why you want to become part of New Gen..."
+required></textarea>
+</div>
+
+<div>
+<label>Password</label>
+<input type="password" name="password" required>
+</div>
+
+<div>
+<label>Confirm Password</label>
+<input type="password" name="confirm_password" required>
+</div>
+
+<div class="full">
+<button type="submit">Create My Account</button>
+</div>
+
+</div>
+
+</form>
+
+<div class="bottom">
+Already a member?
+<a href="/login">Login</a>
+</div>
+
+</div>
+
+</body>
+</html>

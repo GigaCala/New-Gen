@@ -1,6 +1,9 @@
 import json
 import os
 import uuid
+import sqlite3
+
+from werkzeug.security import generate_password_hash
 
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 
@@ -12,6 +15,45 @@ ADMIN_PASSWORD = os.environ.get('NEWGEN_ADMIN_PASS', 'NewGen2026!')
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 EVENTS_FILE = os.path.join(BASE_DIR, 'events.json')
+# ---------------------------------------------------
+# Member database
+# ---------------------------------------------------
+
+DATABASE_FILE = os.path.join(BASE_DIR, 'members.db')
+
+
+def get_db():
+    connection = sqlite3.connect(DATABASE_FILE)
+    connection.row_factory = sqlite3.Row
+    return connection
+
+
+def init_database():
+    connection = get_db()
+
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS members (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            first_name TEXT NOT NULL,
+            last_name TEXT NOT NULL,
+            username TEXT NOT NULL UNIQUE,
+            email TEXT NOT NULL UNIQUE,
+            phone TEXT NOT NULL,
+            school TEXT NOT NULL,
+            class_name TEXT NOT NULL,
+            group_name TEXT NOT NULL,
+            reason TEXT NOT NULL,
+            password_hash TEXT NOT NULL,
+            email_verified INTEGER NOT NULL DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    connection.commit()
+    connection.close()
+
+
+init_database()
 
 
 def load_events():
@@ -39,6 +81,113 @@ def home():
     events = sorted(load_events(), key=lambda event: event.get('date', ''))[:3]
     return render_template('index.html', events=events)
 
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+
+        first_name = request.form.get('first_name', '').strip()
+        last_name = request.form.get('last_name', '').strip()
+        username = request.form.get('username', '').strip()
+        email = request.form.get('email', '').strip().lower()
+        phone = request.form.get('phone', '').strip()
+        school = request.form.get('school', '').strip()
+        class_name = request.form.get('class_name', '').strip()
+        group_name = request.form.get('group_name', '').strip()
+        reason = request.form.get('reason', '').strip()
+        password = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
+
+        # Check required fields
+        if not all([
+            first_name,
+            last_name,
+            username,
+            email,
+            phone,
+            school,
+            class_name,
+            group_name,
+            reason,
+            password
+        ]):
+            flash('Please complete every field.', 'error')
+            return render_template('signup.html')
+
+        # Check password confirmation
+        if password != confirm_password:
+            flash('Passwords do not match.', 'error')
+            return render_template('signup.html')
+
+        # Basic password length requirement
+        if len(password) < 8:
+            flash('Password must be at least 8 characters.', 'error')
+            return render_template('signup.html')
+
+        connection = get_db()
+
+        # Check whether username already exists
+        existing_username = connection.execute(
+            'SELECT id FROM members WHERE username = ?',
+            (username,)
+        ).fetchone()
+
+        if existing_username:
+            connection.close()
+            flash('That username is already taken.', 'error')
+            return render_template('signup.html')
+
+        # Check whether email already exists
+        existing_email = connection.execute(
+            'SELECT id FROM members WHERE email = ?',
+            (email,)
+        ).fetchone()
+
+        if existing_email:
+            connection.close()
+            flash('An account with that email already exists.', 'error')
+            return render_template('signup.html')
+
+        # Hash the password before storing it
+        password_hash = generate_password_hash(password)
+
+        connection.execute("""
+            INSERT INTO members (
+                first_name,
+                last_name,
+                username,
+                email,
+                phone,
+                school,
+                class_name,
+                group_name,
+                reason,
+                password_hash
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            first_name,
+            last_name,
+            username,
+            email,
+            phone,
+            school,
+            class_name,
+            group_name,
+            reason,
+            password_hash
+        ))
+
+        connection.commit()
+        connection.close()
+
+        flash(
+            'Your New Gen account has been created successfully!',
+            'success'
+        )
+
+        return redirect(url_for('login'))
+
+    return render_template('signup.html')
 
 @app.route('/music-dance')
 def music_dance():

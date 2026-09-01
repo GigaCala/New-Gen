@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Login | New Gen{% endblock %}
+
+{% block content %}
+
+<section class="auth-page">
+
+    <div class="auth-card">
+
+        <div class="auth-header">
+
+            <h1>
+                Welcome <span class="gradient-text">Back</span>
+            </h1>
+
+            <p>
+                Sign in with your username or email to access your New Gen account.
+            </p>
+
+        </div>
+
+        <form method="POST">
+
+            <div class="form-group">
+
+                <label>Username or Email</label>
+
+                <input
+                    type="text"
+                    name="login"
+                    placeholder="Enter username or email"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Password</label>
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter password"
+                    required
+                >
+
+            </div>
+
+            <button class="btn btn-primary form-submit">
+                Login
+            </button>
+
+        </form>
+
+        <div class="auth-footer">
+
+            Don't have an account?
+
+            <a href="{{ url_for('signup') }}">
+                Join New Gen
+            </a>
+
+            <br><br>
+
+            <a href="#">
+                Forgot Password?
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

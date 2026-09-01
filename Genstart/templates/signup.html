@@ -4,164 +4,261 @@
 
 {% block content %}
 
+<style>
+.auth-page {
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 20px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 850px;
+    padding: 45px;
+    border-radius: 24px;
+    background: rgba(20,20,24,.92);
+    border: 1px solid rgba(255,255,255,.1);
+    box-shadow: 0 25px 70px rgba(0,0,0,.35);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.auth-header h1 {
+    font-size: 42px;
+    margin-bottom: 10px;
+}
+
+.auth-header p {
+    opacity: .7;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group.full {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.05);
+    color: inherit;
+    outline: none;
+}
+
+.form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #d6b25e;
+}
+
+.submit-btn {
+    width: 100%;
+    margin-top: 25px;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+    background: linear-gradient(135deg,#d6b25e,#f0d78c);
+    color: #111;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 25px;
+    opacity: .8;
+}
+
+.auth-footer a {
+    color: #d6b25e;
+}
+
+@media(max-width:700px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group.full {
+        grid-column: auto;
+    }
+
+    .auth-card {
+        padding: 28px 20px;
+    }
+
+    .auth-header h1 {
+        font-size: 32px;
+    }
+}
+</style>
+
 <section class="auth-page">
 
     <div class="auth-card">
 
         <div class="auth-header">
-            <h1>
-                Join <span class="gradient-text">New Gen</span>
-            </h1>
-
-            <p>
-                Become part of a community where technology, music, art,
-                poetry and fashion shape the future of Africa.
-            </p>
+            <h1>Join <span>New Gen</span></h1>
+            <p>Become part of a generation creating, building and speaking.</p>
         </div>
 
-        <form method="POST" class="form-grid">
+        <form method="POST">
 
-            <div class="form-group">
-                <label>First Name</label>
-                <input
-                    type="text"
-                    name="first_name"
-                    placeholder="First name"
-                    required
-                >
-            </div>
+            <div class="form-grid">
 
-            <div class="form-group">
-                <label>Last Name</label>
-                <input
-                    type="text"
-                    name="last_name"
-                    placeholder="Last name"
-                    required
-                >
-            </div>
-
-            <div class="form-group">
-                <label>Username</label>
-                <input
-                    type="text"
-                    name="username"
-                    placeholder="Unique username"
-                    required
-                >
-            </div>
-
-            <div class="form-group">
-                <label>Phone Number</label>
-                <input
-                    type="tel"
-                    name="phone"
-                    placeholder="024XXXXXXX"
-                    required
-                >
-            </div>
-
-            <div class="form-group full">
-                <label>Email Address</label>
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="you@example.com"
-                    required
-                >
-            </div>
-
-            <div class="form-group">
-                <label>School</label>
-                <input
-                    type="text"
-                    name="school"
-                    placeholder="Abomosu STEM SHS"
-                    required
-                >
-            </div>
-
-            <div class="form-group">
-                <label>Class / Form</label>
-                <select name="class_name" required>
-                    <option value="">Select Form</option>
-                    <option>Form 1</option>
-                    <option>Form 2</option>
-                    <option>Form 3</option>
-                </select>
-            </div>
-
-            <div class="form-group full">
-                <label>Choose Your Group</label>
-
-                <select name="group_name" required>
-                    <option value="">Select Group</option>
-                    <option>Music & Dance</option>
-                    <option>Tech</option>
-                    <option>Art</option>
-                    <option>Poetry</option>
-                    <option>Fashion</option>
-                </select>
-            </div>
-
-            <div class="form-group full">
-                <label>Why do you want to join New Gen?</label>
-
-                <textarea
-                    name="reason_for_joining"
-                    placeholder="Tell us about your passion, talents and goals..."
-                    required
-                ></textarea>
-
-                <div class="form-help">
-                    This helps the executives understand your interests.
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input
+                        type="text"
+                        name="first_name"
+                        placeholder="Your first name"
+                        required
+                    >
                 </div>
+
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input
+                        type="text"
+                        name="last_name"
+                        placeholder="Your last name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Username</label>
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Choose a username"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="you@example.com"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input
+                        type="tel"
+                        name="phone"
+                        placeholder="+233..."
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>School</label>
+                    <input
+                        type="text"
+                        name="school"
+                        placeholder="Your school"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Class</label>
+                    <select name="class_name" required>
+                        <option value="">Select class</option>
+                        <option value="Form 1">Form 1</option>
+                        <option value="Form 2">Form 2</option>
+                        <option value="Form 3">Form 3</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>New Gen Group</label>
+                    <select name="group_name" required>
+                        <option value="">Choose your group</option>
+                        <option value="Music & Dance">Music & Dance</option>
+                        <option value="Tech">Tech</option>
+                        <option value="Art">Art</option>
+                        <option value="Poetry">Poetry</option>
+                        <option value="Fashion">Fashion</option>
+                    </select>
+                </div>
+
+                <div class="form-group full">
+                    <label>Why do you want to join New Gen?</label>
+                    <textarea
+                        name="reason_for_joining"
+                        placeholder="Tell us what you hope to contribute or learn..."
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input
+                        type="password"
+                        name="password"
+                        minlength="8"
+                        placeholder="Minimum 8 characters"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input
+                        type="password"
+                        name="confirm_password"
+                        minlength="8"
+                        placeholder="Repeat your password"
+                        required
+                    >
+                </div>
+
             </div>
 
-            <div class="form-group">
-                <label>Password</label>
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Minimum 8 characters"
-                    required
-                >
-            </div>
-
-            <div class="form-group">
-                <label>Confirm Password</label>
-                <input
-                    type="password"
-                    name="confirm_password"
-                    placeholder="Repeat password"
-                    required
-                >
-            </div>
-
-            <div class="form-group full">
-
-                <button class="btn btn-primary form-submit">
-                    Create My Account
-                </button>
-
-            </div>
+            <button class="submit-btn" type="submit">
+                Create My New Gen Account
+            </button>
 
         </form>
 
         <div class="auth-footer">
-
-            Already have an account?
-
-            <a href="{{ url_for('login') }}">
-                Log in
-            </a>
-
-            <br><br>
-
-            <a href="{{ url_for('executive_apply') }}">
-                Applying as an Executive?
-            </a>
-
+            Already a member?
+            <a href="{{ url_for('login') }}">Log in</a>
         </div>
 
     </div>

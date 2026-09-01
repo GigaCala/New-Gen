@@ -1,295 +1,171 @@
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block title %}Join New Gen{% endblock %}
 
-<title>Join New Gen</title>
+{% block content %}
 
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Segoe UI,sans-serif;
-}
+<section class="auth-page">
 
-body{
-    min-height:100vh;
-    background:linear-gradient(135deg,#060a12,#111827,#1e1b4b);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:40px 15px;
-    color:white;
-}
+    <div class="auth-card">
 
-.container{
-    width:100%;
-    max-width:760px;
-    background:rgba(255,255,255,.05);
-    backdrop-filter:blur(18px);
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:28px;
-    padding:35px;
-    box-shadow:0 30px 60px rgba(0,0,0,.45);
-}
+        <div class="auth-header">
+            <h1>
+                Join <span class="gradient-text">New Gen</span>
+            </h1>
 
-.logo{
-    text-align:center;
-    margin-bottom:25px;
-}
+            <p>
+                Become part of a community where technology, music, art,
+                poetry and fashion shape the future of Africa.
+            </p>
+        </div>
 
-.logo h1{
-    font-size:2.5rem;
-    background:linear-gradient(90deg,#ff5edb,#8b5cf6,#45d0ff);
-    -webkit-background-clip:text;
-    color:transparent;
-}
+        <form method="POST" class="form-grid">
 
-.logo p{
-    color:#b8c4dc;
-    margin-top:8px;
-}
+            <div class="form-group">
+                <label>First Name</label>
+                <input
+                    type="text"
+                    name="first_name"
+                    placeholder="First name"
+                    required
+                >
+            </div>
 
-.flash{
-    background:#16a34a33;
-    border:1px solid #22c55e55;
-    padding:12px;
-    border-radius:12px;
-    margin-bottom:20px;
-}
+            <div class="form-group">
+                <label>Last Name</label>
+                <input
+                    type="text"
+                    name="last_name"
+                    placeholder="Last name"
+                    required
+                >
+            </div>
 
-.grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:18px;
-}
+            <div class="form-group">
+                <label>Username</label>
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="Unique username"
+                    required
+                >
+            </div>
 
-.full{
-    grid-column:1/-1;
-}
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input
+                    type="tel"
+                    name="phone"
+                    placeholder="024XXXXXXX"
+                    required
+                >
+            </div>
 
-label{
-    display:block;
-    margin-bottom:8px;
-    font-size:.9rem;
-    color:#d6e2ff;
-}
+            <div class="form-group full">
+                <label>Email Address</label>
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="you@example.com"
+                    required
+                >
+            </div>
 
-input,select,textarea{
-    width:100%;
-    padding:14px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,.08);
-    background:rgba(255,255,255,.06);
-    color:white;
-    outline:none;
-}
+            <div class="form-group">
+                <label>School</label>
+                <input
+                    type="text"
+                    name="school"
+                    placeholder="Abomosu STEM SHS"
+                    required
+                >
+            </div>
 
-input::placeholder,
-textarea::placeholder{
-    color:#94a3b8;
-}
+            <div class="form-group">
+                <label>Class / Form</label>
+                <select name="class_name" required>
+                    <option value="">Select Form</option>
+                    <option>Form 1</option>
+                    <option>Form 2</option>
+                    <option>Form 3</option>
+                </select>
+            </div>
 
-textarea{
-    resize:vertical;
-    min-height:120px;
-}
+            <div class="form-group full">
+                <label>Choose Your Group</label>
 
-.group-cards{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:12px;
-}
+                <select name="group_name" required>
+                    <option value="">Select Group</option>
+                    <option>Music & Dance</option>
+                    <option>Tech</option>
+                    <option>Art</option>
+                    <option>Poetry</option>
+                    <option>Fashion</option>
+                </select>
+            </div>
 
-.group-cards label{
-    margin:0;
-    cursor:pointer;
-}
+            <div class="form-group full">
+                <label>Why do you want to join New Gen?</label>
 
-.group-cards input{
-    display:none;
-}
+                <textarea
+                    name="reason_for_joining"
+                    placeholder="Tell us about your passion, talents and goals..."
+                    required
+                ></textarea>
 
-.card{
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:16px;
-    padding:16px;
-    text-align:center;
-    transition:.25s;
-    background:rgba(255,255,255,.03);
-}
+                <div class="form-help">
+                    This helps the executives understand your interests.
+                </div>
+            </div>
 
-.group-cards input:checked + .card{
-    border-color:#8b5cf6;
-    background:rgba(139,92,246,.18);
-}
+            <div class="form-group">
+                <label>Password</label>
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Minimum 8 characters"
+                    required
+                >
+            </div>
 
-button{
-    width:100%;
-    padding:16px;
-    border:none;
-    border-radius:999px;
-    background:linear-gradient(90deg,#ff5edb,#8b5cf6,#45d0ff);
-    color:white;
-    font-weight:bold;
-    font-size:1rem;
-    cursor:pointer;
-    margin-top:10px;
-}
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input
+                    type="password"
+                    name="confirm_password"
+                    placeholder="Repeat password"
+                    required
+                >
+            </div>
 
-.bottom{
-    text-align:center;
-    margin-top:20px;
-    color:#b8c4dc;
-}
+            <div class="form-group full">
 
-.bottom a{
-    color:#45d0ff;
-    text-decoration:none;
-}
+                <button class="btn btn-primary form-submit">
+                    Create My Account
+                </button>
 
-@media(max-width:700px){
-    .grid{
-        grid-template-columns:1fr;
-    }
+            </div>
 
-    .group-cards{
-        grid-template-columns:1fr;
-    }
-}
-</style>
+        </form>
 
-</head>
+        <div class="auth-footer">
 
-<body>
+            Already have an account?
 
-<div class="container">
+            <a href="{{ url_for('login') }}">
+                Log in
+            </a>
 
-<div class="logo">
-<h1>NEW GEN</h1>
-<p>African Children Must Speak</p>
-</div>
+            <br><br>
 
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<div class="flash">
-{{ messages[0] }}
-</div>
-{% endif %}
-{% endwith %}
+            <a href="{{ url_for('executive_apply') }}">
+                Applying as an Executive?
+            </a>
 
-<form action="/signup" method="POST">
+        </div>
 
-<div class="grid">
+    </div>
 
-<div>
-<label>First Name</label>
-<input type="text" name="first_name" required>
-</div>
+</section>
 
-<div>
-<label>Last Name</label>
-<input type="text" name="last_name" required>
-</div>
-
-<div>
-<label>Username</label>
-<input type="text" name="username" required>
-</div>
-
-<div>
-<label>Phone Number</label>
-<input type="tel" name="phone" placeholder="+233..." required>
-</div>
-
-<div class="full">
-<label>Email Address</label>
-<input type="email" name="email" required>
-</div>
-
-<div>
-<label>School</label>
-<input type="text" name="school" required>
-</div>
-
-<div>
-<label>Class / Form</label>
-<select name="class_name" required>
-<option value="">Select</option>
-<option>Form 1</option>
-<option>Form 2</option>
-<option>Form 3</option>
-</select>
-</div>
-
-<div class="full">
-<label>Select Your Group</label>
-
-<div class="group-cards">
-
-<label>
-<input type="radio" name="group_name" value="Music & Dance" required>
-<div class="card">🎵 Music & Dance</div>
-</label>
-
-<label>
-<input type="radio" name="group_name" value="Tech">
-<div class="card">💻 Tech</div>
-</label>
-
-<label>
-<input type="radio" name="group_name" value="Art">
-<div class="card">🎨 Art</div>
-</label>
-
-<label>
-<input type="radio" name="group_name" value="Poetry">
-<div class="card">✍ Poetry</div>
-</label>
-
-<label class="full">
-<input type="radio" name="group_name" value="Fashion">
-<div class="card">👗 Fashion</div>
-</label>
-
-</div>
-</div>
-
-<div class="full">
-<label>Why do you want to join New Gen?</label>
-<textarea
-name="reason"
-placeholder="Tell us your passion, goals, and why you want to become part of New Gen..."
-required></textarea>
-</div>
-
-<div>
-<label>Password</label>
-<input type="password" name="password" required>
-</div>
-
-<div>
-<label>Confirm Password</label>
-<input type="password" name="confirm_password" required>
-</div>
-
-<div class="full">
-<button type="submit">Create My Account</button>
-</div>
-
-</div>
-
-</form>
-
-<div class="bottom">
-Already a member?
-<a href="/login">Login</a>
-</div>
-
-</div>
-
-</body>
-</html>
+{% endblock %}

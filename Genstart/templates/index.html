@@ -3,210 +3,414 @@
 {% block title %}New Gen | School Club{% endblock %}
 
 {% block content %}
+
+{% if member %}
+<section style="padding:18px 0;background:rgba(115,240,192,.08);border-bottom:1px solid rgba(115,240,192,.15);">
+  <div class="container" style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;">
+    <div>
+      **Welcome back, {{ member.first_name }}!**
+
+      <div style="color:#b9c6dc;font-size:.92rem;">
+        {{ member.group_name }} Department · {{ member.class_name }}
+      </div>
+    </div>
+
+    <a href="{{ url_for('member_dashboard') }}" class="btn btn-primary">
+      Open Dashboard
+    </a>
+  </div>
+</section>
+{% endif %}
+
 <main id="home">
-  <section class="hero">
-    <div class="container hero-grid reveal">
-      <div class="hero-copy">
-        <span class="eyebrow">School creative club</span>
-        <h1>
-          <span>Make</span>
-          <span class="gradient-text">magic</span>
-          <span>with your voice, your art, and your ideas.</span>
-        </h1>
-        <p>
-          New Gen is where students turn passion into performance. From soulful music and dynamic dance to stunning art, powerful poetry, and bold tech innovation, we bring every creative spark to life.
-        </p>
 
-        <div class="cta-row">
-          <a href="#join" class="btn btn-primary">Become a member</a>
-          <a href="#about" class="btn btn-secondary">Discover more</a>
-        </div>
+<section class="hero">
 
-        <div class="hero-metrics">
-          <div class="metric">
-            <strong>5+</strong>
-            <span>Creative spaces</span>
-          </div>
-          <div class="metric">
-            <strong>200+</strong>
-            <span>Active students</span>
-          </div>
-          <div class="metric">
-            <strong>24/7</strong>
-            <span>Creative energy</span>
-          </div>
-        </div>
-      </div>
+<div class="container hero-grid reveal">
 
-      <div class="showcase" aria-label="Creative club highlights">
-        <div class="spotlight"></div>
-        <div class="main-visual local-hero-visual" aria-label="New Gen portrait"></div>
+<div class="hero-copy">
 
-        <div class="floating-tag tag-a">
-          <span class="tag-icon">♫</span>
-          <div>
-            <strong>Rhythm</strong><br />
-            <small>Live sessions</small>
-          </div>
-        </div>
+<span class="eyebrow">
+School creative club
+</span>
 
-        <div class="floating-tag tag-b">
-          <span class="tag-icon">✦</span>
-          <div>
-            <strong>Art</strong><br />
-            <small>We paint stories</small>
-          </div>
-        </div>
+<h1>
+<span>Make</span>
+<span class="gradient-text">magic</span>
+<span>with your voice, your art, and your ideas.</span>
+</h1>
 
-        <div class="floating-tag tag-c">
-          <span class="tag-icon">⌘</span>
-          <div>
-            <strong>Tech</strong><br />
-            <small>Build the future</small>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+<p>
+New Gen is where students turn passion into performance.
+From soulful music and dynamic dance to stunning art,
+powerful poetry, bold fashion and innovative technology,
+we bring every creative spark to life.
+</p>
 
-  <section id="about" class="section reveal">
-    <div class="container">
-      <div class="section-header">
-        <h2>One club. Endless creativity.</h2>
-        <p>
-          New Gen is a community where students explore talents, celebrate culture, and build confidence through expression, collaboration, and innovation.
-        </p>
-      </div>
+<div class="cta-row">
 
-      <div class="feature-grid">
-        <article class="feature-card reveal">
-          <span class="eyebrow">Music & Dance</span>
-          <h3>Move the room.</h3>
-          <p>
-            We sing, dance, choreograph, and perform with energy that connects hearts and brings our school together through rhythm and movement.
-          </p>
-          <div class="mini-badges">
-            <span>Choir</span>
-            <span>Dance Crew</span>
-            <span>Open Mic</span>
-          </div>
-          <div class="feature-visual music-visual"></div>
-          <a class="read-more" href="{{ url_for('music_dance') }}">Explore music & dance</a>
-        </article>
+{% if member %}
 
-        <article class="feature-card reveal">
-          <span class="eyebrow">Art</span>
-          <h3>Color outside the lines.</h3>
-          <p>
-            We explore drawing, painting, digital design, and visual storytelling to create bold ideas, beautiful work, and unforgettable exhibitions.
-          </p>
-          <div class="mini-badges">
-            <span>Illustration</span>
-            <span>Canvas</span>
-            <span>Design</span>
-          </div>
-          <div class="feature-visual art-visual"></div>
-          <a class="read-more" href="{{ url_for('art') }}">Explore art</a>
-        </article>
+<a href="{{ url_for('member_dashboard') }}" class="btn btn-primary">
+Go to Dashboard
+</a>
 
-        <article class="feature-card reveal">
-          <span class="eyebrow">Poetry</span>
-          <h3>Write the words that stay.</h3>
-          <p>
-            Poetry nights, spoken word, and storytelling sessions give students a voice to express emotion, identity, and imagination with impact.
-          </p>
-          <div class="mini-badges">
-            <span>Spoken word</span>
-            <span>Storytelling</span>
-            <span>Open readings</span>
-          </div>
-          <div class="feature-visual poetry-visual"></div>
-          <a class="read-more" href="{{ url_for('poetry') }}">Explore poetry</a>
-        </article>
+{% else %}
 
-        <article class="feature-card reveal">
-          <span class="eyebrow">Tech</span>
-          <h3>Build the next big idea.</h3>
-          <p>
-            We learn coding, digital media, problem solving, and creative tech skills that help students design, innovate, and lead in the digital world.
-          </p>
-          <div class="mini-badges">
-            <span>Coding</span>
-            <span>Robotics</span>
-            <span>Creative media</span>
-          </div>
-          <div class="feature-visual tech-visual"></div>
-          <a class="read-more" href="{{ url_for('tech') }}">Explore tech</a>
-        </article>
-      </div>
-    </div>
-  </section>
+<a href="{{ url_for('signup') }}" class="btn btn-primary">
+Join New Gen
+</a>
 
-  <section class="section reveal">
-    <div class="container">
-      <div class="section-header">
-        <h2>Our creative highlights</h2>
-        <p>
-          From stage performances to digital projects, New Gen lives in every form of expression and every student who dares to be bold.
-        </p>
-      </div>
+{% endif %}
 
-      <div class="gallery-grid">
-        <div class="gallery-item reveal">
-          <div class="gallery-overlay">
-            <strong>Dance showcases</strong>
-            <span>Energy, rhythm, expression</span>
-          </div>
-        </div>
-        <div class="gallery-item reveal">
-          <div class="gallery-overlay">
-            <strong>Art exhibitions</strong>
-            <span>Original works and stories</span>
-          </div>
-        </div>
-        <div class="gallery-item reveal">
-          <div class="gallery-overlay">
-            <strong>Poetry nights</strong>
-            <span>Heartfelt words and voice</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+<a href="#about" class="btn btn-secondary">
+Discover More
+</a>
 
-  <section class="section reveal">
-    <div class="container">
-      <div class="section-header">
-        <h2>Upcoming events</h2>
-        <p>Come celebrate, create, and connect with the New Gen community.</p>
-      </div>
+</div>
 
-      <div class="event-grid-home">
-        {% for event in events %}
-          <article class="home-event-card">
-            <span class="event-date-chip">{{ format_display_date(event.date) }}</span>
-            <h3>{{ event.title }}</h3>
-            <p>{{ event.description }}</p>
-            <div class="event-footer-row">
-              <span>{{ event.category or 'Club Event' }}</span>
-              <span>{{ event.location or 'School campus' }}</span>
-            </div>
-          </article>
-        {% endfor %}
-      </div>
-    </div>
-  </section>
+<div class="hero-metrics">
 
-  <section id="join" class="section reveal">
-    <div class="container">
-      <div class="cta-band">
-        <div>
-          <h3>Join the New Gen family.</h3>
-          <p>Bring your talent. Share your imagination. Grow with us.</p>
-        </div>
-        <a href="mailto:hello@newgen.club" class="btn btn-primary">Get involved</a>
-      </div>
-    </div>
-  </section>
+<div class="metric">
+<strong>5</strong>
+<span>Creative Departments</span>
+</div>
+
+<div class="metric">
+<strong>200+</strong>
+<span>Young Creators</span>
+</div>
+
+<div class="metric">
+<strong>24/7</strong>
+<span>Innovation</span>
+</div>
+
+</div>
+
+</div>
+
+<div class="showcase">
+
+<div class="spotlight"></div>
+
+<div class="main-visual local-hero-visual"></div>
+
+<div class="floating-tag tag-a">
+<span class="tag-icon">♫</span>
+<div>
+**Rhythm**  
+<small>Live Sessions</small>
+</div>
+</div>
+
+<div class="floating-tag tag-b">
+<span class="tag-icon">✦</span>
+<div>
+**Art**  
+<small>Visual Stories</small>
+</div>
+</div>
+
+<div class="floating-tag tag-c">
+<span class="tag-icon">⌘</span>
+<div>
+**Tech**  
+<small>Build Africa</small>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<section id="about" class="section reveal">
+
+<div class="container">
+
+<div class="section-header">
+
+## One Club. Endless Creativity.
+
+New Gen empowers students to become musicians, artists,
+poets, designers, engineers and leaders.
+
+</div>
+
+<div class="feature-grid">
+
+<article class="feature-card reveal">
+<span class="eyebrow">Music & Dance</span>
+
+## Move the room.
+
+Choir, choreography, performances and live worship.
+
+<div class="mini-badges">
+<span>Choir</span>
+<span>Dance</span>
+<span>Performance</span>
+</div>
+
+<div class="feature-visual music-visual"></div>
+
+<a class="read-more" href="{{ url_for('music_dance') }}">
+Explore Music
+</a>
+
+</article>
+
+<article class="feature-card reveal">
+<span class="eyebrow">Art</span>
+
+## Create beauty.
+
+Drawing, painting, illustration and digital art.
+
+<div class="mini-badges">
+<span>Canvas</span>
+<span>Sketch</span>
+<span>Design</span>
+</div>
+
+<div class="feature-visual art-visual"></div>
+
+<a class="read-more" href="{{ url_for('art') }}">
+Explore Art
+</a>
+
+</article>
+
+<article class="feature-card reveal">
+<span class="eyebrow">Poetry</span>
+
+## Speak from the soul.
+
+Spoken word, storytelling and creative writing.
+
+<div class="mini-badges">
+<span>Poems</span>
+<span>Voice</span>
+<span>Stories</span>
+</div>
+
+<div class="feature-visual poetry-visual"></div>
+
+<a class="read-more" href="{{ url_for('poetry') }}">
+Explore Poetry
+</a>
+
+</article>
+
+<article class="feature-card reveal">
+<span class="eyebrow">Tech</span>
+
+## Build the future.
+
+AI, coding, robotics, cybersecurity and innovation.
+
+<div class="mini-badges">
+<span>Python</span>
+<span>Web</span>
+<span>AI</span>
+</div>
+
+<div class="feature-visual tech-visual"></div>
+
+<a class="read-more" href="{{ url_for('tech') }}">
+Explore Tech
+</a>
+
+</article>
+
+<article class="feature-card reveal">
+<span class="eyebrow">Fashion</span>
+
+## Design the next generation.
+
+Modern African fashion, styling, modeling and clothing design.
+
+<div class="mini-badges">
+<span>Runway</span>
+<span>Design</span>
+<span>Culture</span>
+</div>
+
+<div class="feature-visual art-visual"></div>
+
+<a class="read-more" href="{{ url_for('fashion') }}">
+Explore Fashion
+</a>
+
+</article>
+
+</div>
+
+</div>
+
+</section>
+
+<section class="section reveal">
+
+<div class="container">
+
+<div class="section-header">
+
+## Creative Highlights
+
+Every student has a story worth sharing.
+
+</div>
+
+<div class="gallery-grid">
+
+<div class="gallery-item reveal">
+<div class="gallery-overlay">
+**Dance Showcases**
+
+Energy • Rhythm • Performance
+</div>
+</div>
+
+<div class="gallery-item reveal">
+<div class="gallery-overlay">
+**Art Exhibition**
+
+Original African Creativity
+</div>
+</div>
+
+<div class="gallery-item reveal">
+<div class="gallery-overlay">
+**Poetry Nights**
+
+Words That Change Minds
+</div>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<section class="section reveal">
+
+<div class="container">
+
+<div class="section-header">
+
+## Upcoming Events
+
+Workshops, performances and competitions.
+
+</div>
+
+<div class="event-grid-home">
+
+{% if events %}
+
+{% for event in events %}
+
+<article class="home-event-card">
+
+<span class="event-date-chip">
+{{ format_display_date(event.date) }}
+</span>
+
+### {{ event.title }}
+
+{{ event.description }}
+
+<div class="event-footer-row">
+<span>{{ event.category or "Club Event" }}</span>
+<span>{{ event.location or "School Campus" }}</span>
+</div>
+
+</article>
+
+{% endfor %}
+
+{% else %}
+
+<article class="home-event-card">
+
+## No Events Yet
+
+The executives haven't published any events.
+
+Create one from the admin dashboard.
+
+</article>
+
+{% endif %}
+
+</div>
+
+</div>
+
+</section>
+
+<section id="join" class="section reveal">
+
+<div class="container">
+
+<div class="cta-band">
+
+<div>
+
+## Join the New Gen Family
+
+Bring your talent. Share your imagination. Lead Africa's future.
+
+</div>
+
+{% if member %}
+
+<a href="{{ url_for('member_dashboard') }}" class="btn btn-primary">
+My Dashboard
+</a>
+
+{% else %}
+
+<a href="{{ url_for('signup') }}" class="btn btn-primary">
+Become a Member
+</a>
+
+{% endif %}
+
+</div>
+
+</div>
+
+</section>
+
+<section class="section reveal" style="padding-bottom:70px;">
+
+<div class="container">
+
+<div class="cta-band">
+
+<div>
+
+## Stay Connected
+
+Follow New Gen, contact executives and never miss an announcement.
+
+</div>
+
+<a href="{{ url_for('contact') }}" class="btn btn-secondary">
+Contact Us
+</a>
+
+</div>
+
+</div>
+
+</section>
+
 </main>
+
 {% endblock %}

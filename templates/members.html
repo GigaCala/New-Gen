@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}Members | New Gen{% endblock %}
+
+{% block content %}
+
+<main class="members-page">
+
+  <section class="members-hero">
+
+    <div class="container members-hero-inner">
+
+      <div>
+
+        <span class="auth-kicker">
+          NEW GEN / COMMUNITY
+        </span>
+
+        <h1>
+          The people<br>
+          <span>behind the movement.</span>
+        </h1>
+
+        <p>
+          Meet the students who are building New Gen
+          through creativity, technology, leadership
+          and collaboration.
+        </p>
+
+      </div>
+
+      <div class="members-hero-mark">
+
+        <span>
+          NEW
+        </span>
+
+        <strong>
+          GEN
+        </strong>
+
+        <small>
+          AFRICAN CHILDREN MUST SPEAK.
+        </small>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section class="members-directory">
+
+    <div class="container">
+
+      <div class="dashboard-section-heading">
+
+        <span class="auth-label">
+          MEMBER DIRECTORY
+        </span>
+
+        <h2>
+          Our community.
+        </h2>
+
+        <p>
+          Explore the students who have joined New Gen.
+        </p>
+
+      </div>
+
+
+      <div class="members-table-wrap">
+
+        <table class="members-table">
+
+          <thead>
+
+            <tr>
+
+              <th>#</th>
+              <th>Name</th>
+              <th>Username</th>
+              <th>School</th>
+              <th>Form</th>
+              <th>Group</th>
+              <th>Role</th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            {% for person in members %}
+
+            <tr>
+
+              <td>
+                {{ "%02d"|format(loop.index) }}
+              </td>
+
+
+              <td>
+
+                <strong>
+                  {{ person.first_name }}
+                  {{ person.last_name }}
+                </strong>
+
+              </td>
+
+
+              <td>
+                @{{ person.username }}
+              </td>
+
+
+              <td>
+                {{ person.school }}
+              </td>
+
+
+              <td>
+                {{ person.class_name }}
+              </td>
+
+
+              <td>
+
+                <span class="member-group">
+                  {{ person.group_name }}
+                </span>
+
+              </td>
+
+
+              <td>
+
+                {% if person.role == "executive" %}
+
+                  <span class="role-badge executive">
+                    Executive
+                  </span>
+
+                {% else %}
+
+                  <span class="role-badge">
+                    Member
+                  </span>
+
+                {% endif %}
+
+              </td>
+
+            </tr>
+
+            {% else %}
+
+            <tr>
+
+              <td colspan="7">
+
+                <div class="empty-state">
+
+                  <span>
+                    NO MEMBERS YET
+                  </span>
+
+                  <h3>
+                    The movement is waiting for you.
+                  </h3>
+
+                  <p>
+                    New Gen members will appear here
+                    after they register.
+                  </p>
+
+                  <a
+                    href="{{ url_for('signup') }}"
+                    class="auth-submit"
+                  >
+                    Join New Gen →
+                  </a>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+            {% endfor %}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section class="members-statement">
+
+    <div class="container">
+
+      <span>
+        NEW GEN / COMMUNITY
+      </span>
+
+      <h2>
+        Different talents.<br>
+        <em>One voice.</em>
+      </h2>
+
+      <p>
+        Music. Dance. Art. Poetry. Fashion. Technology.
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <div class="container members-footer">
+
+    <a
+      href="{{ url_for('home') }}"
+      class="auth-link"
+    >
+      ← Back to New Gen
+    </a>
+
+    {% if member %}
+
+      <a
+        href="{{ url_for('member_dashboard') }}"
+        class="dashboard-logout"
+      >
+        My Dashboard →
+      </a>
+
+    {% else %}
+
+      <a
+        href="{{ url_for('signup') }}"
+        class="dashboard-logout"
+      >
+        Join New Gen →
+      </a>
+
+    {% endif %}
+
+  </div>
+
+</main>
+
+{% endblock %}

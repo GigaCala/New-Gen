@@ -1,0 +1,527 @@
+{% extends "base.html" %}
+
+{% block title %}Executive Command Center | New Gen{% endblock %}
+
+{% block content %}
+
+<main class="executive-dashboard-page">
+
+  <!-- HERO -->
+
+  <section class="executive-dashboard-hero">
+
+```
+<div class="container executive-dashboard-hero-inner">
+
+  <div>
+
+    <span class="auth-kicker">
+      NEW GEN / EXECUTIVE COMMAND CENTER
+    </span>
+
+    <h1>
+      Lead the<br>
+      <span>movement.</span>
+    </h1>
+
+    <p>
+      Welcome, {{ member.first_name }}.
+      This is the leadership space for approved
+      New Gen executives.
+    </p>
+
+  </div>
+
+
+  <div class="executive-status">
+
+    <span class="status-dot"></span>
+
+    <div>
+
+      <small>
+        ACCESS STATUS
+      </small>
+
+      <strong>
+        EXECUTIVE
+      </strong>
+
+      <span>
+        @{{ member.username }}
+      </span>
+
+    </div>
+
+  </div>
+
+</div>
+```
+
+  </section>
+
+  <!-- OVERVIEW -->
+
+  <section class="executive-overview">
+
+```
+<div class="container">
+
+  <div class="dashboard-section-heading">
+
+    <span class="auth-label">
+      COMMAND CENTER
+    </span>
+
+    <h2>
+      New Gen at a glance.
+    </h2>
+
+  </div>
+
+
+  <div class="executive-stats">
+
+    <div class="executive-stat">
+
+      <span>
+        MEMBERS
+      </span>
+
+      <strong>
+        {{ members|length }}
+      </strong>
+
+      <small>
+        Registered New Gen members
+      </small>
+
+    </div>
+
+
+    <div class="executive-stat">
+
+      <span>
+        APPLICATIONS
+      </span>
+
+      <strong>
+        {{ applications|length }}
+      </strong>
+
+      <small>
+        Executive applications
+      </small>
+
+    </div>
+
+
+    <div class="executive-stat">
+
+      <span>
+        YOUR GROUP
+      </span>
+
+      <strong>
+        {{ member.group_name }}
+      </strong>
+
+      <small>
+        Your creative community
+      </small>
+
+    </div>
+
+  </div>
+
+</div>
+```
+
+  </section>
+
+  <!-- MEMBERS -->
+
+  <section class="executive-members">
+
+```
+<div class="container">
+
+  <div class="dashboard-section-heading">
+
+    <span class="auth-label">
+      MEMBER DIRECTORY
+    </span>
+
+    <h2>
+      The New Gen community.
+    </h2>
+
+    <p>
+      View registered members and their creative groups.
+    </p>
+
+  </div>
+
+
+  <div class="executive-table-wrap">
+
+    <table class="executive-table">
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Name
+          </th>
+
+          <th>
+            Username
+          </th>
+
+          <th>
+            School
+          </th>
+
+          <th>
+            Form
+          </th>
+
+          <th>
+            Group
+          </th>
+
+          <th>
+            Role
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+        {% for person in members %}
+
+        <tr>
+
+          <td>
+            <strong>
+              {{ person.first_name }}
+              {{ person.last_name }}
+            </strong>
+          </td>
+
+          <td>
+            @{{ person.username }}
+          </td>
+
+          <td>
+            {{ person.school }}
+          </td>
+
+          <td>
+            {{ person.class_name }}
+          </td>
+
+          <td>
+            {{ person.group_name }}
+          </td>
+
+          <td>
+
+            {% if person.role == "executive" %}
+
+              <span class="role-badge executive">
+                Executive
+              </span>
+
+            {% else %}
+
+              <span class="role-badge">
+                Member
+              </span>
+
+            {% endif %}
+
+          </td>
+
+        </tr>
+
+        {% else %}
+
+        <tr>
+
+          <td colspan="6">
+            No members have registered yet.
+          </td>
+
+        </tr>
+
+        {% endfor %}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+```
+
+  </section>
+
+  <!-- APPLICATIONS -->
+
+  <section class="executive-applications">
+
+```
+<div class="container">
+
+  <div class="dashboard-section-heading">
+
+    <span class="auth-label">
+      LEADERSHIP APPLICATIONS
+    </span>
+
+    <h2>
+      Applications received.
+    </h2>
+
+    <p>
+      Applications are reviewed and approved by
+      New Gen administrators.
+    </p>
+
+  </div>
+
+
+  <div class="executive-application-list">
+
+    {% for application in applications %}
+
+      <article class="executive-application-card">
+
+        <div class="application-number">
+          {{ loop.index|string|zfill(2) }}
+        </div>
+
+
+        <div class="application-main">
+
+          <span class="application-status {{ application.status }}">
+            {{ application.status }}
+          </span>
+
+          <h3>
+            {{ application.first_name }}
+            {{ application.last_name }}
+          </h3>
+
+          <p>
+            @{{ application.username }}
+            · {{ application.school }}
+            · {{ application.class_name }}
+          </p>
+
+          <strong>
+            Applying for: {{ application.position }}
+          </strong>
+
+          <blockquote>
+            {{ application.reason }}
+          </blockquote>
+
+        </div>
+
+
+        <div class="application-date">
+
+          <small>
+            SUBMITTED
+          </small>
+
+          <span>
+            {{ application.created_at[:10] }}
+          </span>
+
+        </div>
+
+      </article>
+
+    {% else %}
+
+      <div class="empty-state">
+
+        <span>
+          NO APPLICATIONS
+        </span>
+
+        <h3>
+          The leadership queue is clear.
+        </h3>
+
+        <p>
+          New executive applications will appear here.
+        </p>
+
+      </div>
+
+    {% endfor %}
+
+  </div>
+
+</div>
+```
+
+  </section>
+
+  <!-- EXECUTIVE ACTIONS -->
+
+  <section class="executive-actions-section">
+
+```
+<div class="container">
+
+  <div class="dashboard-section-heading">
+
+    <span class="auth-label">
+      QUICK ACTIONS
+    </span>
+
+    <h2>
+      Keep New Gen moving.
+    </h2>
+
+  </div>
+
+
+  <div class="dashboard-actions">
+
+    <a
+      href="{{ url_for('calendar') }}"
+      class="dashboard-action"
+    >
+
+      <span>01</span>
+
+      <div>
+
+        <strong>
+          Events &amp; Calendar
+        </strong>
+
+        <small>
+          See upcoming New Gen activities.
+        </small>
+
+      </div>
+
+      <b>→</b>
+
+    </a>
+
+
+    <a
+      href="{{ url_for('contact') }}"
+      class="dashboard-action"
+    >
+
+      <span>02</span>
+
+      <div>
+
+        <strong>
+          Contact New Gen
+        </strong>
+
+        <small>
+          Coordinate ideas and communication.
+        </small>
+
+      </div>
+
+      <b>→</b>
+
+    </a>
+
+
+    <a
+      href="{{ url_for('admin_login') }}"
+      class="dashboard-action"
+    >
+
+      <span>03</span>
+
+      <div>
+
+        <strong>
+          Administrator Area
+        </strong>
+
+        <small>
+          Restricted administrative controls.
+        </small>
+
+      </div>
+
+      <b>→</b>
+
+    </a>
+
+  </div>
+
+</div>
+```
+
+  </section>
+
+  <!-- FOOTER STATEMENT -->
+
+  <section class="executive-dashboard-statement">
+
+```
+<div class="container">
+
+  <span>
+    NEW GEN / LEADERSHIP
+  </span>
+
+  <h2>
+    African children<br>
+    <em>must speak.</em>
+  </h2>
+
+  <p>
+    Lead with purpose. Create with courage.
+  </p>
+
+</div>
+```
+
+  </section>
+
+  <div class="container executive-dashboard-footer">
+
+```
+<a
+  href="{{ url_for('member_dashboard') }}"
+  class="auth-link"
+>
+  ← Back to my dashboard
+</a>
+
+<a
+  href="{{ url_for('logout') }}"
+  class="dashboard-logout"
+>
+  Log out →
+</a>
+```
+
+  </div>
+
+</main>
+
+{% endblock %}

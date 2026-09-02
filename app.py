@@ -239,17 +239,12 @@ def is_executive():
 
 @app.route("/")
 def home():
-    events = sorted(
-        load_events(),
-        key=lambda event: event.get("date", "")
-    )[:3]
-
-    return render_template(
-        "index.html",
-        events=events,
-        member=get_current_member(),
-    )
-
+    return """
+    <html style="background:black;color:white;font-size:40px;
+    display:flex;justify-content:center;align-items:center;height:100vh;">
+        NEW GEN TEST 2026
+    </html>
+    """
 
 # ============================================================
 # CREATIVE PAGES

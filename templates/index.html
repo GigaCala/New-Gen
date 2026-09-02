@@ -4,75 +4,103 @@
 
 {% block content %}
 
-<section style="background:#ff0055;padding:25px;text-align:center;color:white;font-size:32px;font-weight:bold;">
-    🚀 TEMPLATE INDEX IS WORKING
-</section>
-
 <main id="home">
   <section class="hero">
-    <div class="container hero-grid reveal">
-      <div class="hero-copy">
-        <span class="eyebrow">School creative club</span>
-        <h1>
-          <span>Make</span>
-          <span class="gradient-text">magic</span>
-          <span>with your voice, your art, and your ideas.</span>
-        </h1>
-        <p>
-          New Gen is where students turn passion into performance. From soulful music and dynamic dance to stunning art, powerful poetry, and bold tech innovation, we bring every creative spark to life.
-        </p>
+  <div class="container hero-grid reveal">
 
-        <div class="cta-row">
-          <a href="#join" class="btn btn-primary">Become a member</a>
-          <a href="#about" class="btn btn-secondary">Discover more</a>
-        </div>
+    <div class="hero-copy">
 
-        <div class="hero-metrics">
-          <div class="metric">
-            <strong>5+</strong>
-            <span>Creative spaces</span>
-          </div>
-          <div class="metric">
-            <strong>200+</strong>
-            <span>Active students</span>
-          </div>
-          <div class="metric">
-            <strong>24/7</strong>
-            <span>Creative energy</span>
-          </div>
-        </div>
+      <span class="eyebrow">ABOMOSU STEM SHS • NEW GEN</span>
+
+      <h1>
+        Africa's next
+        <span class="gradient-text">Creators</span>
+        start here.
+      </h1>
+
+      <p>
+        New Gen is more than a school club. It's a movement of musicians,
+        programmers, artists, poets and fashion designers building the future
+        from Ghana.
+      </p>
+
+      <div class="cta-row">
+
+        {% if member %}
+
+          <a href="{{ url_for('member_dashboard') }}" class="btn btn-primary">
+            My Dashboard
+          </a>
+
+        {% else %}
+
+          <a href="{{ url_for('signup') }}" class="btn btn-primary">
+            Join New Gen
+          </a>
+
+          <a href="{{ url_for('login') }}" class="btn btn-secondary">
+            Login
+          </a>
+
+        {% endif %}
+
       </div>
 
-      <div class="showcase" aria-label="Creative club highlights">
-        <div class="spotlight"></div>
-        <div class="main-visual local-hero-visual" aria-label="New Gen portrait"></div>
+      <div class="hero-metrics">
 
-        <div class="floating-tag tag-a">
-          <span class="tag-icon">♫</span>
-          <div>
-            <strong>Rhythm</strong><br />
-            <small>Live sessions</small>
-          </div>
+        <div class="metric">
+          <strong>5</strong>
+          <span>Departments</span>
         </div>
 
-        <div class="floating-tag tag-b">
-          <span class="tag-icon">✦</span>
-          <div>
-            <strong>Art</strong><br />
-            <small>We paint stories</small>
-          </div>
+        <div class="metric">
+          <strong>100%</strong>
+          <span>Student Led</span>
         </div>
 
-        <div class="floating-tag tag-c">
-          <span class="tag-icon">⌘</span>
-          <div>
-            <strong>Tech</strong><br />
-            <small>Build the future</small>
-          </div>
+        <div class="metric">
+          <strong>∞</strong>
+          <span>Creativity</span>
         </div>
+
       </div>
+
     </div>
-  </section>
+
+    <div class="showcase">
+
+      <div class="spotlight"></div>
+
+      <div class="main-visual local-hero-visual"></div>
+
+      <div class="floating-tag tag-a">
+        <span class="tag-icon">💻</span>
+        <div>
+          <strong>Tech</strong><br>
+          <small>AI & Coding</small>
+        </div>
+      </div>
+
+      <div class="floating-tag tag-b">
+        <span class="tag-icon">🎨</span>
+        <div>
+          <strong>Art</strong><br>
+          <small>Create Stories</small>
+        </div>
+      </div>
+
+      <div class="floating-tag tag-c">
+        <span class="tag-icon">👗</span>
+        <div>
+          <strong>Fashion</strong><br>
+          <small>Design Culture</small>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
 
   <section id="about" class="section reveal">
     <div class="container">
@@ -143,6 +171,31 @@
           <div class="feature-visual tech-visual"></div>
           <a class="read-more" href="{{ url_for('tech') }}">Explore tech</a>
         </article>
+          
+        <article class="feature-card reveal">
+
+  <span class="eyebrow">Fashion</span>
+
+  <h3>Wear your identity.</h3>
+
+  <p>
+    Discover styling, clothing design, runway confidence and modern African
+    fashion that tells powerful stories.
+  </p>
+
+  <div class="mini-badges">
+    <span>Design</span>
+    <span>Runway</span>
+    <span>Culture</span>
+  </div>
+
+  <div class="feature-visual art-visual"></div>
+
+  <a class="read-more" href="{{ url_for('fashion') }}">
+    Explore Fashion
+  </a>
+
+</article>
       </div>
     </div>
   </section>

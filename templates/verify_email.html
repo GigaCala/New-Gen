@@ -1,185 +1,306 @@
+```html
 {% extends "base.html" %}
 
-{% block title %}Verify Email | New Gen{% endblock %}
+{% block title %}Verify Your Email | New Gen{% endblock %}
 
 {% block content %}
 
-<main class="auth-page">
+<style>
+.verify-page {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 15% 20%, rgba(201,168,92,.09), transparent 30%),
+        #090909;
+    color: #f1eee7;
+    display: flex;
+    align-items: center;
+    padding: 80px 0;
+}
 
-  <section class="auth-shell">
+.verify-wrap {
+    width: min(760px, 92%);
+    margin: auto;
+}
 
-    <div class="auth-intro">
+.verify-card {
+    border: 1px solid rgba(255,255,255,.1);
+    background: rgba(255,255,255,.025);
+    padding: clamp(35px, 7vw, 75px);
+    position: relative;
+    overflow: hidden;
+}
 
-      <span class="auth-kicker">
-        NEW GEN / ACCOUNT SECURITY
-      </span>
+.verify-card::before {
+    content: "✦";
+    position: absolute;
+    right: 35px;
+    top: 20px;
+    font-size: 7rem;
+    color: rgba(201,168,92,.06);
+}
 
-      <h1>
-        Verify<br>
-        <span>your email.</span>
-      </h1>
+.verify-number {
+    font-size: .72rem;
+    letter-spacing: .2em;
+    color: #c9a85c;
+    text-transform: uppercase;
+    margin-bottom: 35px;
+}
 
-      <p>
-        One final step. Confirm your email address
-        to activate your New Gen account and access
-        your member dashboard.
-      </p>
+.verify-icon {
+    width: 70px;
+    height: 70px;
+    border: 1px solid rgba(201,168,92,.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7rem;
+    color: #c9a85c;
+    margin-bottom: 30px;
+}
 
-      <div class="auth-highlight">
+.verify-card h1 {
+    font-size: clamp(2.5rem, 7vw, 5.5rem);
+    line-height: .92;
+    letter-spacing: -.05em;
+    margin: 0;
+}
 
-        <span>01</span>
+.verify-card h1 span {
+    color: #c9a85c;
+}
 
-        <div>
-          <strong>Protect your account.</strong>
+.verify-card p {
+    color: #9d9a93;
+    line-height: 1.8;
+    max-width: 580px;
+    margin: 25px 0 0;
+}
 
-          <small>
-            Email verification helps keep your account secure.
-          </small>
-        </div>
+.verify-email {
+    display: inline-block;
+    margin-top: 18px;
+    color: #f1eee7;
+    font-weight: 700;
+    word-break: break-word;
+}
 
-      </div>
+.verify-action {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255,255,255,.08);
+}
 
-      <div class="auth-highlight">
+.verify-action button {
+    border: 1px solid #c9a85c;
+    background: #c9a85c;
+    color: #090909;
+    padding: 16px 25px;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: .25s ease;
+}
 
-        <span>02</span>
+.verify-action button:hover {
+    background: transparent;
+    color: #c9a85c;
+}
 
-        <div>
-          <strong>Unlock your membership.</strong>
+.verify-back {
+    display: inline-block;
+    margin-top: 25px;
+    color: #77736c;
+    text-decoration: none;
+    font-size: .9rem;
+}
 
-          <small>
-            Verified members can sign in and access their dashboard.
-          </small>
-        </div>
+.verify-back:hover {
+    color: #c9a85c;
+}
 
-      </div>
+.verify-success {
+    border-color: rgba(201,168,92,.35);
+}
 
-      <div class="auth-highlight">
+.verify-success .verify-icon {
+    background: #c9a85c;
+    color: #090909;
+}
 
-        <span>03</span>
+.verify-error .verify-icon {
+    border-color: #8d5555;
+    color: #d48787;
+}
 
-        <div>
-          <strong>Join the movement.</strong>
+.verify-error h1 span {
+    color: #d48787;
+}
 
-          <small>
-            Create. Collaborate. Lead.
-          </small>
-        </div>
+@media (max-width: 600px) {
+    .verify-card {
+        padding: 30px 24px;
+    }
 
-      </div>
+    .verify-card::before {
+        display: none;
+    }
+}
+</style>
+
+<main class="verify-page">
+
+    <div class="verify-wrap">
+
+        {% if success %}
+
+        <section class="verify-card verify-success">
+
+            <div class="verify-number">
+                NEW GEN / VERIFICATION
+            </div>
+
+            <div class="verify-icon">✓</div>
+
+            <h1>
+                You're<br>
+                <span>verified.</span>
+            </h1>
+
+            <p>
+                Your email has been successfully verified.
+                Your New Gen account is now ready.
+            </p>
+
+            <a
+                href="{{ url_for('login') }}"
+                class="auth-submit"
+                style="display:inline-block; margin-top:35px; text-decoration:none;"
+            >
+                Enter New Gen →
+            </a>
+
+        </section>
+
+        {% elif expired %}
+
+        <section class="verify-card verify-error">
+
+            <div class="verify-number">
+                NEW GEN / VERIFICATION
+            </div>
+
+            <div class="verify-icon">!</div>
+
+            <h1>
+                This link<br>
+                <span>expired.</span>
+            </h1>
+
+            <p>
+                Your verification link is no longer valid.
+                Verification links expire after 24 hours for security.
+            </p>
+
+            {% if email %}
+
+            <div class="verify-action">
+
+                <form method="POST" action="{{ url_for('resend_verification') }}">
+
+                    <input
+                        type="hidden"
+                        name="email"
+                        value="{{ email }}"
+                    >
+
+                    <button type="submit">
+                        Send me a new link →
+                    </button>
+
+                </form>
+
+            </div>
+
+            {% endif %}
+
+            <a
+                href="{{ url_for('login') }}"
+                class="verify-back"
+            >
+                ← Back to login
+            </a>
+
+        </section>
+
+        {% else %}
+
+        <section class="verify-card">
+
+            <div class="verify-number">
+                NEW GEN / VERIFICATION
+            </div>
+
+            <div class="verify-icon">✉</div>
+
+            <h1>
+                Your voice is<br>
+                <span>almost in.</span>
+            </h1>
+
+            <p>
+                We've sent a verification link to:
+            </p>
+
+            {% if email %}
+                <div class="verify-email">{{ email }}</div>
+            {% endif %}
+
+            <p>
+                Open the email and click the verification link
+                to activate your New Gen account.
+            </p>
+
+            <div class="verify-action">
+
+                {% if email %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for('resend_verification') }}"
+                >
+
+                    <input
+                        type="hidden"
+                        name="email"
+                        value="{{ email }}"
+                    >
+
+                    <button type="submit">
+                        Didn't receive it? Resend →
+                    </button>
+
+                </form>
+
+                {% endif %}
+
+            </div>
+
+            <a
+                href="{{ url_for('login') }}"
+                class="verify-back"
+            >
+                ← Already verified? Log in
+            </a>
+
+        </section>
+
+        {% endif %}
 
     </div>
-
-
-    <div class="auth-card">
-
-      <div class="auth-card-header">
-
-        <span class="auth-label">
-          EMAIL VERIFICATION
-        </span>
-
-        <h2>
-          Almost there.
-        </h2>
-
-        <p>
-          Your account has been created successfully.
-        </p>
-
-      </div>
-
-
-      <div class="verification-message">
-
-        <div class="verification-icon">
-          ✓
-        </div>
-
-        <h3>
-          Check your inbox.
-        </h3>
-
-        <p>
-          We sent a verification link to the email
-          address you used when creating your account.
-        </p>
-
-      </div>
-
-
-      <div class="verification-steps">
-
-        <div class="verification-step">
-
-          <span>01</span>
-
-          <div>
-            <strong>Open your email.</strong>
-
-            <small>
-              Check your inbox and spam folder.
-            </small>
-          </div>
-
-        </div>
-
-
-        <div class="verification-step">
-
-          <span>02</span>
-
-          <div>
-            <strong>Find the New Gen message.</strong>
-
-            <small>
-              Open the verification email.
-            </small>
-          </div>
-
-        </div>
-
-
-        <div class="verification-step">
-
-          <span>03</span>
-
-          <div>
-            <strong>Click the verification link.</strong>
-
-            <small>
-              Your account will then be activated.
-            </small>
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <div class="auth-divider">
-        <span>NEW GEN</span>
-      </div>
-
-
-      <div class="auth-footer">
-
-        <p>
-          Already verified?
-        </p>
-
-        <a
-          href="{{ url_for('login') }}"
-          class="auth-link"
-        >
-          Go to member login →
-        </a>
-
-      </div>
-
-    </div>
-
-  </section>
 
 </main>
 
 {% endblock %}
+```

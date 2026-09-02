@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+
+{% block title %}Join New Gen | Create Account{% endblock %}
+
+{% block content %}
+
+<main class="auth-page">
+
+  <section class="auth-shell signup-shell">
+
+```
+<!-- LEFT SIDE -->
+<div class="auth-intro">
+
+  <span class="auth-kicker">
+    NEW GEN / JOIN THE MOVEMENT
+  </span>
+
+  <h1>
+    Your voice<br>
+    <span>starts here.</span>
+  </h1>
+
+  <p>
+    New Gen is a space for young African creators,
+    thinkers, artists, innovators and leaders.
+  </p>
+
+  <div class="auth-highlight">
+    <span>01</span>
+    <div>
+      <strong>Choose your space.</strong>
+      <small>
+        Music &amp; Dance, Tech, Art, Poetry or Fashion.
+      </small>
+    </div>
+  </div>
+
+  <div class="auth-highlight">
+    <span>02</span>
+    <div>
+      <strong>Build your identity.</strong>
+      <small>
+        Create your own New Gen username and profile.
+      </small>
+    </div>
+  </div>
+
+  <div class="auth-highlight">
+    <span>03</span>
+    <div>
+      <strong>Become part of something bigger.</strong>
+      <small>
+        Create. Collaborate. Speak. Lead.
+      </small>
+    </div>
+  </div>
+
+  <div class="signup-motto">
+    <span>NEW GEN</span>
+    <strong>African children must speak.</strong>
+  </div>
+
+</div>
+
+
+<!-- RIGHT SIDE -->
+<div class="auth-card signup-card">
+
+  <div class="auth-card-header">
+
+    <span class="auth-label">
+      CREATE ACCOUNT
+    </span>
+
+    <h2>
+      Join New Gen.
+    </h2>
+
+    <p>
+      Tell us a little about yourself.
+    </p>
+
+  </div>
+
+
+  <form
+    method="POST"
+    action="{{ url_for('signup') }}"
+    class="auth-form"
+  >
+
+    <!-- FIRST NAME + LAST NAME -->
+    <div class="form-row">
+
+      <div class="form-group">
+
+        <label for="first_name">
+          First Name
+        </label>
+
+        <input
+          type="text"
+          id="first_name"
+          name="first_name"
+          placeholder="First name"
+          autocomplete="given-name"
+          required
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="last_name">
+          Last Name
+        </label>
+
+        <input
+          type="text"
+          id="last_name"
+          name="last_name"
+          placeholder="Last name"
+          autocomplete="family-name"
+          required
+        >
+
+      </div>
+
+    </div>
+
+
+    <!-- USERNAME -->
+    <div class="form-group">
+
+      <label for="username">
+        Username
+      </label>
+
+      <input
+        type="text"
+        id="username"
+        name="username"
+        placeholder="Choose your New Gen username"
+        autocomplete="username"
+        required
+      >
+
+      <small class="form-help">
+        This is the username you'll use to log in.
+      </small>
+
+    </div>
+
+
+    <!-- EMAIL -->
+    <div class="form-group">
+
+      <label for="email">
+        Email Address
+      </label>
+
+      <input
+        type="email"
+        id="email"
+        name="email"
+        placeholder="you@example.com"
+        autocomplete="email"
+        required
+      >
+
+    </div>
+
+
+    <!-- PHONE -->
+    <div class="form-group">
+
+      <label for="phone">
+        Phone Number
+      </label>
+
+      <input
+        type="tel"
+        id="phone"
+        name="phone"
+        placeholder="e.g. 024 000 0000"
+        autocomplete="tel"
+        required
+      >
+
+    </div>
+
+
+    <!-- SCHOOL -->
+    <div class="form-group">
+
+      <label for="school">
+        School
+      </label>
+
+      <input
+        type="text"
+        id="school"
+        name="school"
+        placeholder="Enter your school"
+        autocomplete="organization"
+        required
+      >
+
+    </div>
+
+
+    <!-- FORM + GROUP -->
+    <div class="form-row">
+
+      <div class="form-group">
+
+        <label for="class_name">
+          Class / Form
+        </label>
+
+        <select
+          id="class_name"
+          name="class_name"
+          required
+        >
+
+          <option value="" selected disabled>
+            Select your form
+          </option>
+
+          <option value="Form 1">
+            Form 1
+          </option>
+
+          <option value="Form 2">
+            Form 2
+          </option>
+
+          <option value="Form 3">
+            Form 3
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="group_name">
+          New Gen Group
+        </label>
+
+        <select
+          id="group_name"
+          name="group_name"
+          required
+        >
+
+          <option value="" selected disabled>
+            Choose a group
+          </option>
+
+          <option value="Music &amp; Dance">
+            Music &amp; Dance
+          </option>
+
+          <option value="Tech">
+            Tech
+          </option>
+
+          <option value="Art">
+            Art
+          </option>
+
+          <option value="Poetry">
+            Poetry
+          </option>
+
+          <option value="Fashion">
+            Fashion
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <!-- REASON FOR JOINING -->
+    <div class="form-group">
+
+      <label for="reason_for_joining">
+        Why do you want to join New Gen?
+      </label>
+
+      <textarea
+        id="reason_for_joining"
+        name="reason_for_joining"
+        rows="4"
+        placeholder="Tell us about your interests, talents or what you hope to contribute..."
+        required
+      ></textarea>
+
+    </div>
+
+
+    <!-- PASSWORD + CONFIRM PASSWORD -->
+    <div class="form-row">
+
+      <div class="form-group">
+
+        <label for="password">
+          Password
+        </label>
+
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Create a password"
+          autocomplete="new-password"
+          minlength="8"
+          required
+        >
+
+        <small class="form-help">
+          At least 8 characters.
+        </small>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="confirm_password">
+          Confirm Password
+        </label>
+
+        <input
+          type="password"
+          id="confirm_password"
+          name="confirm_password"
+          placeholder="Repeat your password"
+          autocomplete="new-password"
+          minlength="8"
+          required
+        >
+
+      </div>
+
+    </div>
+
+
+    <!-- AGREEMENT -->
+    <label class="auth-checkbox">
+
+      <input
+        type="checkbox"
+        required
+      >
+
+      <span>
+        I confirm that the information I provided is accurate
+        and I want to join New Gen.
+      </span>
+
+    </label>
+
+
+    <!-- SUBMIT -->
+    <button
+      type="submit"
+      class="auth-submit"
+    >
+      Create My Account
+      <span>→</span>
+    </button>
+
+  </form>
+
+
+  <!-- LOGIN -->
+  <div class="auth-divider">
+    <span>ALREADY A MEMBER?</span>
+  </div>
+
+
+  <div class="auth-footer">
+
+    <p>
+      Already have a New Gen account?
+    </p>
+
+    <a
+      href="{{ url_for('login') }}"
+      class="auth-link"
+    >
+      Log in here →
+    </a>
+
+  </div>
+
+</div>
+```
+
+  </section>
+
+</main>
+
+{% endblock %}

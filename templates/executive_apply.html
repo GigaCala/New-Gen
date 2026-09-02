@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+
+{% block title %}Executive Application | New Gen{% endblock %}
+
+{% block content %}
+
+<main class="executive-apply-page">
+
+  <!-- HERO -->
+
+  <section class="executive-apply-hero">
+
+```
+<div class="container executive-apply-hero-inner">
+
+  <div>
+
+    <span class="auth-kicker">
+      NEW GEN / LEADERSHIP
+    </span>
+
+    <h1>
+      Don't just<br>
+      <span>join.</span><br>
+      Lead.
+    </h1>
+
+    <p>
+      New Gen executives help turn ideas into action.
+      If you believe you can serve, organize, create
+      and inspire others, this is your opportunity.
+    </p>
+
+  </div>
+
+
+  <div class="executive-emblem">
+
+    <span>NG</span>
+
+    <small>
+      LEADERSHIP<br>
+      APPLICATION
+    </small>
+
+  </div>
+
+</div>
+```
+
+  </section>
+
+  <!-- APPLICATION -->
+
+  <section class="executive-apply-content">
+
+```
+<div class="container executive-apply-grid">
+
+
+  <!-- INFORMATION -->
+  <div class="executive-apply-info">
+
+    <span class="auth-label">
+      BEFORE YOU APPLY
+    </span>
+
+    <h2>
+      Leadership is<br>
+      <em>service.</em>
+    </h2>
+
+    <p>
+      Being a New Gen executive is more than having
+      a title. Executives are trusted to help members,
+      organize activities, protect the values of the
+      club and help turn student ideas into real projects.
+    </p>
+
+
+    <div class="leadership-principle">
+
+      <span>01</span>
+
+      <div>
+        <strong>Serve</strong>
+        <small>
+          Put the community before the title.
+        </small>
+      </div>
+
+    </div>
+
+
+    <div class="leadership-principle">
+
+      <span>02</span>
+
+      <div>
+        <strong>Create</strong>
+        <small>
+          Turn ideas into meaningful projects.
+        </small>
+      </div>
+
+    </div>
+
+
+    <div class="leadership-principle">
+
+      <span>03</span>
+
+      <div>
+        <strong>Lead</strong>
+        <small>
+          Help other young people find their voice.
+        </small>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- FORM -->
+  <div class="auth-card executive-apply-card">
+
+    <div class="auth-card-header">
+
+      <span class="auth-label">
+        EXECUTIVE APPLICATION
+      </span>
+
+      <h2>
+        Tell us why you.
+      </h2>
+
+      <p>
+        Your application will be reviewed by a New Gen
+        administrator.
+      </p>
+
+    </div>
+
+
+    <div class="applicant-summary">
+
+      <span>APPLYING AS</span>
+
+      <strong>
+        {{ member.first_name }} {{ member.last_name }}
+      </strong>
+
+      <small>
+        @{{ member.username }}
+      </small>
+
+    </div>
+
+
+    <form
+      method="POST"
+      action="{{ url_for('executive_apply') }}"
+      class="auth-form"
+    >
+
+      <!-- POSITION -->
+      <div class="form-group">
+
+        <label for="position">
+          Position
+        </label>
+
+        <select
+          id="position"
+          name="position"
+          required
+        >
+
+          <option
+            value=""
+            selected
+            disabled
+          >
+            Select a position
+          </option>
+
+          <option value="President">
+            President
+          </option>
+
+          <option value="Vice President">
+            Vice President
+          </option>
+
+          <option value="Secretary">
+            Secretary
+          </option>
+
+          <option value="Treasurer">
+            Treasurer
+          </option>
+
+          <option value="Public Relations">
+            Public Relations
+          </option>
+
+          <option value="Group Leader">
+            Group Leader
+          </option>
+
+          <option value="Creative Director">
+            Creative Director
+          </option>
+
+          <option value="Tech Lead">
+            Tech Lead
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- REASON -->
+      <div class="form-group">
+
+        <label for="reason">
+          Why should you be an executive?
+        </label>
+
+        <textarea
+          id="reason"
+          name="reason"
+          rows="8"
+          placeholder="Tell us about your leadership experience, ideas for New Gen, what you can contribute and why you want this position..."
+          required
+        ></textarea>
+
+      </div>
+
+
+      <!-- AGREEMENT -->
+      <label class="auth-checkbox">
+
+        <input
+          type="checkbox"
+          required
+        >
+
+        <span>
+          I understand that submitting this application
+          does not automatically make me an executive.
+          My application must be reviewed and approved.
+        </span>
+
+      </label>
+
+
+      <!-- SUBMIT -->
+      <button
+        type="submit"
+        class="auth-submit"
+      >
+        Submit Application
+        <span>→</span>
+      </button>
+
+    </form>
+
+
+    <div class="auth-footer">
+
+      <a
+        href="{{ url_for('member_dashboard') }}"
+        class="auth-link"
+      >
+        ← Return to dashboard
+      </a>
+
+    </div>
+
+  </div>
+
+</div>
+```
+
+  </section>
+
+  <!-- STATEMENT -->
+
+  <section class="executive-statement">
+
+```
+<div class="container">
+
+  <span>
+    NEW GEN / LEADERSHIP
+  </span>
+
+  <h2>
+    A title is given.<br>
+    <em>Leadership is earned.</em>
+  </h2>
+
+</div>
+```
+
+  </section>
+
+</main>
+
+{% endblock %}

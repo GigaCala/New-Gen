@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Email | New Gen{% endblock %}
+
+{% block content %}
+
+<main class="auth-page">
+
+  <section class="auth-shell">
+
+    <div class="auth-intro">
+
+      <span class="auth-kicker">
+        NEW GEN / ACCOUNT SECURITY
+      </span>
+
+      <h1>
+        Verify<br>
+        <span>your email.</span>
+      </h1>
+
+      <p>
+        One final step. Confirm your email address
+        to activate your New Gen account and access
+        your member dashboard.
+      </p>
+
+      <div class="auth-highlight">
+
+        <span>01</span>
+
+        <div>
+          <strong>Protect your account.</strong>
+
+          <small>
+            Email verification helps keep your account secure.
+          </small>
+        </div>
+
+      </div>
+
+      <div class="auth-highlight">
+
+        <span>02</span>
+
+        <div>
+          <strong>Unlock your membership.</strong>
+
+          <small>
+            Verified members can sign in and access their dashboard.
+          </small>
+        </div>
+
+      </div>
+
+      <div class="auth-highlight">
+
+        <span>03</span>
+
+        <div>
+          <strong>Join the movement.</strong>
+
+          <small>
+            Create. Collaborate. Lead.
+          </small>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="auth-card">
+
+      <div class="auth-card-header">
+
+        <span class="auth-label">
+          EMAIL VERIFICATION
+        </span>
+
+        <h2>
+          Almost there.
+        </h2>
+
+        <p>
+          Your account has been created successfully.
+        </p>
+
+      </div>
+
+
+      <div class="verification-message">
+
+        <div class="verification-icon">
+          ✓
+        </div>
+
+        <h3>
+          Check your inbox.
+        </h3>
+
+        <p>
+          We sent a verification link to the email
+          address you used when creating your account.
+        </p>
+
+      </div>
+
+
+      <div class="verification-steps">
+
+        <div class="verification-step">
+
+          <span>01</span>
+
+          <div>
+            <strong>Open your email.</strong>
+
+            <small>
+              Check your inbox and spam folder.
+            </small>
+          </div>
+
+        </div>
+
+
+        <div class="verification-step">
+
+          <span>02</span>
+
+          <div>
+            <strong>Find the New Gen message.</strong>
+
+            <small>
+              Open the verification email.
+            </small>
+          </div>
+
+        </div>
+
+
+        <div class="verification-step">
+
+          <span>03</span>
+
+          <div>
+            <strong>Click the verification link.</strong>
+
+            <small>
+              Your account will then be activated.
+            </small>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="auth-divider">
+        <span>NEW GEN</span>
+      </div>
+
+
+      <div class="auth-footer">
+
+        <p>
+          Already verified?
+        </p>
+
+        <a
+          href="{{ url_for('login') }}"
+          class="auth-link"
+        >
+          Go to member login →
+        </a>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+{% endblock %}

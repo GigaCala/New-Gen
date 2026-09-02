@@ -232,6 +232,15 @@ def is_executive():
 
     return user["role"] == "executive"
 
+# ============================================================
+# GLOBAL TEMPLATE DATA
+# ============================================================
+
+@app.context_processor
+def inject_member():
+    return {
+        "member": get_current_member()
+    }
 
 # ============================================================
 # HOME

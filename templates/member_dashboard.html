@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+
+{% block title %}My Dashboard | New Gen{% endblock %}
+
+{% block content %}
+
+<main class="dashboard-page">
+
+  <section class="dashboard-hero">
+
+```
+<div class="container dashboard-hero-inner">
+
+  <div>
+
+    <span class="auth-kicker">
+      NEW GEN / MEMBER SPACE
+    </span>
+
+    <h1>
+      Welcome,<br>
+      <span>{{ member.first_name }}.</span>
+    </h1>
+
+    <p>
+      This is your New Gen space.
+      Explore your group, discover events and
+      keep building your voice.
+    </p>
+
+  </div>
+
+  <div class="dashboard-badge">
+
+    <span>MEMBER</span>
+
+    <strong>
+      @{{ member.username }}
+    </strong>
+
+    <small>
+      {% if member.email_verified %}
+        EMAIL VERIFIED
+      {% else %}
+        EMAIL NOT VERIFIED
+      {% endif %}
+    </small>
+
+  </div>
+
+</div>
+```
+
+  </section>
+
+  <section class="dashboard-content">
+
+```
+<div class="container">
+
+
+  <!-- PROFILE -->
+  <div class="dashboard-section-heading">
+
+    <span class="auth-label">
+      YOUR PROFILE
+    </span>
+
+    <h2>
+      Your New Gen identity.
+    </h2>
+
+  </div>
+
+
+  <div class="profile-grid">
+
+    <article class="profile-card">
+
+      <span class="profile-label">
+        NAME
+      </span>
+
+      <strong>
+        {{ member.first_name }} {{ member.last_name }}
+      </strong>
+
+    </article>
+
+
+    <article class="profile-card">
+
+      <span class="profile-label">
+        USERNAME
+      </span>
+
+      <strong>
+        @{{ member.username }}
+      </strong>
+
+    </article>
+
+
+    <article class="profile-card">
+
+      <span class="profile-label">
+        SCHOOL
+      </span>
+
+      <strong>
+        {{ member.school }}
+      </strong>
+
+    </article>
+
+
+    <article class="profile-card">
+
+      <span class="profile-label">
+        FORM
+      </span>
+
+      <strong>
+        {{ member.class_name }}
+      </strong>
+
+    </article>
+
+
+    <article class="profile-card">
+
+      <span class="profile-label">
+        GROUP
+      </span>
+
+      <strong>
+        {{ member.group_name }}
+      </strong>
+
+    </article>
+
+
+    <article class="profile-card">
+
+      <span class="profile-label">
+        EMAIL
+      </span>
+
+      <strong>
+        {{ member.email }}
+      </strong>
+
+    </article>
+
+  </div>
+
+
+  <!-- ABOUT -->
+  <div class="dashboard-about">
+
+    <span class="profile-label">
+      WHY I JOINED
+    </span>
+
+    <p>
+      {{ member.reason_for_joining }}
+    </p>
+
+  </div>
+
+
+  <!-- ACTIONS -->
+  <div class="dashboard-section-heading dashboard-actions-heading">
+
+    <span class="auth-label">
+      YOUR SPACE
+    </span>
+
+    <h2>
+      Keep creating.
+    </h2>
+
+  </div>
+
+
+  <div class="dashboard-actions">
+
+    <a
+      href="{{ url_for('calendar') }}"
+      class="dashboard-action"
+    >
+      <span>01</span>
+
+      <div>
+        <strong>Explore Events</strong>
+        <small>
+          See what's happening in New Gen.
+        </small>
+      </div>
+
+      <b>→</b>
+
+    </a>
+
+
+    <a
+      href="{{ url_for('contact') }}"
+      class="dashboard-action"
+    >
+      <span>02</span>
+
+      <div>
+        <strong>Contact New Gen</strong>
+        <small>
+          Share an idea or start a conversation.
+        </small>
+      </div>
+
+      <b>→</b>
+
+    </a>
+
+
+    <a
+      href="{{ url_for('executive_apply') }}"
+      class="dashboard-action"
+    >
+      <span>03</span>
+
+      <div>
+        <strong>Become an Executive</strong>
+        <small>
+          Apply to help lead the movement.
+        </small>
+      </div>
+
+      <b>→</b>
+
+    </a>
+
+  </div>
+
+
+  <!-- GROUP -->
+  <section class="dashboard-group">
+
+    <span class="auth-kicker">
+      YOUR CREATIVE HOME
+    </span>
+
+    <h2>
+      {{ member.group_name }}
+    </h2>
+
+    <p>
+      Your group is where your ideas become projects,
+      collaborations and experiences.
+    </p>
+
+    {% if member.group_name == "Music & Dance" %}
+
+      <a href="{{ url_for('music_dance') }}" class="auth-submit">
+        Explore Music &amp; Dance
+        <span>→</span>
+      </a>
+
+    {% elif member.group_name == "Tech" %}
+
+      <a href="{{ url_for('tech') }}" class="auth-submit">
+        Explore Tech
+        <span>→</span>
+      </a>
+
+    {% elif member.group_name == "Art" %}
+
+      <a href="{{ url_for('art') }}" class="auth-submit">
+        Explore Art
+        <span>→</span>
+      </a>
+
+    {% elif member.group_name == "Poetry" %}
+
+      <a href="{{ url_for('poetry') }}" class="auth-submit">
+        Explore Poetry
+        <span>→</span>
+      </a>
+
+    {% elif member.group_name == "Fashion" %}
+
+      <a href="{{ url_for('fashion') }}" class="auth-submit">
+        Explore Fashion
+        <span>→</span>
+      </a>
+
+    {% endif %}
+
+  </section>
+
+
+  <!-- LOGOUT -->
+  <div class="dashboard-footer">
+
+    <a
+      href="{{ url_for('logout') }}"
+      class="dashboard-logout"
+    >
+      Log out of New Gen →
+    </a>
+
+  </div>
+
+</div>
+```
+
+  </section>
+
+</main>
+
+{% endblock %}

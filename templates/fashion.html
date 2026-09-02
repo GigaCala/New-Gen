@@ -1,62 +1,110 @@
-{% extends "base.html" %}
+```html
+{% extends 'base.html' %}
 
-{% block title %}Fashion | New Gen{% endblock %}
+{% block title %}New Gen | Fashion{% endblock %}
 
 {% block content %}
 
-<main class="fashion-page">
+<main class="page-main">
 
-  <section class="fashion-hero">
-    <div class="container">
+  <!-- FASHION HERO -->
 
-      <span class="auth-kicker">NEW GEN / FASHION</span>
+  <section class="page-hero fashion-page reveal">
 
-      <h1>Wear Your Identity.</h1>
+    <div class="container hero-split">
 
-      <p>
-        Fashion is where creativity meets culture. Design, style,
-        confidence and African expression live here.
-      </p>
+      <div>
 
-      <a href="{{ url_for('signup') }}" class="auth-submit">
-        Join the Fashion Group →
-      </a>
+        <span class="eyebrow">
+          Fashion
+        </span>
+
+        <h1>
+          Wear your identity.
+        </h1>
+
+        <p>
+          Fashion gives students a space to express culture,
+          creativity, confidence and individuality through
+          design, styling and visual storytelling.
+        </p>
+
+      </div>
+
+      <img
+        src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=900&q=80"
+        alt="Creative fashion and clothing"
+        class="page-image"
+      />
 
     </div>
+
   </section>
 
-  <section class="fashion-content">
-    <div class="container">
 
-      <h2>What We Do</h2>
+  <!-- CONTENT -->
 
-      <div class="feature-grid">
+  <section class="container content-section reveal">
 
-        <article class="feature-card">
-          <h3>Design</h3>
-          <p>Create original clothing ideas and collections.</p>
-        </article>
+    <div class="info-grid">
 
-        <article class="feature-card">
-          <h3>Styling</h3>
-          <p>Build looks that tell powerful stories.</p>
-        </article>
+      <div class="info-card">
 
-        <article class="feature-card">
-          <h3>Photography</h3>
-          <p>Capture fashion through creative visuals.</p>
-        </article>
+        <h2>
+          What we create
+        </h2>
 
-        <article class="feature-card">
-          <h3>Runway</h3>
-          <p>Develop confidence and presentation skills.</p>
-        </article>
+        <ul>
+          <li>Fashion and clothing designs</li>
+          <li>Styling and creative direction</li>
+          <li>Fashion photography</li>
+          <li>Runway and presentation projects</li>
+        </ul>
+
+      </div>
+
+
+      <div class="info-card highlight">
+
+        <h2>
+          Impact
+        </h2>
+
+        <p>
+          Fashion helps students discover their identity,
+          build confidence and turn culture and imagination
+          into something people can see, wear and remember.
+        </p>
 
       </div>
 
     </div>
+
+
+    <!-- GALLERY -->
+
+    <div class="gallery-strip">
+
+      <img
+        src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=700&q=80"
+        alt="Fashion styling"
+      />
+
+      <img
+        src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=700&q=80"
+        alt="Creative fashion design"
+      />
+
+      <img
+        src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=700&q=80"
+        alt="Fashion creativity"
+      />
+
+    </div>
+
   </section>
 
 </main>
 
 {% endblock %}
+```

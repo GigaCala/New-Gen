@@ -1,3 +1,4 @@
+```html
 {% extends "base.html" %}
 
 {% block title %}Contact Us | New Gen{% endblock %}
@@ -6,266 +7,262 @@
 
 <main class="contact-page">
 
-  <section class="contact-hero">
+    <!-- HERO -->
 
-    <div class="container contact-hero-inner">
+    <section class="contact-hero">
+        <div class="container contact-hero-inner">
 
-      <div class="contact-hero-copy">
+            <div class="contact-hero-copy">
 
-        <span class="auth-kicker">
-          NEW GEN / CONNECTION
-        </span>
+                <span class="auth-kicker">
+                    NEW GEN / CONNECTION
+                </span>
 
-        <h1>
-          Let's<br>
-          <span>connect.</span>
-        </h1>
+                <h1>
+                    Let's<br>
+                    <span>connect.</span>
+                </h1>
 
-        <p>
-          Have an idea, a question, a collaboration,
-          or something you want New Gen to hear?
-          Reach out.
-        </p>
+                <p>
+                    Have an idea, a question, a collaboration,
+                    or something you want New Gen to hear?
+                    Reach out.
+                </p>
 
-      </div>
+            </div>
 
-      <div class="contact-hero-mark">
+            <div class="contact-hero-mark">
 
-        <span>OUR</span>
+                <span>OUR</span>
 
-        <strong>VOICE</strong>
+                <strong>VOICE</strong>
 
-        <small>
-          AFRICAN CHILDREN MUST SPEAK.
-        </small>
+                <small>
+                    AFRICAN CHILDREN MUST SPEAK.
+                </small>
 
-      </div>
+            </div>
 
-    </div>
-
-  </section>
-
-
-  <section class="contact-hub">
-
-    <div class="container">
-
-      <div class="contact-heading">
-
-        <span class="auth-label">
-          CONTACT US
-        </span>
-
-        <h2>
-          Choose your connection.
-        </h2>
-
-        <p>
-          We're building the movement together.
-          Pick a way to reach New Gen.
-        </p>
-
-      </div>
+        </div>
+    </section>
 
 
-      <div class="contact-grid">
+    <!-- CONTACT OPTIONS -->
+
+    <section class="contact-hub">
+
+        <div class="container">
+
+            <div class="contact-heading">
+
+                <span class="auth-label">
+                    CONTACT US
+                </span>
+
+                <h2>
+                    Choose your connection.
+                </h2>
+
+                <p>
+                    We're building the movement together.
+                    Pick a way to reach New Gen.
+                </p>
+
+            </div>
 
 
-        <!-- EMAIL -->
+            <div class="contact-grid">
+
+                <!-- EMAIL -->
+
+                <a
+                    href="mailto:newgenclub@proton.me"
+                    class="contact-card contact-card-active"
+                >
+
+                    <div class="contact-icon">
+                        ✉
+                    </div>
+
+                    <div class="contact-card-content">
+
+                        <span>
+                            DIRECT CONTACT
+                        </span>
+
+                        <h3>
+                            Email
+                        </h3>
+
+                        <p>
+                            newgenclub@proton.me
+                        </p>
+
+                    </div>
+
+                    <div class="contact-arrow">
+                        →
+                    </div>
+
+                </a>
+
+
+                <!-- TIKTOK -->
+
+                <div class="contact-card contact-card-disabled">
+
+                    <div class="contact-icon">
+                        ♪
+                    </div>
+
+                    <div class="contact-card-content">
+
+                        <span>
+                            SOCIAL
+                        </span>
+
+                        <h3>
+                            TikTok
+                        </h3>
+
+                        <p>
+                            Coming soon
+                        </p>
+
+                    </div>
+
+                    <div class="contact-status">
+                        SOON
+                    </div>
+
+                </div>
+
+
+                <!-- INSTAGRAM -->
+
+                <div class="contact-card contact-card-disabled">
+
+                    <div class="contact-icon">
+                        ◎
+                    </div>
+
+                    <div class="contact-card-content">
+
+                        <span>
+                            SOCIAL
+                        </span>
+
+                        <h3>
+                            Instagram
+                        </h3>
+
+                        <p>
+                            Coming soon
+                        </p>
+
+                    </div>
+
+                    <div class="contact-status">
+                        SOON
+                    </div>
+
+                </div>
+
+
+                <!-- WHATSAPP -->
+
+                <div class="contact-card contact-card-disabled">
+
+                    <div class="contact-icon">
+                        ◌
+                    </div>
+
+                    <div class="contact-card-content">
+
+                        <span>
+                            MESSAGING
+                        </span>
+
+                        <h3>
+                            WhatsApp
+                        </h3>
+
+                        <p>
+                            Not available yet
+                        </p>
+
+                    </div>
+
+                    <div class="contact-status">
+                        SOON
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- MESSAGE -->
+
+    <section class="contact-message">
+
+        <div class="container">
+
+            <div class="contact-message-inner">
+
+                <span>
+                    NEW GEN / OUR VOICE
+                </span>
+
+                <h2>
+                    Your idea could<br>
+                    <em>be the next movement.</em>
+                </h2>
+
+                <p>
+                    Don't wait for permission to create.
+                    Speak. Build. Share.
+                </p>
+
+                <a
+                    href="mailto:newgenclub@proton.me?subject=New%20Gen%20Inquiry"
+                    class="auth-submit"
+                >
+                    Email New Gen →
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- BOTTOM -->
+
+    <div class="container contact-footer">
 
         <a
-          href="mailto:newgenclub@proton.me"
-          class="contact-card contact-card-active"
+            href="{{ url_for('home') }}"
+            class="auth-link"
         >
-
-          <div class="contact-icon email-icon">
-            ✉
-          </div>
-
-          <div class="contact-card-content">
-
-            <span>
-              DIRECT CONTACT
-            </span>
-
-            <h3>
-              Email
-            </h3>
-
-            <p>
-              newgenclub@proton.me
-            </p>
-
-          </div>
-
-          <div class="contact-arrow">
-            →
-          </div>
-
+            ← Back to New Gen
         </a>
-
-
-        <!-- TIKTOK -->
-
-        <div
-          class="contact-card contact-card-disabled"
-          aria-disabled="true"
-        >
-
-          <div class="contact-icon tiktok-icon">
-            ♪
-          </div>
-
-          <div class="contact-card-content">
-
-            <span>
-              SOCIAL
-            </span>
-
-            <h3>
-              TikTok
-            </h3>
-
-            <p>
-              Coming soon
-            </p>
-
-          </div>
-
-          <div class="contact-status">
-            SOON
-          </div>
-
-        </div>
-
-
-        <!-- INSTAGRAM -->
-
-        <div
-          class="contact-card contact-card-disabled"
-          aria-disabled="true"
-        >
-
-          <div class="contact-icon instagram-icon">
-            ◎
-          </div>
-
-          <div class="contact-card-content">
-
-            <span>
-              SOCIAL
-            </span>
-
-            <h3>
-              Instagram
-            </h3>
-
-            <p>
-              Coming soon
-            </p>
-
-          </div>
-
-          <div class="contact-status">
-            SOON
-          </div>
-
-        </div>
-
-
-        <!-- WHATSAPP -->
-
-        <div
-          class="contact-card contact-card-disabled"
-          aria-disabled="true"
-        >
-
-          <div class="contact-icon whatsapp-icon">
-            ◌
-          </div>
-
-          <div class="contact-card-content">
-
-            <span>
-              MESSAGING
-            </span>
-
-            <h3>
-              WhatsApp
-            </h3>
-
-            <p>
-              Not available yet
-            </p>
-
-          </div>
-
-          <div class="contact-status">
-            SOON
-          </div>
-
-        </div>
-
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <section class="contact-message">
-
-    <div class="container">
-
-      <div class="contact-message-inner">
-
-        <span>
-          NEW GEN / OUR VOICE
-        </span>
-
-        <h2>
-          Your idea could<br>
-          <em>be the next movement.</em>
-        </h2>
-
-        <p>
-          Don't wait for permission to create.
-          Speak. Build. Share.
-        </p>
 
         <a
-          href="mailto:newgenclub@proton.me?subject=New%20Gen%20Inquiry"
-          class="auth-submit"
+            href="{{ url_for('signup') }}"
+            class="dashboard-logout"
         >
-          Email New Gen →
+            Join the movement →
         </a>
 
-      </div>
-
     </div>
-
-  </section>
-
-
-  <div class="container contact-footer">
-
-    <a
-      href="{{ url_for('home') }}"
-      class="auth-link"
-    >
-      ← Back to New Gen
-    </a>
-
-    <a
-      href="{{ url_for('signup') }}"
-      class="dashboard-logout"
-    >
-      Join the movement →
-    </a>
-
-  </div>
 
 </main>
 
 {% endblock %}
+```

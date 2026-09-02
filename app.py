@@ -3,7 +3,9 @@ import os
 import uuid
 import secrets
 import sqlite3
-from datetime import datetime, timezone
+import smtplib
+from email.message import EmailMessage
+from datetime import datetime, timezone, timedelta
 
 from flask import (
     Flask,
@@ -42,6 +44,38 @@ ADMIN_PASSWORD = os.environ.get("NEWGEN_ADMIN_PASS")
 ADMIN_CREDENTIALS_CONFIGURED = bool(
     ADMIN_USERNAME and ADMIN_PASSWORD
 )
+
+# ============================================================
+# LEADERSHIP RECOGNITION
+# ============================================================
+# Add the real leadership names and positions here later.
+# Members never choose these roles during signup.
+LEADERSHIP = {
+    # ("first", "last"): {
+    #     "role": "admin",
+    #     "position": "Administrator",
+    # },
+    # ("first", "last"): {
+    #     "role": "executive",
+    #     "position": "President",
+    # },
+}
+
+# ============================================================
+# EMAIL CONFIGURATION
+# ============================================================
+# Configure these as Render Environment Variables.
+SMTP_HOST = os.environ.get("NEWGEN_SMTP_HOST", "")
+SMTP_PORT = int(os.environ.get("NEWGEN_SMTP_PORT", "587"))
+SMTP_USERNAME = os.environ.get("NEWGEN_SMTP_USERNAME", "")
+SMTP_PASSWORD = os.environ.get("NEWGEN_SMTP_PASSWORD", "")
+EMAIL_FROM = os.environ.get("NEWGEN_EMAIL_FROM", SMTP_USERNAME)
+
+EMAIL_CONFIGURED = bool(
+    SMTP_HOST and SMTP_USERNAME and SMTP_PASSWORD and EMAIL_FROM
+)
+
+VERIFICATION_EXPIRY_HOURS = 24
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -87,8 +121,10 @@ def init_database():
             phone_verified INTEGER NOT NULL DEFAULT 0,
 
             verification_token TEXT,
+            verification_expires_at TEXT,
 
             role TEXT NOT NULL DEFAULT 'member',
+            position TEXT NOT NULL DEFAULT '',
 
             created_at TEXT NOT NULL
         )
@@ -162,6 +198,22 @@ def init_database():
             """
         )
 
+    if "verification_expires_at" not in existing_columns:
+        connection.execute(
+            """
+            ALTER TABLE users
+            ADD COLUMN verification_expires_at TEXT
+            """
+        )
+
+    if "position" not in existing_columns:
+        connection.execute(
+            """
+            ALTER TABLE users
+            ADD COLUMN position TEXT NOT NULL DEFAULT ''
+            """
+        )
+
     connection.commit()
     connection.close()
 
@@ -195,7 +247,26 @@ def save_events(events):
 # ============================================================
 
 def is_admin_logged_in():
-    return session.get("admin_logged_in") is True
+    if session.get("admin_logged_in") is True:
+        return True
+
+    admin_member_id = session.get("admin_member_id")
+
+    if not admin_member_id:
+        return False
+
+    connection = get_db()
+    user = connection.execute(
+        """
+        SELECT role
+        FROM users
+        WHERE id = ?
+        """,
+        (admin_member_id,),
+    ).fetchone()
+    connection.close()
+
+    return bool(user and user["role"] == "admin")
 
 
 def is_member_logged_in():
@@ -231,6 +302,54 @@ def is_executive():
         return False
 
     return user["role"] == "executive"
+
+
+def normalize_name(value):
+    return " ".join(value.strip().lower().split())
+
+
+def get_leadership_match(first_name, last_name):
+    key = (
+        normalize_name(first_name),
+        normalize_name(last_name),
+    )
+    return LEADERSHIP.get(key)
+
+
+def send_verification_email(recipient, first_name, verification_url):
+    if not EMAIL_CONFIGURED:
+        raise RuntimeError(
+            "Email delivery is not configured. "
+            "Set the NEWGEN_SMTP_* and NEWGEN_EMAIL_FROM environment variables."
+        )
+
+    message = EmailMessage()
+    message["Subject"] = "Verify your New Gen account"
+    message["From"] = EMAIL_FROM
+    message["To"] = recipient
+
+    message.set_content(
+        f"""Hi {first_name},
+
+Welcome to New Gen — African children must speak.
+
+Your account has been created. Please verify your email address by opening this link:
+
+{verification_url}
+
+This verification link expires in {VERIFICATION_EXPIRY_HOURS} hours.
+
+If you did not create a New Gen account, you can safely ignore this email.
+
+— New Gen
+"""
+    )
+
+    with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=20) as smtp:
+        smtp.starttls()
+        smtp.login(SMTP_USERNAME, SMTP_PASSWORD)
+        smtp.send_message(message)
+
 
 # ============================================================
 # GLOBAL TEMPLATE DATA
@@ -488,6 +607,23 @@ def signup():
 
         verification_token = secrets.token_urlsafe(32)
 
+        verification_expires_at = (
+            datetime.now(timezone.utc)
+            + timedelta(hours=VERIFICATION_EXPIRY_HOURS)
+        ).isoformat()
+
+        leadership_match = get_leadership_match(
+            first_name,
+            last_name,
+        )
+
+        assigned_role = "member"
+        assigned_position = ""
+
+        if leadership_match:
+            assigned_role = leadership_match["role"]
+            assigned_position = leadership_match.get("position", "")
+
         created_at = datetime.now(
             timezone.utc
         ).isoformat()
@@ -512,10 +648,12 @@ def signup():
                 email_verified,
                 phone_verified,
                 verification_token,
+                verification_expires_at,
                 role,
+                position,
                 created_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 first_name,
@@ -531,7 +669,9 @@ def signup():
                 0,
                 0,
                 verification_token,
-                "member",
+                verification_expires_at,
+                assigned_role,
+                assigned_position,
                 created_at,
             ),
         )
@@ -539,13 +679,33 @@ def signup():
         connection.commit()
         connection.close()
 
+        verification_url = url_for(
+            "verify_email",
+            token=verification_token,
+            _external=True,
+        )
+
+        try:
+            send_verification_email(
+                email,
+                first_name,
+                verification_url,
+            )
+        except Exception:
+            flash(
+                "Your account was created, but we could not send "
+                "the verification email yet. Please use the resend "
+                "verification option.",
+                "error",
+            )
+            return redirect(url_for("verify_notice", email=email))
+
         flash(
-            "Account created successfully. "
-            "Please verify your email before using all member features.",
+            "Account created successfully. Check your email to verify your New Gen account.",
             "success"
         )
 
-        return redirect(url_for("login"))
+        return redirect(url_for("verify_notice", email=email))
 
     return render_template("signup.html")
 
@@ -619,6 +779,13 @@ def login():
             "success"
         )
 
+        if user["role"] == "admin":
+            session["admin_member_id"] = user["id"]
+            return redirect(url_for("admin"))
+
+        if user["role"] == "executive":
+            return redirect(url_for("executive_dashboard"))
+
         return redirect(url_for("member_dashboard"))
 
     return render_template("login.html")
@@ -679,6 +846,95 @@ def logout():
 # EMAIL VERIFICATION
 # ============================================================
 
+@app.route("/verify-notice")
+def verify_notice():
+    email = request.args.get("email", "").strip().lower()
+
+    return render_template(
+        "verify_email.html",
+        notice=True,
+        email=email,
+    )
+
+
+@app.route("/resend-verification", methods=["POST"])
+def resend_verification():
+    email = request.form.get("email", "").strip().lower()
+
+    if not email:
+        flash("Please enter your email address.", "error")
+        return redirect(url_for("login"))
+
+    connection = get_db()
+
+    user = connection.execute(
+        """
+        SELECT *
+        FROM users
+        WHERE email = ?
+        """,
+        (email,),
+    ).fetchone()
+
+    if not user:
+        connection.close()
+        flash(
+            "If that account exists, a verification email will be sent.",
+            "success",
+        )
+        return redirect(url_for("login"))
+
+    if user["email_verified"]:
+        connection.close()
+        flash("That email is already verified. You can log in.", "success")
+        return redirect(url_for("login"))
+
+    verification_token = secrets.token_urlsafe(32)
+    verification_expires_at = (
+        datetime.now(timezone.utc)
+        + timedelta(hours=VERIFICATION_EXPIRY_HOURS)
+    ).isoformat()
+
+    connection.execute(
+        """
+        UPDATE users
+        SET verification_token = ?,
+            verification_expires_at = ?
+        WHERE id = ?
+        """,
+        (
+            verification_token,
+            verification_expires_at,
+            user["id"],
+        ),
+    )
+
+    connection.commit()
+    connection.close()
+
+    verification_url = url_for(
+        "verify_email",
+        token=verification_token,
+        _external=True,
+    )
+
+    try:
+        send_verification_email(
+            user["email"],
+            user["first_name"],
+            verification_url,
+        )
+    except Exception:
+        flash(
+            "We could not send the verification email right now. Please try again shortly.",
+            "error",
+        )
+        return redirect(url_for("verify_notice", email=email))
+
+    flash("A new verification email has been sent.", "success")
+    return redirect(url_for("verify_notice", email=email))
+
+
 @app.route("/verify-email/<token>")
 def verify_email(token):
 
@@ -699,14 +955,45 @@ def verify_email(token):
         return render_template(
             "verify_email.html",
             success=False,
-            message="This verification link is invalid or has expired.",
+            message="This verification link is invalid or has already been used.",
         )
+
+    expires_at = user["verification_expires_at"]
+
+    if expires_at:
+        try:
+            expiry = datetime.fromisoformat(expires_at)
+
+            if expiry.tzinfo is None:
+                expiry = expiry.replace(tzinfo=timezone.utc)
+
+            if datetime.now(timezone.utc) > expiry:
+                connection.close()
+
+                return render_template(
+                    "verify_email.html",
+                    success=False,
+                    message="This verification link has expired. Please request a new one.",
+                    email=user["email"],
+                    expired=True,
+                )
+
+        except ValueError:
+            connection.close()
+
+            return render_template(
+                "verify_email.html",
+                success=False,
+                message="This verification link is invalid. Please request a new one.",
+                email=user["email"],
+            )
 
     connection.execute(
         """
         UPDATE users
         SET email_verified = 1,
-            verification_token = NULL
+            verification_token = NULL,
+            verification_expires_at = NULL
         WHERE id = ?
         """,
         (user["id"],),
@@ -890,6 +1177,7 @@ def executive_dashboard():
             group_name,
             reason_for_joining,
             role,
+            position,
             email_verified,
             phone_verified,
             created_at
@@ -1188,6 +1476,7 @@ def admin_members():
             group_name,
             reason_for_joining,
             role,
+            position,
             email_verified,
             phone_verified,
             created_at
@@ -1366,6 +1655,7 @@ def change_member_role(user_id):
     allowed_roles = {
         "member",
         "executive",
+        "admin",
     }
 
     if role not in allowed_roles:

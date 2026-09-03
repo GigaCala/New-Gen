@@ -1011,3 +1011,29 @@ h1 {
     grid-template-columns: 1fr;
   }
 }
+
+/* ===========================
+   NEW GEN FLASH MESSAGES
+=========================== */
+
+.flash-wrap{
+    width:min(900px,92%);
+    margin:25px auto 0;
+}
+
+.flash{
+    padding:16px 20px;
+    margin-bottom:12px;
+    border-left:4px solid;
+    background:rgba(255,255,255,.04);
+    color:var(--text);
+    backdrop-filter:blur(10px);
+}
+
+.flash.success{
+    border-color:#d4af37;
+}
+
+.flash.error{
+    border-color:#ff6b6b;
+}

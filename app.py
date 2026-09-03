@@ -497,6 +497,11 @@ def signup():
             "group_name", ""
         ).strip()
 
+        account_type = request.form.get(
+            "account_type",
+            "member"
+        ).strip().lower()
+
         reason_for_joining = request.form.get(
             "reason_for_joining", ""
         ).strip()
@@ -522,6 +527,7 @@ def signup():
             school,
             class_name,
             group_name,
+            account_type,
             reason_for_joining,
             password,
             confirm_password,
@@ -587,6 +593,19 @@ def signup():
 
             return render_template("signup.html")
 
+        allowed_account_types = {
+            "member",
+            "executive",
+        }
+
+        if account_type not in allowed_account_types:
+            flash(
+                "Please select a valid account type.",
+                "error"
+            )
+
+            return render_template("signup.html")
+
         # ----------------------------------------------------
         # CHECK EXISTING ACCOUNT
         # ----------------------------------------------------
@@ -634,12 +653,22 @@ def signup():
             last_name,
         )
 
-        assigned_role = "member"
-        assigned_position = ""
 
-        if leadership_match:
+        assigned_role = "member"
+        assigned_position = "Member"
+
+        # Choosing "Executive" does NOT automatically grant executive access.
+        # The account remains a normal member until an administrator approves it.
+        if account_type == "executive":
+            assigned_role = "member"
+            assigned_position = "Executive Applicant"
+
+        elif leadership_match:
             assigned_role = leadership_match["role"]
-            assigned_position = leadership_match.get("position", "")
+            assigned_position = leadership_match.get(
+                "position",
+                "Member"
+            )
 
         created_at = datetime.now(
             timezone.utc
@@ -649,7 +678,9 @@ def signup():
         # SAVE MEMBER
         # ----------------------------------------------------
 
-        connection.execute(
+            cursor = connection.execute(
+            """
+            INSERT INTO users (
             """
             INSERT INTO users (
                 first_name,
@@ -692,6 +723,29 @@ def signup():
                 created_at,
             ),
         )
+
+                user_id = cursor.lastrowid
+
+        if account_type == "executive":
+            connection.execute(
+                """
+                INSERT INTO executive_applications (
+                    user_id,
+                    position,
+                    reason,
+                    status,
+                    created_at
+                )
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (
+                    user_id,
+                    "Executive",
+                    reason_for_joining,
+                    "pending",
+                    created_at,
+                ),
+            )
 
         connection.commit()
         connection.close()

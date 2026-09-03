@@ -1,149 +1,173 @@
 {% extends "base.html" %}
 
-{% block title %}Member Login | New Gen{% endblock %}
+{% block title %}Member Access | New Gen{% endblock %}
 
 {% block content %}
 
-<main class="auth-page">
+<main class="login-page">
 
-  <section class="auth-shell">
+    <section class="login-visual">
 
-    <div class="auth-intro">
-
-      <span class="auth-kicker">NEW GEN / MEMBER ACCESS</span>
-
-      <h1>
-        Welcome<br>
-        <span>back.</span>
-      </h1>
-
-      <p>
-        Your voice. Your creativity. Your place in New Gen.
-        Sign in to continue your journey.
-      </p>
-
-      <div class="auth-highlight">
-        <span>01</span>
-        <div>
-          <strong>One community.</strong>
-          <small>Music, dance, art, poetry, fashion & tech.</small>
+        <div class="login-visual-top">
+            <span>NEW GEN</span>
+            <span>MEMBER ACCESS / 01</span>
         </div>
-      </div>
 
-      <div class="auth-highlight">
-        <span>02</span>
-        <div>
-          <strong>Your identity.</strong>
-          <small>Your profile keeps your New Gen journey connected.</small>
-        </div>
-      </div>
+        <div class="login-visual-main">
 
-      <div class="auth-highlight">
-        <span>03</span>
-        <div>
-          <strong>Your future.</strong>
-          <small>Create. Collaborate. Lead.</small>
-        </div>
-      </div>
+            <p class="login-eyebrow">
+                AFRICAN CHILDREN MUST SPEAK.
+            </p>
 
-    </div>
+            <h1>
+                Your voice<br>
+                <em>has a place.</em>
+            </h1>
 
-
-    <div class="auth-card">
-
-      <div class="auth-card-header">
-
-        <span class="auth-label">
-          MEMBER LOGIN
-        </span>
-
-        <h2>
-          Enter New Gen.
-        </h2>
-
-        <p>
-          Use your username or email address.
-        </p>
-
-      </div>
-
-
-      <form
-        method="POST"
-        action="{{ url_for('login') }}"
-        class="auth-form"
-      >
-
-        <div class="form-group">
-
-          <label for="login">
-            Username or Email
-          </label>
-
-          <input
-            type="text"
-            id="login"
-            name="login"
-            placeholder="Enter your username or email"
-            autocomplete="username"
-            required
-          >
+            <div class="login-statement">
+                <span>01</span>
+                <p>
+                    Enter the space where ideas become
+                    art, technology, music, movement and
+                    something bigger.
+                </p>
+            </div>
 
         </div>
 
+        <div class="login-visual-bottom">
+            <span>CREATE</span>
+            <span>CONNECT</span>
+            <span>LEAD</span>
+        </div>
 
-        <div class="form-group">
+    </section>
 
-          <label for="password">
-            Password
-          </label>
 
-          <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Enter your password"
-            autocomplete="current-password"
-            required
-          >
+    <section class="login-panel">
+
+        <div class="login-panel-inner">
+
+            <div class="login-brand">
+                <div class="login-mark">NG</div>
+
+                <div>
+                    <span>NEW GEN</span>
+                    <small>THE CREATIVE MOVEMENT</small>
+                </div>
+            </div>
+
+
+            <div class="login-heading">
+
+                <span class="login-label">
+                    MEMBER LOGIN
+                </span>
+
+                <h2>
+                    Welcome<br>
+                    <em>back.</em>
+                </h2>
+
+                <p>
+                    Sign in and continue where you left off.
+                </p>
+
+            </div>
+
+
+            <form
+                method="POST"
+                action="{{ url_for('login') }}"
+                class="login-form"
+            >
+
+                <div class="login-field">
+
+                    <label for="login">
+                        USERNAME / EMAIL
+                    </label>
+
+                    <input
+                        type="text"
+                        id="login"
+                        name="login"
+                        placeholder="Enter your username or email"
+                        autocomplete="username"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="login-field">
+
+                    <div class="login-field-heading">
+
+                        <label for="password">
+                            PASSWORD
+                        </label>
+
+                    </div>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="login-button"
+                >
+                    <span>ENTER NEW GEN</span>
+                    <strong>→</strong>
+                </button>
+
+            </form>
+
+
+            <div class="login-divider">
+                <span>NEW GEN / 2026</span>
+            </div>
+
+
+            <div class="login-register">
+
+                <p>
+                    New to the movement?
+                </p>
+
+                <a href="{{ url_for('signup') }}">
+                    Create your account
+                    <span>→</span>
+                </a>
+
+            </div>
+
+
+            <div class="login-note">
+
+                <span class="login-note-number">
+                    02
+                </span>
+
+                <p>
+                    Your account gives you access to your
+                    New Gen journey, group and creative space.
+                </p>
+
+            </div>
 
         </div>
 
-
-        <button
-          type="submit"
-          class="auth-submit"
-        >
-          Enter New Gen
-          <span>→</span>
-        </button>
-
-      </form>
-
-
-      <div class="auth-divider">
-        <span>NEW GEN</span>
-      </div>
-
-
-      <div class="auth-footer">
-
-        <p>
-          Don't have an account?
-        </p>
-
-        <a
-          href="{{ url_for('signup') }}"
-          class="auth-link"
-        >
-          Create your New Gen account →
-        </a>
-
-      </div>
-
-    </div>
-
-  </section>
+    </section>
 
 </main>
 

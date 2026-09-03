@@ -124,32 +124,15 @@ def init_database():
             verification_expires_at TEXT,
 
             role TEXT NOT NULL DEFAULT 'member',
-            position TEXT NOT NULL DEFAULT '',
+            position TEXT NOT NULL DEFAULT 'Member',
+        
 
             created_at TEXT NOT NULL
         )
         """
     )
 
-    # Executive applications
-    connection.execute(
-        """
-        CREATE TABLE IF NOT EXISTS executive_applications (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-            user_id INTEGER NOT NULL,
-
-            position TEXT NOT NULL,
-            reason TEXT NOT NULL,
-
-            status TEXT NOT NULL DEFAULT 'pending',
-
-            created_at TEXT NOT NULL,
-
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        )
-        """
-    )
+   
 
     # --------------------------------------------------------
     # DATABASE MIGRATION
@@ -181,6 +164,14 @@ def init_database():
             ADD COLUMN role TEXT NOT NULL DEFAULT 'member'
             """
         )
+        
+    if "position" not in existing_columns:
+    connection.execute(
+        """
+        ALTER TABLE users
+        ADD COLUMN position TEXT NOT NULL DEFAULT 'Member'
+        """
+    )
 
     if "phone_verified" not in existing_columns:
         connection.execute(
@@ -350,6 +341,32 @@ If you did not create a New Gen account, you can safely ignore this email.
         smtp.login(SMTP_USERNAME, SMTP_PASSWORD)
         smtp.send_message(message)
 
+# ============================================================
+# NEW GEN LEADERSHIP REGISTRY
+# ============================================================
+
+LEADERSHIP = {
+    # ADMINS
+    # ("ava", "wache"): {
+    #     "role": "admin",
+    #     "position": "Administrator",
+    # },
+
+    # EXECUTIVES
+    # ("john", "mensah"): {
+    #     "role": "executive",
+    #     "position": "President",
+    # },
+}
+
+
+def get_leadership_role(first_name, last_name):
+    key = (
+        first_name.strip().lower(),
+        last_name.strip().lower(),
+    )
+
+    return LEADERSHIP.get(key)
 
 # ============================================================
 # GLOBAL TEMPLATE DATA
@@ -599,6 +616,18 @@ def signup():
         # HASH PASSWORD
         # ----------------------------------------------------
 
+        leadership = get_leadership_role(
+            first_name,
+            last_name
+        )
+
+        role = "member"
+        position = "Member"
+
+        if leadership:
+            role = leadership["role"]
+            position = leadership["position"]
+        
         password_hash = generate_password_hash(password)
 
         # ----------------------------------------------------
@@ -649,6 +678,7 @@ def signup():
                 phone_verified,
                 verification_token,
                 verification_expires_at,
+                verification_token,
                 role,
                 position,
                 created_at

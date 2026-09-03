@@ -678,7 +678,6 @@ def signup():
                 phone_verified,
                 verification_token,
                 verification_expires_at,
-                verification_token,
                 role,
                 position,
                 created_at

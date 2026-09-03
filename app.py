@@ -678,9 +678,7 @@ def signup():
         # SAVE MEMBER
         # ----------------------------------------------------
 
-            cursor = connection.execute(
-            """
-            INSERT INTO users (
+        cursor = connection.execute(
             """
             INSERT INTO users (
                 first_name,

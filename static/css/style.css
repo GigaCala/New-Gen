@@ -1758,3 +1758,269 @@ h1 {
         margin-top: 45px;
     }
 }
+/* =========================================================
+   NEW GEN — THEME-SYNC FOR CONTACT / LOGIN / SIGNUP
+========================================================= */
+
+/* CONTACT */
+
+.contact-page {
+    background:
+        radial-gradient(circle at 85% 10%, var(--glow-1), transparent 28%),
+        var(--bg);
+    color: var(--text);
+}
+
+.contact-hero {
+    border-bottom-color: var(--line);
+}
+
+.contact-hero-copy .auth-kicker,
+.contact-hero-copy h1 span,
+.contact-hero-mark small,
+.contact-heading .auth-label,
+.contact-message-inner > span,
+.contact-message-inner h2 em,
+.contact-icon,
+.contact-arrow {
+    color: var(--gold);
+}
+
+.contact-hero-copy p,
+.contact-hero-mark span,
+.contact-heading p,
+.contact-card-content p,
+.contact-message-inner p {
+    color: var(--muted);
+}
+
+.contact-hero-mark {
+    border-left-color: var(--line);
+}
+
+.contact-grid {
+    background: var(--line);
+    border-color: var(--line);
+}
+
+.contact-card {
+    background: var(--surface-strong);
+    color: var(--text);
+}
+
+.contact-card-active:hover {
+    background: var(--surface);
+}
+
+.contact-icon {
+    border-color: var(--line);
+}
+
+.contact-card-content > span,
+.contact-status {
+    color: var(--muted);
+}
+
+.contact-message {
+    border-top-color: var(--line);
+    border-bottom-color: var(--line);
+}
+
+
+/* LOGIN */
+
+.login-page {
+    background:
+        radial-gradient(circle at 20% 20%, var(--glow-1), transparent 35%),
+        var(--bg);
+    color: var(--text);
+}
+
+.login-visual {
+    border-right-color: var(--line);
+    background:
+        radial-gradient(
+            circle at 70% 45%,
+            var(--glow-1),
+            transparent 32%
+        ),
+        var(--bg-soft);
+}
+
+.login-visual::before {
+    color:.login-visual::before {
+    color: var(--surface-strong);
+}
+}
+
+.login-visual-top span,
+.login-visual-bottom span {
+    color: var(--muted);
+}
+
+.login-visual-top span:first-child,
+.login-eyebrow,
+.login-statement > span,
+.login-mark,
+.login-label,
+.login-heading h2 em,
+.login-button,
+.login-register a span,
+.login-note-number {
+    color: var(--gold);
+}
+
+.login-statement {
+    border-top-color: var(--line);
+}
+
+.login-statement p,
+.login-heading p,
+.login-field label,
+.login-register p {
+    color: var(--muted);
+}
+
+.login-panel {
+    background: var(--surface-strong);
+}
+
+.login-mark {
+    border-color: var(--gold);
+}
+
+.login-brand small,
+.login-note p {
+    color: var(--muted);
+}
+
+.login-field input {
+    color: var(--text);
+    border-bottom-color: var(--line);
+}
+
+.login-field input::placeholder {
+    color: var(--muted);
+    opacity: .65;
+}
+
+.login-field input:focus {
+    border-bottom-color: var(--gold);
+}
+
+.login-button {
+    border-color: var(--gold);
+    background: var(--gold);
+    color: var(--bg);
+}
+
+.login-button:hover {
+    background: transparent;
+    color: var(--gold);
+}
+
+.login-divider {
+    color: var(--muted);
+}
+
+.login-divider::before,
+.login-divider::after {
+    background: var(--line);
+}
+
+.login-register a {
+    color: var(--text);
+    border-bottom-color: var(--gold);
+}
+
+.login-note {
+    border-top-color: var(--line);
+}
+
+
+/* SIGNUP */
+
+.signup-page {
+    background:
+        radial-gradient(circle at 85% 10%, var(--glow-1), transparent 28%),
+        var(--bg);
+    color: var(--text);
+}
+
+.signup-hero {
+    border-bottom-color: var(--line);
+}
+
+.signup-kicker,
+.signup-label {
+    color: var(--gold);
+}
+
+.signup-hero h1 span {
+    color: var(--gold);
+}
+
+.signup-hero p,
+.signup-side p {
+    color: var(--muted);
+}
+
+.signup-note {
+    border-left-color: var(--gold);
+    background: var(--surface);
+    color: var(--muted);
+}
+
+.signup-form {
+    border-color: var(--line);
+    background: var(--surface);
+}
+
+.form-section {
+    border-bottom-color: var(--line);
+}
+
+.form-group label,
+.form-help {
+    color: var(--muted);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    border-color: var(--line);
+    background: var(--surface-strong);
+    color: var(--text);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--glow-1);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: var(--muted);
+    opacity: .65;
+}
+
+.signup-submit {
+    border-color: var(--gold);
+    background: var(--gold);
+    color: var(--bg);
+}
+
+.signup-submit:hover {
+    background: transparent;
+    color: var(--gold);
+}
+
+.signup-bottom {
+    color: var(--muted);
+}
+
+.signup-bottom a {
+    color: var(--gold);
+}

@@ -166,12 +166,12 @@ def init_database():
         )
         
     if "position" not in existing_columns:
-    connection.execute(
-        """
-        ALTER TABLE users
-        ADD COLUMN position TEXT NOT NULL DEFAULT 'Member'
-        """
-    )
+        connection.execute(
+            """
+            ALTER TABLE users
+            ADD COLUMN position TEXT NOT NULL DEFAULT 'Member'
+            """
+        )
 
     if "phone_verified" not in existing_columns:
         connection.execute(

@@ -2024,3 +2024,69 @@ h1 {
 .signup-bottom a {
     color: var(--gold);
 }
+
+/* =========================================================
+   NEW GEN — GLOBAL FLASH TOAST
+========================================================= */
+
+.flash-container {
+    position: fixed;
+    top: 95px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(560px, calc(100% - 40px));
+    z-index: 5000;
+    display: grid;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.flash-message {
+    padding: 14px 18px;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--gold);
+    border-radius: 12px;
+    background: var(--surface-strong);
+    color: var(--text);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, .22);
+    font-size: .88rem;
+    line-height: 1.5;
+    pointer-events: auto;
+    animation: flash-in .3s ease;
+}
+
+.flash-message.success {
+    border-left-color: var(--mint);
+}
+
+.flash-message.error {
+    border-left-color: #ff6b6b;
+}
+
+.flash-message.info {
+    border-left-color: var(--blue);
+}
+
+@keyframes flash-in {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 600px) {
+    .flash-container {
+        top: 82px;
+        width: calc(100% - 24px);
+    }
+
+    .flash-message {
+        font-size: .82rem;
+    }
+}

@@ -616,18 +616,6 @@ def signup():
         # HASH PASSWORD
         # ----------------------------------------------------
 
-        leadership = get_leadership_role(
-            first_name,
-            last_name
-        )
-
-        role = "member"
-        position = "Member"
-
-        if leadership:
-            role = leadership["role"]
-            position = leadership["position"]
-        
         password_hash = generate_password_hash(password)
 
         # ----------------------------------------------------

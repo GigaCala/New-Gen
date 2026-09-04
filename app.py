@@ -463,6 +463,93 @@ def send_verification_email(
     first_name,
     verification_url,
 ):
+    mailer_url = os.environ.get(
+        "NEWGEN_MAILER_URL",
+        "",
+    )
+
+    mail_secret = os.environ.get(
+        "NEWGEN_MAIL_SECRET",
+        "",
+    )
+
+    if not mailer_url:
+        raise RuntimeError(
+            "NEWGEN_MAILER_URL is not configured."
+        )
+
+    if not mail_secret:
+        raise RuntimeError(
+            "NEWGEN_MAIL_SECRET is not configured."
+        )
+
+    payload = {
+        "recipient": recipient,
+        "first_name": first_name,
+        "verification_url": verification_url,
+        "secret": mail_secret,
+    }
+
+    import urllib.request
+    import urllib.error
+    import json
+
+    request_data = json.dumps(
+        payload
+    ).encode("utf-8")
+
+    req = urllib.request.Request(
+        mailer_url,
+        data=request_data,
+        headers={
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+
+    try:
+        with urllib.request.urlopen(
+            req,
+            timeout=30,
+        ) as response:
+
+            response_body = (
+                response
+                .read()
+                .decode("utf-8")
+            )
+
+            result = json.loads(
+                response_body
+            )
+
+            if not result.get("success"):
+                raise RuntimeError(
+                    result.get(
+                        "error",
+                        "Email service failed.",
+                    )
+                )
+
+    except urllib.error.HTTPError as error:
+
+        error_body = (
+            error
+            .read()
+            .decode("utf-8")
+        )
+
+        raise RuntimeError(
+            f"Email service HTTP error: "
+            f"{error.code} {error_body}"
+        )
+
+    except urllib.error.URLError as error:
+
+        raise RuntimeError(
+            f"Could not reach email service: "
+            f"{error.reason}"
+        )
 
     if not EMAIL_CONFIGURED:
         raise RuntimeError(

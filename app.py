@@ -3,9 +3,9 @@ import os
 import uuid
 import secrets
 import sqlite3
-import smtplib
+import urllib.request
+import urllib.error
 
-from email.message import EmailMessage
 from datetime import datetime, timezone, timedelta
 
 from flask import (
@@ -47,8 +47,13 @@ app.secret_key = SESSION_SECRET
 # ADMIN CONFIGURATION
 # ============================================================
 
-ADMIN_USERNAME = os.environ.get("NEWGEN_ADMIN_USER")
-ADMIN_PASSWORD = os.environ.get("NEWGEN_ADMIN_PASS")
+ADMIN_USERNAME = os.environ.get(
+    "NEWGEN_ADMIN_USER"
+)
+
+ADMIN_PASSWORD = os.environ.get(
+    "NEWGEN_ADMIN_PASS"
+)
 
 ADMIN_CREDENTIALS_CONFIGURED = bool(
     ADMIN_USERNAME and ADMIN_PASSWORD
@@ -56,13 +61,11 @@ ADMIN_CREDENTIALS_CONFIGURED = bool(
 
 
 # ============================================================
-# LEADERSHIP RECOGNITION
+# LEADERSHIP REGISTRY
 # ============================================================
 #
-# This registry is for people who are already officially
-# recognized by New Gen.
-#
-# DO NOT put ordinary members here.
+# Only officially recognized New Gen leaders should be placed
+# here.
 #
 # Example:
 #
@@ -81,44 +84,20 @@ LEADERSHIP = {
 
 
 # ============================================================
-# EMAIL CONFIGURATION
+# EMAIL VERIFICATION CONFIGURATION
 # ============================================================
 
-SMTP_HOST = os.environ.get(
-    "NEWGEN_SMTP_HOST",
-    "",
-)
-
-SMTP_PORT = int(
-    os.environ.get(
-        "NEWGEN_SMTP_PORT",
-        "587",
-    )
-)
-
-SMTP_USERNAME = os.environ.get(
-    "NEWGEN_SMTP_USERNAME",
-    "",
-)
-
-SMTP_PASSWORD = os.environ.get(
-    "NEWGEN_SMTP_PASSWORD",
-    "",
-)
-
-EMAIL_FROM = os.environ.get(
-    "NEWGEN_EMAIL_FROM",
-    SMTP_USERNAME,
-)
-
-EMAIL_CONFIGURED = bool(
-    SMTP_HOST
-    and SMTP_USERNAME
-    and SMTP_PASSWORD
-    and EMAIL_FROM
-)
-
 VERIFICATION_EXPIRY_HOURS = 24
+
+MAILER_URL = os.environ.get(
+    "NEWGEN_MAILER_URL",
+    "",
+)
+
+MAILER_SECRET = os.environ.get(
+    "NEWGEN_MAIL_SECRET",
+    "",
+)
 
 
 # ============================================================
@@ -145,6 +124,7 @@ DATABASE_FILE = os.path.join(
 # ============================================================
 
 def get_db():
+
     connection = sqlite3.connect(
         DATABASE_FILE
     )
@@ -155,10 +135,11 @@ def get_db():
 
 
 def init_database():
+
     connection = get_db()
 
     # --------------------------------------------------------
-    # USERS TABLE
+    # USERS
     # --------------------------------------------------------
 
     connection.execute(
@@ -196,7 +177,7 @@ def init_database():
     )
 
     # --------------------------------------------------------
-    # EXECUTIVE APPLICATIONS TABLE
+    # EXECUTIVE APPLICATIONS
     # --------------------------------------------------------
 
     connection.execute(
@@ -220,12 +201,7 @@ def init_database():
     )
 
     # --------------------------------------------------------
-    # DATABASE MIGRATION
-    # --------------------------------------------------------
-    #
-    # This upgrades older users.db files without deleting
-    # existing members.
-    #
+    # MIGRATE OLDER DATABASES
     # --------------------------------------------------------
 
     columns = connection.execute(
@@ -238,6 +214,7 @@ def init_database():
     }
 
     if "reason_for_joining" not in existing_columns:
+
         connection.execute(
             """
             ALTER TABLE users
@@ -247,6 +224,7 @@ def init_database():
         )
 
     if "role" not in existing_columns:
+
         connection.execute(
             """
             ALTER TABLE users
@@ -256,6 +234,7 @@ def init_database():
         )
 
     if "position" not in existing_columns:
+
         connection.execute(
             """
             ALTER TABLE users
@@ -265,6 +244,7 @@ def init_database():
         )
 
     if "phone_verified" not in existing_columns:
+
         connection.execute(
             """
             ALTER TABLE users
@@ -274,6 +254,7 @@ def init_database():
         )
 
     if "verification_token" not in existing_columns:
+
         connection.execute(
             """
             ALTER TABLE users
@@ -283,6 +264,7 @@ def init_database():
         )
 
     if "verification_expires_at" not in existing_columns:
+
         connection.execute(
             """
             ALTER TABLE users
@@ -303,6 +285,7 @@ init_database()
 # ============================================================
 
 def load_events():
+
     if not os.path.exists(EVENTS_FILE):
         return []
 
@@ -313,19 +296,21 @@ def load_events():
     ) as file:
 
         try:
+
             data = json.load(file)
 
-            return (
-                data
-                if isinstance(data, list)
-                else []
-            )
+            if isinstance(data, list):
+                return data
+
+            return []
 
         except json.JSONDecodeError:
+
             return []
 
 
 def save_events(events):
+
     with open(
         EVENTS_FILE,
         "w",
@@ -345,7 +330,10 @@ def save_events(events):
 
 def is_admin_logged_in():
 
-    if session.get("admin_logged_in") is True:
+    if session.get(
+        "admin_logged_in"
+    ) is True:
+
         return True
 
     admin_member_id = session.get(
@@ -375,6 +363,7 @@ def is_admin_logged_in():
 
 
 def is_member_logged_in():
+
     return (
         session.get(
             "member_logged_in"
@@ -425,6 +414,7 @@ def is_executive():
 # ============================================================
 
 def normalize_name(value):
+
     return " ".join(
         value.strip().lower().split()
     )
@@ -434,6 +424,7 @@ def get_leadership_match(
     first_name,
     last_name,
 ):
+
     key = (
         normalize_name(first_name),
         normalize_name(last_name),
@@ -442,20 +433,8 @@ def get_leadership_match(
     return LEADERSHIP.get(key)
 
 
-def get_leadership_role(
-    first_name,
-    last_name,
-):
-    key = (
-        first_name.strip().lower(),
-        last_name.strip().lower(),
-    )
-
-    return LEADERSHIP.get(key)
-
-
 # ============================================================
-# EMAIL VERIFICATION
+# REAL EMAIL VERIFICATION
 # ============================================================
 
 def send_verification_email(
@@ -463,22 +442,15 @@ def send_verification_email(
     first_name,
     verification_url,
 ):
-    mailer_url = os.environ.get(
-        "NEWGEN_MAILER_URL",
-        "",
-    )
 
-    mail_secret = os.environ.get(
-        "NEWGEN_MAIL_SECRET",
-        "",
-    )
+    if not MAILER_URL:
 
-    if not mailer_url:
         raise RuntimeError(
             "NEWGEN_MAILER_URL is not configured."
         )
 
-    if not mail_secret:
+    if not MAILER_SECRET:
+
         raise RuntimeError(
             "NEWGEN_MAIL_SECRET is not configured."
         )
@@ -487,19 +459,15 @@ def send_verification_email(
         "recipient": recipient,
         "first_name": first_name,
         "verification_url": verification_url,
-        "secret": mail_secret,
+        "secret": MAILER_SECRET,
     }
-
-    import urllib.request
-    import urllib.error
-    import json
 
     request_data = json.dumps(
         payload
     ).encode("utf-8")
 
-    req = urllib.request.Request(
-        mailer_url,
+    request_object = urllib.request.Request(
+        MAILER_URL,
         data=request_data,
         headers={
             "Content-Type": "application/json",
@@ -508,8 +476,9 @@ def send_verification_email(
     )
 
     try:
+
         with urllib.request.urlopen(
-            req,
+            request_object,
             timeout=30,
         ) as response:
 
@@ -523,7 +492,10 @@ def send_verification_email(
                 response_body
             )
 
-            if not result.get("success"):
+            if not result.get(
+                "success"
+            ):
+
                 raise RuntimeError(
                     result.get(
                         "error",
@@ -540,69 +512,15 @@ def send_verification_email(
         )
 
         raise RuntimeError(
-            f"Email service HTTP error: "
+            "Email service HTTP error: "
             f"{error.code} {error_body}"
         )
 
     except urllib.error.URLError as error:
 
         raise RuntimeError(
-            f"Could not reach email service: "
+            "Could not reach email service: "
             f"{error.reason}"
-        )
-
-    if not EMAIL_CONFIGURED:
-        raise RuntimeError(
-            "Email delivery is not configured. "
-            "Set the NEWGEN_SMTP_* and "
-            "NEWGEN_EMAIL_FROM environment variables."
-        )
-
-    message = EmailMessage()
-
-    message["Subject"] = (
-        "Verify your New Gen account"
-    )
-
-    message["From"] = EMAIL_FROM
-    message["To"] = recipient
-
-    message.set_content(
-        f"""Hi {first_name},
-
-Welcome to New Gen — African children must speak.
-
-Your account has been created.
-
-Please verify your email address by opening this link:
-
-{verification_url}
-
-This verification link expires in
-{VERIFICATION_EXPIRY_HOURS} hours.
-
-If you did not create a New Gen account,
-you can safely ignore this email.
-
-— New Gen
-"""
-    )
-
-    with smtplib.SMTP(
-        SMTP_HOST,
-        SMTP_PORT,
-        timeout=20,
-    ) as smtp:
-
-        smtp.starttls()
-
-        smtp.login(
-            SMTP_USERNAME,
-            SMTP_PASSWORD,
-        )
-
-        smtp.send_message(
-            message
         )
 
 
@@ -612,6 +530,7 @@ you can safely ignore this email.
 
 @app.context_processor
 def inject_member():
+
     return {
         "member": get_current_member()
     }
@@ -627,7 +546,7 @@ def home():
     events = sorted(
         load_events(),
         key=lambda event:
-            event.get("date", "")
+            event.get("date", ""),
     )[:3]
 
     return render_template(
@@ -643,6 +562,7 @@ def home():
 
 @app.route("/music-dance")
 def music_dance():
+
     return render_template(
         "music_dance.html"
     )
@@ -650,6 +570,7 @@ def music_dance():
 
 @app.route("/art")
 def art():
+
     return render_template(
         "art.html"
     )
@@ -657,6 +578,7 @@ def art():
 
 @app.route("/poetry")
 def poetry():
+
     return render_template(
         "poetry.html"
     )
@@ -664,6 +586,7 @@ def poetry():
 
 @app.route("/tech")
 def tech():
+
     return render_template(
         "tech.html"
     )
@@ -671,6 +594,7 @@ def tech():
 
 @app.route("/fashion")
 def fashion():
+
     return render_template(
         "fashion.html"
     )
@@ -682,6 +606,7 @@ def fashion():
 
 @app.route("/contact")
 def contact():
+
     return render_template(
         "contact.html"
     )
@@ -697,7 +622,7 @@ def calendar():
     events = sorted(
         load_events(),
         key=lambda event:
-            event.get("date", "")
+            event.get("date", ""),
     )
 
     featured_event = (
@@ -711,7 +636,7 @@ def calendar():
         events=events,
         featured_event=featured_event,
     )
-# ============================================================
+    # ============================================================
 # MEMBER SIGNUP
 # ============================================================
 
@@ -719,7 +644,9 @@ def calendar():
 def signup():
 
     if is_member_logged_in():
-        return redirect(url_for("home"))
+        return redirect(
+            url_for("home")
+        )
 
     if request.method == "POST":
 
@@ -805,6 +732,7 @@ def signup():
             password,
             confirm_password,
         ]):
+
             flash(
                 "Please complete every field.",
                 "error",
@@ -819,6 +747,7 @@ def signup():
         # ----------------------------------------------------
 
         if password != confirm_password:
+
             flash(
                 "Passwords do not match.",
                 "error",
@@ -829,6 +758,7 @@ def signup():
             )
 
         if len(password) < 8:
+
             flash(
                 "Password must be at least 8 characters.",
                 "error",
@@ -862,6 +792,7 @@ def signup():
         }
 
         if class_name not in allowed_classes:
+
             flash(
                 "Please select a valid class.",
                 "error",
@@ -872,6 +803,7 @@ def signup():
             )
 
         if group_name not in allowed_groups:
+
             flash(
                 "Please select a valid New Gen group.",
                 "error",
@@ -882,6 +814,7 @@ def signup():
             )
 
         if account_type not in allowed_account_types:
+
             flash(
                 "Please select a valid account type.",
                 "error",
@@ -911,6 +844,7 @@ def signup():
         ).fetchone()
 
         if existing_user:
+
             connection.close()
 
             flash(
@@ -955,17 +889,16 @@ def signup():
         )
 
         # ----------------------------------------------------
-        # DEFAULT ROLE
+        # ROLE
         # ----------------------------------------------------
 
         assigned_role = "member"
         assigned_position = "Member"
 
-        # IMPORTANT:
-        # Selecting Executive never grants executive access.
+        # Selecting Executive does NOT grant executive
+        # privileges.
         #
-        # The account remains a normal member until an
-        # administrator approves the executive application.
+        # The account must be approved by an administrator.
 
         if account_type == "executive":
 
@@ -990,7 +923,7 @@ def signup():
         ).isoformat()
 
         # ----------------------------------------------------
-        # SAVE USER
+        # SAVE MEMBER
         # ----------------------------------------------------
 
         cursor = connection.execute(
@@ -1072,7 +1005,7 @@ def signup():
         connection.close()
 
         # ----------------------------------------------------
-        # BUILD VERIFICATION URL
+        # VERIFICATION URL
         # ----------------------------------------------------
 
         verification_url = url_for(
@@ -1144,7 +1077,9 @@ def signup():
 def login():
 
     if is_member_logged_in():
-        return redirect(url_for("home"))
+        return redirect(
+            url_for("home")
+        )
 
     if request.method == "POST":
 
@@ -1197,7 +1132,7 @@ def login():
             )
 
         # ----------------------------------------------------
-        # EMAIL VERIFICATION CHECK
+        # EMAIL VERIFICATION
         # ----------------------------------------------------
 
         if not user["email_verified"]:
@@ -1212,7 +1147,7 @@ def login():
             )
 
         # ----------------------------------------------------
-        # CREATE SESSION
+        # SESSION
         # ----------------------------------------------------
 
         session.clear()
@@ -1250,7 +1185,7 @@ def login():
             )
 
         # ----------------------------------------------------
-        # NORMAL MEMBER
+        # MEMBER
         # ----------------------------------------------------
 
         return redirect(
@@ -1419,7 +1354,7 @@ def resend_verification():
         )
 
     # --------------------------------------------------------
-    # NEW TOKEN
+    # GENERATE NEW TOKEN
     # --------------------------------------------------------
 
     verification_token = secrets.token_urlsafe(
@@ -1452,7 +1387,7 @@ def resend_verification():
     connection.close()
 
     # --------------------------------------------------------
-    # NEW VERIFICATION URL
+    # BUILD NEW LINK
     # --------------------------------------------------------
 
     verification_url = url_for(
@@ -1462,7 +1397,7 @@ def resend_verification():
     )
 
     # --------------------------------------------------------
-    # SEND
+    # SEND NEW EMAIL
     # --------------------------------------------------------
 
     try:
@@ -1544,7 +1479,7 @@ def verify_email(token):
         )
 
     # --------------------------------------------------------
-    # CHECK EXPIRATION
+    # EXPIRATION
     # --------------------------------------------------------
 
     expires_at = user[
@@ -1598,7 +1533,7 @@ def verify_email(token):
             )
 
     # --------------------------------------------------------
-    # VERIFY ACCOUNT
+    # MARK EMAIL VERIFIED
     # --------------------------------------------------------
 
     connection.execute(
@@ -1615,10 +1550,6 @@ def verify_email(token):
 
     connection.commit()
     connection.close()
-
-    # --------------------------------------------------------
-    # SUCCESS
-    # --------------------------------------------------------
 
     return render_template(
         "verify_email.html",
@@ -1661,7 +1592,6 @@ def executive_apply():
             url_for("login")
         )
 
-    # Already approved
     if member["role"] == "executive":
 
         return redirect(
@@ -2035,7 +1965,7 @@ def admin(event_id=None):
         )
 
         # ----------------------------------------------------
-        # VALIDATE
+        # VALIDATION
         # ----------------------------------------------------
 
         if not title or not date_value:
@@ -2049,13 +1979,15 @@ def admin(event_id=None):
                 "admin.html",
                 events=events,
                 event=current_event,
-                mode="Edit"
-                if current_event
-                else "Create",
+                mode=(
+                    "Edit"
+                    if current_event
+                    else "Create"
+                ),
             )
 
         # ----------------------------------------------------
-        # BUILD EVENT
+        # EVENT DATA
         # ----------------------------------------------------
 
         event_data = {
@@ -2070,12 +2002,11 @@ def admin(event_id=None):
         existing_events = load_events()
 
         # ----------------------------------------------------
-        # UPDATE EXISTING EVENT
+        # UPDATE EVENT
         # ----------------------------------------------------
 
         if any(
-            item.get("id")
-            == event_id_value
+            item.get("id") == event_id_value
             for item in existing_events
         ):
 
@@ -2090,7 +2021,7 @@ def admin(event_id=None):
             ]
 
         # ----------------------------------------------------
-        # CREATE NEW EVENT
+        # CREATE EVENT
         # ----------------------------------------------------
 
         else:
@@ -2280,10 +2211,6 @@ def approve_executive(
 
     connection = get_db()
 
-    # --------------------------------------------------------
-    # FIND APPLICATION
-    # --------------------------------------------------------
-
     application = connection.execute(
         """
         SELECT *
@@ -2307,7 +2234,7 @@ def approve_executive(
         )
 
     # --------------------------------------------------------
-    # APPROVE APPLICATION
+    # APPROVE
     # --------------------------------------------------------
 
     connection.execute(
@@ -2320,7 +2247,7 @@ def approve_executive(
     )
 
     # --------------------------------------------------------
-    # GRANT EXECUTIVE ROLE
+    # GRANT ROLE
     # --------------------------------------------------------
 
     connection.execute(
@@ -2490,6 +2417,115 @@ def change_member_role(user_id):
 
 
 # ============================================================
+# ADMIN DELETE USER
+# ============================================================
+
+@app.route(
+    "/admin/member/<int:user_id>/delete",
+    methods=["POST"],
+)
+def delete_member(user_id):
+
+    if not is_admin_logged_in():
+
+        flash(
+            "Administrator access required.",
+            "error",
+        )
+
+        return redirect(
+            url_for("admin_login")
+        )
+
+    connection = get_db()
+
+    # --------------------------------------------------------
+    # FIND USER
+    # --------------------------------------------------------
+
+    user = connection.execute(
+        """
+        SELECT
+            id,
+            first_name,
+            last_name,
+            role
+        FROM users
+        WHERE id = ?
+        """,
+        (user_id,),
+    ).fetchone()
+
+    if not user:
+
+        connection.close()
+
+        flash(
+            "Member not found.",
+            "error",
+        )
+
+        return redirect(
+            url_for("admin_members")
+        )
+
+    # --------------------------------------------------------
+    # PROTECT ADMIN ACCOUNT
+    # --------------------------------------------------------
+
+    if user["role"] == "admin":
+
+        connection.close()
+
+        flash(
+            "Administrator accounts cannot be deleted "
+            "from this panel.",
+            "error",
+        )
+
+        return redirect(
+            url_for("admin_members")
+        )
+
+    # --------------------------------------------------------
+    # DELETE EXECUTIVE APPLICATIONS FIRST
+    # --------------------------------------------------------
+
+    connection.execute(
+        """
+        DELETE FROM executive_applications
+        WHERE user_id = ?
+        """,
+        (user_id,),
+    )
+
+    # --------------------------------------------------------
+    # DELETE USER
+    # --------------------------------------------------------
+
+    connection.execute(
+        """
+        DELETE FROM users
+        WHERE id = ?
+        """,
+        (user_id,),
+    )
+
+    connection.commit()
+    connection.close()
+
+    flash(
+        f"Member {user['first_name']} "
+        f"{user['last_name']} was deleted.",
+        "success",
+    )
+
+    return redirect(
+        url_for("admin_members")
+    )
+
+
+# ============================================================
 # DATE HELPERS
 # ============================================================
 
@@ -2500,9 +2536,7 @@ def format_display_date(value):
 
     try:
 
-        year, month, day = value.split(
-            "-"
-        )
+        year, month, day = value.split("-")
 
         return (
             f"{day}/{month}/{year}"

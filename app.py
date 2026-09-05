@@ -2619,6 +2619,24 @@ def delete_event(event_id):
         )
 
    # ============================================================
+    connection.execute(
+        "DELETE FROM events WHERE event_key = ?",
+        (event_id,),
+    )
+
+    connection.commit()
+    connection.close()
+
+    flash(
+        f"Event '{event['title']}' deleted successfully.",
+        "success",
+    )
+
+    return redirect(
+        url_for("admin_portal")
+    )
+
+
 # DELETE MEMBER (CONFIRMATION)
 # ============================================================
 
@@ -2648,54 +2666,12 @@ def delete_member_page(user_id):
     )
 
 
-@app.route(
-    "/admin/member/<int:user_id>/delete/confirm",
-    methods=["POST"]
-)
-def delete_member_page(user_id):
-
-    if not is_admin_logged_in():
-        flash("Administrator access required.", "error")
-        return redirect(url_for("admin_login"))
-
-    connection = get_db()
-
-    user = connection.execute(
-        "SELECT * FROM users WHERE id=?",
-        (user_id,)
-    ).fetchone()
-
-    if not user:
-        connection.close()
-        flash("Member not found.", "error")
-        return redirect(url_for("admin_members"))
-
-    if user["role"] == "admin":
-        connection.close()
-        flash("Admin accounts cannot be deleted.", "error")
-        return redirect(url_for("admin_members"))
-
-    connection.execute(
-        "DELETE FROM executive_applications WHERE user_id=?",
-        (user_id,)
-    )
-
-    connection.execute(
-        "DELETE FROM users WHERE id=?",
-        (user_id,)
-    )
-
-    connection.commit()
-    connection.close()
-
-    flash("Member deleted successfully.", "success")
-
-    return redirect(url_for("admin_members"))
 # ============================================================
 # ADMIN SEARCH MEMBERS
 # ============================================================
 
 @app.route("/admin/members/search")
+@app.route("/admin/search")
 def admin_search():
 
     if not is_admin_logged_in():
@@ -3149,29 +3125,40 @@ def change_member_role(user_id):
 
 
 # ============================================================
-# DELETE MEMBER — STEP 1
+# DELETE MEMBER — FINAL CONFIRMATION
 # ============================================================
-#
-# Instead of deleting immediately, send the administrator to
-# a confirmation page.
-#
 
 @app.route(
-    "/admin/member/<int:user_id>/delete",
-    methods=["GET", "POST"],
+    "/admin/member/<int:user_id>/delete/confirm",
+    methods=["POST"],
 )
 def delete_member(user_id):
 
     if not is_admin_logged_in():
-
         flash(
             "Administrator access required.",
             "error",
         )
+        return redirect(url_for("admin_login"))
 
-        return redirect(
-            url_for("admin_login")
+    confirmation = request.form.get(
+        "confirm",
+        "",
+    ).strip().lower()
+
+    if confirmation not in {
+        "yes",
+        "true",
+        "1",
+        "delete",
+        "confirm",
+    }:
+        flash(
+            "Account deletion cancelled. "
+            "You must confirm permanent deletion.",
+            "error",
         )
+        return redirect(url_for("admin_members"))
 
     connection = get_db()
 
@@ -3189,76 +3176,19 @@ def delete_member(user_id):
         (user_id,),
     ).fetchone()
 
-    connection.close()
-
     if not user:
-
-        flash(
-            "Member not found.",
-            "error",
-        )
-
-        return redirect(
-            url_for("admin_members")
-        )
-
-    # Never allow an administrator account to be deleted
-    # through this member deletion tool.
+        connection.close()
+        flash("Member not found.", "error")
+        return redirect(url_for("admin_members"))
 
     if user["role"] == "admin":
-
+        connection.close()
         flash(
             "Administrator accounts cannot be deleted "
             "from this panel.",
             "error",
         )
-
-        return redirect(
-            url_for("admin_members")
-        )
-
-    if request.method == "GET":
-
-        # If delete_confirm.html exists, use it.
-        # This gives the permanent deletion confirmation
-        # its own page.
-
-        return render_template(
-            "delete_confirm.html",
-            user=user,
-        )
-
-    confirmation = request.form.get(
-        "confirm",
-        "",
-    ).strip().lower()
-
-    if confirmation not in {
-        "yes",
-        "true",
-        "1",
-        "delete",
-        "confirm",
-    }:
-
-        flash(
-            "Account deletion cancelled. "
-            "You must confirm permanent deletion.",
-            "error",
-        )
-
-        return redirect(
-            url_for("admin_members")
-        )
-
-    # --------------------------------------------------------
-    # FINAL DELETE
-    # --------------------------------------------------------
-
-    connection = get_db()
-
-    # Applications are removed first because they reference
-    # the user.
+        return redirect(url_for("admin_members"))
 
     connection.execute(
         """
@@ -3285,107 +3215,7 @@ def delete_member(user_id):
         "success",
     )
 
-    return redirect(
-        url_for("admin_members")
-    )
-
-
-# ============================================================
-# ADMIN SEARCH
-# ============================================================
-
-@app.route("/admin/search")
-def admin_search():
-
-    if not is_admin_logged_in():
-
-        flash(
-            "Administrator access required.",
-            "error",
-        )
-
-        return redirect(
-            url_for("admin_login")
-        )
-
-    query = request.args.get(
-        "q",
-        "",
-    ).strip()
-
-    connection = get_db()
-
-    if query:
-
-        search_value = f"%{query}%"
-
-        members = connection.execute(
-            """
-            SELECT
-                id,
-                first_name,
-                last_name,
-                username,
-                email,
-                phone,
-                school,
-                class_name,
-                group_name,
-                role,
-                position,
-                email_verified,
-                created_at
-            FROM users
-            WHERE
-                first_name LIKE ?
-                OR last_name LIKE ?
-                OR username LIKE ?
-                OR email LIKE ?
-                OR school LIKE ?
-                OR group_name LIKE ?
-            ORDER BY created_at DESC
-            """,
-            (
-                search_value,
-                search_value,
-                search_value,
-                search_value,
-                search_value,
-                search_value,
-            ),
-        ).fetchall()
-
-    else:
-
-        members = connection.execute(
-            """
-            SELECT
-                id,
-                first_name,
-                last_name,
-                username,
-                email,
-                phone,
-                school,
-                class_name,
-                group_name,
-                role,
-                position,
-                email_verified,
-                created_at
-            FROM users
-            ORDER BY created_at DESC
-            """
-        ).fetchall()
-
-    connection.close()
-
-    return render_template(
-        "members.html",
-        members=members,
-        applications=[],
-        search_query=query,
-    )
+    return redirect(url_for("admin_members"))
 
 
 # ============================================================

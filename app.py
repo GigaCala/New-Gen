@@ -2618,56 +2618,140 @@ def delete_event(event_id):
             url_for("admin_portal")
         )
 
-    # --------------------------------------------------------
-    # PERMANENT DELETE CONFIRMATION
-    # --------------------------------------------------------
+   # ============================================================
+# DELETE MEMBER (CONFIRMATION)
+# ============================================================
 
-    confirmation = request.form.get(
-        "confirm",
-        "",
-    ).strip().lower()
+@app.route("/admin/member/<int:user_id>/delete")
+def delete_member_page(user_id):
 
-    if confirmation not in {
-        "yes",
-        "true",
-        "1",
-        "delete",
-        "confirm",
-    }:
+    if not is_admin_logged_in():
+        flash("Administrator access required.", "error")
+        return redirect(url_for("admin_login"))
 
+    connection = get_db()
+
+    member = connection.execute(
+        "SELECT * FROM users WHERE id=?",
+        (user_id,)
+    ).fetchone()
+
+    connection.close()
+
+    if not member:
+        flash("Member not found.", "error")
+        return redirect(url_for("admin_members"))
+
+    return render_template(
+        "delete_confirm.html",
+        person=member
+    )
+
+
+@app.route(
+    "/admin/member/<int:user_id>/delete/confirm",
+    methods=["POST"]
+)
+def delete_member(user_id):
+
+    if not is_admin_logged_in():
+        flash("Administrator access required.", "error")
+        return redirect(url_for("admin_login"))
+
+    connection = get_db()
+
+    user = connection.execute(
+        "SELECT * FROM users WHERE id=?",
+        (user_id,)
+    ).fetchone()
+
+    if not user:
         connection.close()
+        flash("Member not found.", "error")
+        return redirect(url_for("admin_members"))
 
-        flash(
-            "Event deletion was cancelled. "
-            "Confirmation is required.",
-            "error",
-        )
-
-        return redirect(
-            url_for("admin_portal")
-        )
+    if user["role"] == "admin":
+        connection.close()
+        flash("Admin accounts cannot be deleted.", "error")
+        return redirect(url_for("admin_members"))
 
     connection.execute(
-        """
-        DELETE FROM events
-        WHERE event_key = ?
-        """,
-        (event_id,),
+        "DELETE FROM executive_applications WHERE user_id=?",
+        (user_id,)
+    )
+
+    connection.execute(
+        "DELETE FROM users WHERE id=?",
+        (user_id,)
     )
 
     connection.commit()
     connection.close()
 
-    flash(
-        "Event deleted permanently.",
-        "success",
+    flash("Member deleted successfully.", "success")
+
+    return redirect(url_for("admin_members"))
+# ============================================================
+# ADMIN SEARCH MEMBERS
+# ============================================================
+
+@app.route("/admin/members/search")
+def admin_search():
+
+    if not is_admin_logged_in():
+        flash("Administrator access required.", "error")
+        return redirect(url_for("admin_login"))
+
+    query = request.args.get("q", "").strip()
+
+    connection = get_db()
+
+    members = connection.execute(
+        """
+        SELECT *
+        FROM users
+        WHERE
+            first_name LIKE ?
+            OR last_name LIKE ?
+            OR username LIKE ?
+            OR school LIKE ?
+            OR group_name LIKE ?
+        ORDER BY created_at DESC
+        """,
+        (
+            f"%{query}%",
+            f"%{query}%",
+            f"%{query}%",
+            f"%{query}%",
+            f"%{query}%"
+        )
+    ).fetchall()
+
+    applications = connection.execute(
+        """
+        SELECT
+            ea.*,
+            u.first_name,
+            u.last_name,
+            u.username,
+            u.school,
+            u.class_name,
+            u.group_name
+        FROM executive_applications ea
+        JOIN users u
+        ON ea.user_id=u.id
+        ORDER BY ea.created_at DESC
+        """
+    ).fetchall()
+
+    connection.close()
+
+    return render_template(
+        "members.html",
+        members=members,
+        applications=applications,
+        search_query=query
     )
-
-    return redirect(
-        url_for("admin_portal")
-    )
-
-
 # ============================================================
 # ADMIN MEMBERS
 # ============================================================

@@ -2402,3 +2402,71 @@ body[data-theme="luxury"] .form-group.has-error textarea {
     }
 
 }
+/* DELETE PAGE */
+
+.delete-page{
+    min-height:80vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:var(--bg);
+}
+
+.delete-card{
+    width:min(520px,92%);
+    padding:40px;
+    border-radius:24px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    text-align:center;
+}
+
+.delete-kicker{
+    color:var(--gold);
+    letter-spacing:.2em;
+    font-size:.75rem;
+}
+
+.delete-card h1{
+    margin:15px 0;
+}
+
+.delete-card p{
+    color:var(--muted);
+}
+
+.delete-member{
+    margin:28px 0;
+    padding:18px;
+    border-radius:16px;
+    background:var(--surface-strong);
+}
+
+.delete-member strong{
+    display:block;
+    font-size:1.25rem;
+}
+
+.delete-member span,
+.delete-member small{
+    color:var(--muted);
+    display:block;
+    margin-top:6px;
+}
+
+.delete-button{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:14px;
+    background:#ff4b4b;
+    color:white;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.cancel-button{
+    display:block;
+    margin-top:18px;
+    color:var(--gold);
+}

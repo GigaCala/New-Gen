@@ -1,134 +1,118 @@
 {% extends "base.html" %}
 
-{% block title %}Join New Gen | Membership{% endblock %}
+{% block title %}Create Account | New Gen{% endblock %}
 
 {% block content %}
 
 <style>
 .signup-page {
     min-height: 100vh;
+    padding: 70px 20px 90px;
     background:
         radial-gradient(
-            circle at 85% 10%,
-            rgba(210, 170, 70, .10),
+            circle at 85% 5%,
+            rgba(201, 168, 92, .10),
             transparent 28%
-        ),
-        #0a0a0a;
-    color: #f2eee6;
-    padding-bottom: 100px;
+        );
 }
 
-.signup-hero {
-    padding: 90px 0 70px;
-    border-bottom: 1px solid rgba(255,255,255,.09);
+.signup-container {
+    width: min(760px, 100%);
+    margin: 0 auto;
 }
 
-.signup-kicker,
-.signup-label {
+.signup-heading {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.signup-kicker {
     display: block;
+    margin-bottom: 14px;
+    color: #c9a85c;
     font-size: .72rem;
+    font-weight: 700;
     letter-spacing: .2em;
     text-transform: uppercase;
-    color: #c9a85c;
-    margin-bottom: 18px;
 }
 
-.signup-hero h1 {
-    max-width: 900px;
-    font-size: clamp(3.2rem, 8vw, 7rem);
-    line-height: .9;
-    letter-spacing: -.055em;
+.signup-heading h1 {
     margin: 0;
-    font-weight: 800;
+    font-size: clamp(2.4rem, 7vw, 4.5rem);
+    line-height: .95;
+    letter-spacing: -.045em;
 }
 
-.signup-hero h1 span {
+.signup-heading h1 span {
     color: #c9a85c;
 }
 
-.signup-hero p {
-    max-width: 650px;
-    margin-top: 28px;
-    color: #aaa7a0;
-    font-size: 1.05rem;
-    line-height: 1.8;
-}
-
-.signup-layout {
-    display: grid;
-    grid-template-columns: .75fr 1.25fr;
-    gap: 70px;
-    padding-top: 70px;
-    align-items: start;
-}
-
-.signup-side {
-    position: sticky;
-    top: 100px;
-}
-
-.signup-side-number {
-    font-size: 6rem;
-    line-height: 1;
-    font-weight: 800;
-    color: rgba(201,168,92,.16);
-    margin-bottom: -20px;
-}
-
-.signup-side h2 {
-    font-size: 2rem;
-    margin: 0 0 15px;
-}
-
-.signup-side p {
+.signup-heading p {
+    max-width: 520px;
+    margin: 18px auto 0;
     color: #9e9b95;
     line-height: 1.7;
+    font-size: .95rem;
 }
 
-.signup-note {
-    margin-top: 35px;
-    padding: 20px;
-    border-left: 2px solid #c9a85c;
+.signup-card {
+    padding: clamp(24px, 5vw, 45px);
+    border: 1px solid rgba(255,255,255,.10);
     background: rgba(255,255,255,.025);
-    color: #aaa7a0;
-    line-height: 1.6;
-    font-size: .9rem;
+    box-shadow: 0 25px 70px rgba(0,0,0,.22);
 }
 
-.signup-form {
-    border: 1px solid rgba(255,255,255,.1);
-    background: rgba(255,255,255,.025);
-    padding: clamp(25px, 5vw, 55px);
-    box-shadow: 0 30px 80px rgba(0,0,0,.25);
+.signup-card-header {
+    margin-bottom: 32px;
+}
+
+.signup-card-header h2 {
+    margin: 0 0 8px;
+    font-size: 1.5rem;
+}
+
+.signup-card-header p {
+    margin: 0;
+    color: #77736c;
+    font-size: .88rem;
 }
 
 .form-section {
-    padding-bottom: 38px;
-    margin-bottom: 38px;
-    border-bottom: 1px solid rgba(255,255,255,.08);
+    margin-bottom: 30px;
 }
 
-.form-section:last-of-type {
-    border-bottom: 0;
-    margin-bottom: 0;
-    padding-bottom: 15px;
+.form-section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
 }
 
-.form-section h2 {
-    font-size: 1.35rem;
-    margin: 0 0 25px;
+.form-section-number {
+    color: #c9a85c;
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+}
+
+.form-section-title h3 {
+    margin: 0;
+    font-size: .82rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #aaa7a0;
 }
 
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 22px;
+    gap: 18px;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    gap: 8px;
 }
 
 .form-group.full {
@@ -136,29 +120,25 @@
 }
 
 .form-group label {
-    font-size: .73rem;
-    letter-spacing: .12em;
+    color: #aaa7a0;
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .08em;
     text-transform: uppercase;
-    color: #a8a59e;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
     width: 100%;
-    border: 1px solid rgba(255,255,255,.12);
+    padding: 14px 15px;
+    border: 1px solid rgba(255,255,255,.11);
+    border-radius: 8px;
+    outline: none;
     background: #101010;
     color: #f1eee7;
-    padding: 15px 16px;
-    border-radius: 0;
-    outline: none;
     font: inherit;
-    transition: .25s ease;
-}
-
-.form-group textarea {
-    min-height: 130px;
-    resize: vertical;
+    transition: border-color .2s ease, box-shadow .2s ease;
 }
 
 .form-group input:focus,
@@ -173,52 +153,60 @@
     color: #555;
 }
 
+.form-group textarea {
+    min-height: 105px;
+    resize: vertical;
+}
+
 .form-help {
     color: #68655f;
-    font-size: .75rem;
+    font-size: .74rem;
+    line-height: 1.5;
 }
 
 .signup-submit {
     width: 100%;
-    margin-top: 20px;
-    padding: 18px 25px;
+    margin-top: 8px;
+    padding: 16px 20px;
     border: 1px solid #c9a85c;
+    border-radius: 8px;
     background: #c9a85c;
     color: #090909;
+    font-size: .8rem;
     font-weight: 800;
-    font-size: .82rem;
-    letter-spacing: .12em;
+    letter-spacing: .1em;
     text-transform: uppercase;
     cursor: pointer;
-    transition: .25s ease;
+    transition: .2s ease;
 }
 
 .signup-submit:hover {
     background: transparent;
     color: #c9a85c;
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
 .signup-bottom {
+    margin-top: 24px;
     text-align: center;
-    margin-top: 28px;
     color: #77736c;
-    font-size: .9rem;
+    font-size: .88rem;
 }
 
 .signup-bottom a {
     color: #c9a85c;
     text-decoration: none;
+    font-weight: 600;
 }
 
-@media (max-width: 800px) {
-    .signup-layout {
-        grid-template-columns: 1fr;
-        gap: 40px;
-    }
+.signup-bottom a:hover {
+    text-decoration: underline;
+}
 
-    .signup-side {
-        position: static;
+@media (max-width: 650px) {
+
+    .signup-page {
+        padding: 45px 15px 70px;
     }
 
     .form-grid {
@@ -229,81 +217,78 @@
         grid-column: auto;
     }
 
-    .signup-hero {
-        padding-top: 60px;
+    .signup-card {
+        padding: 22px 18px;
+    }
+
+    .signup-heading {
+        margin-bottom: 28px;
     }
 }
 </style>
 
+
 <main class="signup-page">
 
-    <section class="signup-hero">
-        <div class="container">
+    <div class="signup-container">
+
+        <!-- PAGE HEADING -->
+
+        <div class="signup-heading">
+
             <span class="signup-kicker">
                 NEW GEN / MEMBERSHIP
             </span>
 
             <h1>
-                Find your voice.<br>
-                <span>Then give it somewhere to go.</span>
+                Join <span>New Gen.</span>
             </h1>
 
             <p>
-                New Gen is a space for students who want to create, build,
-                perform, question, design and make an impact.
-                Tell us who you are and where your voice belongs.
+                Create your account and find your place
+                in the New Gen community.
             </p>
+
         </div>
-    </section>
 
 
-    <section class="container signup-layout">
-
-        <aside class="signup-side">
-
-            <div class="signup-side-number">
-                01
-            </div>
-
-            <h2>
-                Become part of New Gen.
-            </h2>
-
-            <p>
-                Your membership connects you to one of our creative groups
-                and gives you a place to develop your ideas with other
-                young African creators.
-            </p>
-
-            <div class="signup-note">
-                <strong>Your information matters.</strong><br>
-
-                Your password is securely hashed and your account must be
-                verified through your email before you can log in.
-            </div>
-
-        </aside>
-
+        <!-- SIGNUP CARD -->
 
         <form
-            class="signup-form"
+            class="signup-card"
             method="POST"
             action="{{ url_for('signup') }}"
         >
 
-            <!-- =================================================
-                 01 / IDENTITY
-            ================================================== -->
-
-            <div class="form-section">
-
-                <span class="signup-label">
-                    01 / Identity
-                </span>
+            <div class="signup-card-header">
 
                 <h2>
-                    Who are you?
+                    Create your account
                 </h2>
+
+                <p>
+                    Fill in your details below.
+                </p>
+
+            </div>
+
+
+            <!-- IDENTITY -->
+
+            <section class="form-section">
+
+                <div class="form-section-title">
+
+                    <span class="form-section-number">
+                        01
+                    </span>
+
+                    <h3>
+                        Your details
+                    </h3>
+
+                </div>
+
 
                 <div class="form-grid">
 
@@ -317,8 +302,9 @@
                             type="text"
                             id="first_name"
                             name="first_name"
-                            placeholder="Your first name"
+                            placeholder="First name"
                             autocomplete="given-name"
+                            value="{{ request.form.get('first_name', '') }}"
                             required
                         >
 
@@ -335,8 +321,9 @@
                             type="text"
                             id="last_name"
                             name="last_name"
-                            placeholder="Your last name"
+                            placeholder="Last name"
                             autocomplete="family-name"
+                            value="{{ request.form.get('last_name', '') }}"
                             required
                         >
 
@@ -356,6 +343,7 @@
                             placeholder="Choose a username"
                             autocomplete="username"
                             minlength="3"
+                            value="{{ request.form.get('username', '') }}"
                             required
                         >
 
@@ -374,6 +362,7 @@
                             name="email"
                             placeholder="you@example.com"
                             autocomplete="email"
+                            value="{{ request.form.get('email', '') }}"
                             required
                         >
 
@@ -392,6 +381,7 @@
                             name="phone"
                             placeholder="+233..."
                             autocomplete="tel"
+                            value="{{ request.form.get('phone', '') }}"
                             required
                         >
 
@@ -399,22 +389,25 @@
 
                 </div>
 
-            </div>
+            </section>
 
 
-            <!-- =================================================
-                 02 / YOU
-            ================================================== -->
+            <!-- SCHOOL -->
 
-            <div class="form-section">
+            <section class="form-section">
 
-                <span class="signup-label">
-                    02 / You
-                </span>
+                <div class="form-section-title">
 
-                <h2>
-                    Where do you belong?
-                </h2>
+                    <span class="form-section-number">
+                        02
+                    </span>
+
+                    <h3>
+                        School
+                    </h3>
+
+                </div>
+
 
                 <div class="form-grid">
 
@@ -429,6 +422,7 @@
                             id="school"
                             name="school"
                             placeholder="Your school"
+                            value="{{ request.form.get('school', '') }}"
                             required
                         >
 
@@ -446,68 +440,64 @@
                             name="class_name"
                             required
                         >
+
                             <option value="">
                                 Select your class
                             </option>
 
-                            <option value="Form 1">
+                            <option
+                                value="Form 1"
+                                {% if request.form.get('class_name') == 'Form 1' %}selected{% endif %}
+                            >
                                 Form 1
                             </option>
 
-                            <option value="Form 2">
+                            <option
+                                value="Form 2"
+                                {% if request.form.get('class_name') == 'Form 2' %}selected{% endif %}
+                            >
                                 Form 2
                             </option>
 
-                            <option value="Form 3">
+                            <option
+                                value="Form 3"
+                                {% if request.form.get('class_name') == 'Form 3' %}selected{% endif %}
+                            >
                                 Form 3
                             </option>
+
                         </select>
 
                     </div>
 
+                </div>
 
-                    <!-- ACCOUNT TYPE -->
-
-                    <div class="form-group full">
-
-                        <label for="account_type">
-                            New Gen account type
-                        </label>
-
-                        <select
-                            id="account_type"
-                            name="account_type"
-                            required
-                        >
-
-                            <option value="">
-                                Choose account type
-                            </option>
-
-                            <option value="member">
-                                Regular Member
-                            </option>
-
-                            <option value="executive">
-                                New Gen Executive
-                            </option>
-
-                        </select>
-
-                        <span class="form-help">
-                            Executive accounts require verification
-                            and administrator approval.
-                        </span>
-
-                    </div>
+            </section>
 
 
-                    <!-- GROUP -->
+            <!-- NEW GEN -->
 
-                    <div class="form-group full">
+            <section class="form-section">
+
+                <div class="form-section-title">
+
+                    <span class="form-section-number">
+                        03
+                    </span>
+
+                    <h3>
+                        New Gen
+                    </h3>
+
+                </div>
+
+
+                <div class="form-grid">
+
+                    <div class="form-group">
 
                         <label for="group_name">
-                            New Gen group
+                            Your group
                         </label>
 
                         <select
@@ -520,23 +510,38 @@
                                 Choose your group
                             </option>
 
-                            <option value="Music & Dance">
+                            <option
+                                value="Music & Dance"
+                                {% if request.form.get('group_name') == 'Music & Dance' %}selected{% endif %}
+                            >
                                 Music & Dance
                             </option>
 
-                            <option value="Tech">
+                            <option
+                                value="Tech"
+                                {% if request.form.get('group_name') == 'Tech' %}selected{% endif %}
+                            >
                                 Tech
                             </option>
 
-                            <option value="Art">
+                            <option
+                                value="Art"
+                                {% if request.form.get('group_name') == 'Art' %}selected{% endif %}
+                            >
                                 Art
                             </option>
 
-                            <option value="Poetry">
+                            <option
+                                value="Poetry"
+                                {% if request.form.get('group_name') == 'Poetry' %}selected{% endif %}
+                            >
                                 Poetry
                             </option>
 
-                            <option value="Fashion">
+                            <option
+                                value="Fashion"
+                                {% if request.form.get('group_name') == 'Fashion' %}selected{% endif %}
+                            >
                                 Fashion
                             </option>
 
@@ -544,60 +549,82 @@
 
                     </div>
 
+
+                    <div class="form-group">
+
+                        <label for="account_type">
+                            Account type
+                        </label>
+
+                        <select
+                            id="account_type"
+                            name="account_type"
+                            required
+                        >
+
+                            <option value="">
+                                Choose account type
+                            </option>
+
+                            <option
+                                value="member"
+                                {% if request.form.get('account_type') == 'member' %}selected{% endif %}
+                            >
+                                Regular Member
+                            </option>
+
+                            <option
+                                value="executive"
+                                {% if request.form.get('account_type') == 'executive' %}selected{% endif %}
+                            >
+                                New Gen Executive
+                            </option>
+
+                        </select>
+
+                        <span class="form-help">
+                            Executive selection requires approval.
+                        </span>
+
+                    </div>
+
+
+                    <div class="form-group full">
+
+                        <label for="reason_for_joining">
+                            Why are you joining?
+                        </label>
+
+                        <textarea
+                            id="reason_for_joining"
+                            name="reason_for_joining"
+                            placeholder="Tell us briefly what you want to create, learn or contribute."
+                            required
+                        >{{ request.form.get('reason_for_joining', '') }}</textarea>
+
+                    </div>
+
                 </div>
 
-            </div>
+            </section>
 
 
-            <!-- =================================================
-                 03 / YOUR VOICE
-            ================================================== -->
+            <!-- SECURITY -->
 
-            <div class="form-section">
+            <section class="form-section">
 
-                <span class="signup-label">
-                    03 / Your voice
-                </span>
+                <div class="form-section-title">
 
-                <h2>
-                    Why are you joining?
-                </h2>
-
-                <div class="form-group">
-
-                    <label for="reason_for_joining">
-                        Tell us
-                    </label>
-
-                    <textarea
-                        id="reason_for_joining"
-                        name="reason_for_joining"
-                        placeholder="What do you want to create, learn, change or contribute?"
-                        required
-                    ></textarea>
-
-                    <span class="form-help">
-                        There is no perfect answer. Just be honest.
+                    <span class="form-section-number">
+                        04
                     </span>
 
+                    <h3>
+                        Security
+                    </h3>
+
                 </div>
 
-            </div>
-
-
-            <!-- =================================================
-                 04 / SECURITY
-            ================================================== -->
-
-            <div class="form-section">
-
-                <span class="signup-label">
-                    04 / Security
-                </span>
-
-                <h2>
-                    Protect your account.
-                </h2>
 
                 <div class="form-grid">
 
@@ -640,12 +667,10 @@
 
                 </div>
 
-            </div>
+            </section>
 
 
-            <!-- =================================================
-                 SUBMIT
-            ================================================== -->
+            <!-- SUBMIT -->
 
             <button
                 type="submit"
@@ -657,7 +682,7 @@
 
             <div class="signup-bottom">
 
-                Already a member?
+                Already have an account?
 
                 <a href="{{ url_for('login') }}">
                     Log in
@@ -667,7 +692,7 @@
 
         </form>
 
-    </section>
+    </div>
 
 </main>
 

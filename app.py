@@ -2652,7 +2652,7 @@ def delete_member_page(user_id):
     "/admin/member/<int:user_id>/delete/confirm",
     methods=["POST"]
 )
-def delete_member(user_id):
+def delete_member_page(user_id):
 
     if not is_admin_logged_in():
         flash("Administrator access required.", "error")

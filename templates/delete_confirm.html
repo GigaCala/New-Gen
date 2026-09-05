@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Delete Member{% endblock %}
+
+{% block content %}
+
+<main class="delete-page">
+
+<section class="delete-card">
+
+    <span class="delete-kicker">
+        NEW GEN / ADMIN
+    </span>
+
+    <h1>
+        Delete Member
+    </h1>
+
+    <p>
+        This action is permanent and cannot be undone.
+    </p>
+
+    <div class="delete-member">
+
+        <strong>
+            {{ person.first_name }} {{ person.last_name }}
+        </strong>
+
+        <span>@{{ person.username }}</span>
+
+        <small>{{ person.school }}</small>
+
+    </div>
+
+    <form
+        method="POST"
+        action="{{ url_for('delete_member', user_id=person.id) }}"
+    >
+
+        <button class="delete-button">
+            Permanently Delete
+        </button>
+
+    </form>
+
+    <a
+        href="{{ url_for('admin_members') }}"
+        class="cancel-button"
+    >
+        Cancel
+    </a>
+
+</section>
+
+</main>
+
+{% endblock %}

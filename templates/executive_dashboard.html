@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 
 {% block title %}Executive Command Center | New Gen{% endblock %}
@@ -10,518 +11,511 @@
 
   <section class="executive-dashboard-hero">
 
-```
-<div class="container executive-dashboard-hero-inner">
+    <div class="container executive-dashboard-hero-inner">
 
-  <div>
+      <div>
 
-    <span class="auth-kicker">
-      NEW GEN / EXECUTIVE COMMAND CENTER
-    </span>
+        <span class="auth-kicker">
+          NEW GEN / EXECUTIVE COMMAND CENTER
+        </span>
 
-    <h1>
-      Lead the<br>
-      <span>movement.</span>
-    </h1>
+        <h1>
+          Lead the<br>
+          <span>movement.</span>
+        </h1>
 
-    <p>
-      Welcome, {{ member.first_name }}.
-      This is the leadership space for approved
-      New Gen executives.
-    </p>
+        <p>
+          Welcome, {{ member.first_name }}.
+          This is the leadership space for approved
+          New Gen executives.
+        </p>
 
-  </div>
+      </div>
 
 
-  <div class="executive-status">
+      <div class="executive-status">
 
-    <span class="status-dot"></span>
+        <span class="status-dot"></span>
 
-    <div>
+        <div>
 
-      <small>
-        ACCESS STATUS
-      </small>
+          <small>
+            ACCESS STATUS
+          </small>
 
-      <strong>
-        EXECUTIVE
-      </strong>
+          <strong>
+            EXECUTIVE
+          </strong>
 
-      <span>
-        @{{ member.username }}
-      </span>
+          <span>
+            @{{ member.username }}
+          </span>
+
+        </div>
+
+      </div>
 
     </div>
 
-  </div>
-
-</div>
-```
-
   </section>
+
 
   <!-- OVERVIEW -->
 
   <section class="executive-overview">
 
-```
-<div class="container">
+    <div class="container">
 
-  <div class="dashboard-section-heading">
+      <div class="dashboard-section-heading">
 
-    <span class="auth-label">
-      COMMAND CENTER
-    </span>
+        <span class="auth-label">
+          COMMAND CENTER
+        </span>
 
-    <h2>
-      New Gen at a glance.
-    </h2>
+        <h2>
+          New Gen at a glance.
+        </h2>
 
-  </div>
+      </div>
 
 
-  <div class="executive-stats">
+      <div class="executive-stats">
 
-    <div class="executive-stat">
+        <div class="executive-stat">
 
-      <span>
-        MEMBERS
-      </span>
+          <span>
+            MEMBERS
+          </span>
 
-      <strong>
-        {{ members|length }}
-      </strong>
+          <strong>
+            {{ members|length }}
+          </strong>
 
-      <small>
-        Registered New Gen members
-      </small>
+          <small>
+            Registered New Gen members
+          </small>
+
+        </div>
+
+
+        <div class="executive-stat">
+
+          <span>
+            APPLICATIONS
+          </span>
+
+          <strong>
+            {{ applications|length }}
+          </strong>
+
+          <small>
+            Executive applications
+          </small>
+
+        </div>
+
+
+        <div class="executive-stat">
+
+          <span>
+            YOUR GROUP
+          </span>
+
+          <strong>
+            {{ member.group_name }}
+          </strong>
+
+          <small>
+            Your creative community
+          </small>
+
+        </div>
+
+      </div>
 
     </div>
-
-
-    <div class="executive-stat">
-
-      <span>
-        APPLICATIONS
-      </span>
-
-      <strong>
-        {{ applications|length }}
-      </strong>
-
-      <small>
-        Executive applications
-      </small>
-
-    </div>
-
-
-    <div class="executive-stat">
-
-      <span>
-        YOUR GROUP
-      </span>
-
-      <strong>
-        {{ member.group_name }}
-      </strong>
-
-      <small>
-        Your creative community
-      </small>
-
-    </div>
-
-  </div>
-
-</div>
-```
 
   </section>
+
 
   <!-- MEMBERS -->
 
   <section class="executive-members">
 
-```
-<div class="container">
+    <div class="container">
 
-  <div class="dashboard-section-heading">
+      <div class="dashboard-section-heading">
 
-    <span class="auth-label">
-      MEMBER DIRECTORY
-    </span>
+        <span class="auth-label">
+          MEMBER DIRECTORY
+        </span>
 
-    <h2>
-      The New Gen community.
-    </h2>
+        <h2>
+          The New Gen community.
+        </h2>
 
-    <p>
-      View registered members and their creative groups.
-    </p>
+        <p>
+          View registered members and their creative groups.
+        </p>
 
-  </div>
-
-
-  <div class="executive-table-wrap">
-
-    <table class="executive-table">
-
-      <thead>
-
-        <tr>
-
-          <th>
-            Name
-          </th>
-
-          <th>
-            Username
-          </th>
-
-          <th>
-            School
-          </th>
-
-          <th>
-            Form
-          </th>
-
-          <th>
-            Group
-          </th>
-
-          <th>
-            Role
-          </th>
-
-        </tr>
-
-      </thead>
+      </div>
 
 
-      <tbody>
+      <div class="executive-table-wrap">
 
-        {% for person in members %}
+        <table class="executive-table">
 
-        <tr>
+          <thead>
 
-          <td>
-            <strong>
-              {{ person.first_name }}
-              {{ person.last_name }}
-            </strong>
-          </td>
+            <tr>
 
-          <td>
-            @{{ person.username }}
-          </td>
+              <th>
+                Name
+              </th>
 
-          <td>
-            {{ person.school }}
-          </td>
+              <th>
+                Username
+              </th>
 
-          <td>
-            {{ person.class_name }}
-          </td>
+              <th>
+                School
+              </th>
 
-          <td>
-            {{ person.group_name }}
-          </td>
+              <th>
+                Form
+              </th>
 
-          <td>
+              <th>
+                Group
+              </th>
 
-            {% if person.role == "executive" %}
+              <th>
+                Role
+              </th>
 
-              <span class="role-badge executive">
-                Executive
-              </span>
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            {% for person in members %}
+
+            <tr>
+
+              <td>
+                <strong>
+                  {{ person.first_name }}
+                  {{ person.last_name }}
+                </strong>
+              </td>
+
+              <td>
+                @{{ person.username }}
+              </td>
+
+              <td>
+                {{ person.school }}
+              </td>
+
+              <td>
+                {{ person.class_name }}
+              </td>
+
+              <td>
+                {{ person.group_name }}
+              </td>
+
+              <td>
+
+                {% if person.role == "executive" %}
+
+                  <span class="role-badge executive">
+                    Executive
+                  </span>
+
+                {% else %}
+
+                  <span class="role-badge">
+                    Member
+                  </span>
+
+                {% endif %}
+
+              </td>
+
+            </tr>
 
             {% else %}
 
-              <span class="role-badge">
-                Member
-              </span>
+            <tr>
 
-            {% endif %}
+              <td colspan="6">
+                No members have registered yet.
+              </td>
 
-          </td>
+            </tr>
 
-        </tr>
+            {% endfor %}
 
-        {% else %}
+          </tbody>
 
-        <tr>
+        </table>
 
-          <td colspan="6">
-            No members have registered yet.
-          </td>
+      </div>
 
-        </tr>
-
-        {% endfor %}
-
-      </tbody>
-
-    </table>
-
-  </div>
-
-</div>
-```
+    </div>
 
   </section>
+
 
   <!-- APPLICATIONS -->
 
   <section class="executive-applications">
 
-```
-<div class="container">
+    <div class="container">
 
-  <div class="dashboard-section-heading">
+      <div class="dashboard-section-heading">
 
-    <span class="auth-label">
-      LEADERSHIP APPLICATIONS
-    </span>
-
-    <h2>
-      Applications received.
-    </h2>
-
-    <p>
-      Applications are reviewed and approved by
-      New Gen administrators.
-    </p>
-
-  </div>
-
-
-  <div class="executive-application-list">
-
-    {% for application in applications %}
-
-      <article class="executive-application-card">
-
-        <div class="application-number">
-          {{ loop.index|string|zfill(2) }}
-        </div>
-
-
-        <div class="application-main">
-
-          <span class="application-status {{ application.status }}">
-            {{ application.status }}
-          </span>
-
-          <h3>
-            {{ application.first_name }}
-            {{ application.last_name }}
-          </h3>
-
-          <p>
-            @{{ application.username }}
-            · {{ application.school }}
-            · {{ application.class_name }}
-          </p>
-
-          <strong>
-            Applying for: {{ application.position }}
-          </strong>
-
-          <blockquote>
-            {{ application.reason }}
-          </blockquote>
-
-        </div>
-
-
-        <div class="application-date">
-
-          <small>
-            SUBMITTED
-          </small>
-
-          <span>
-            {{ application.created_at[:10] }}
-          </span>
-
-        </div>
-
-      </article>
-
-    {% else %}
-
-      <div class="empty-state">
-
-        <span>
-          NO APPLICATIONS
+        <span class="auth-label">
+          LEADERSHIP APPLICATIONS
         </span>
 
-        <h3>
-          The leadership queue is clear.
-        </h3>
+        <h2>
+          Applications received.
+        </h2>
 
         <p>
-          New executive applications will appear here.
+          Applications are reviewed and approved by
+          New Gen administrators.
         </p>
 
       </div>
 
-    {% endfor %}
 
-  </div>
+      <div class="executive-application-list">
 
-</div>
-```
+        {% for application in applications %}
+
+          <article class="executive-application-card">
+
+            <div class="application-number">
+              {{ loop.index|string|zfill(2) }}
+            </div>
+
+
+            <div class="application-main">
+
+              <span class="application-status {{ application.status }}">
+                {{ application.status }}
+              </span>
+
+              <h3>
+                {{ application.first_name }}
+                {{ application.last_name }}
+              </h3>
+
+              <p>
+                @{{ application.username }}
+                · {{ application.school }}
+                · {{ application.class_name }}
+              </p>
+
+              <strong>
+                Applying for: {{ application.position }}
+              </strong>
+
+              <blockquote>
+                {{ application.reason }}
+              </blockquote>
+
+            </div>
+
+
+            <div class="application-date">
+
+              <small>
+                SUBMITTED
+              </small>
+
+              <span>
+                {{ application.created_at[:10] }}
+              </span>
+
+            </div>
+
+          </article>
+
+        {% else %}
+
+          <div class="empty-state">
+
+            <span>
+              NO APPLICATIONS
+            </span>
+
+            <h3>
+              The leadership queue is clear.
+            </h3>
+
+            <p>
+              New executive applications will appear here.
+            </p>
+
+          </div>
+
+        {% endfor %}
+
+      </div>
+
+    </div>
 
   </section>
+
 
   <!-- EXECUTIVE ACTIONS -->
 
   <section class="executive-actions-section">
 
-```
-<div class="container">
+    <div class="container">
 
-  <div class="dashboard-section-heading">
+      <div class="dashboard-section-heading">
 
-    <span class="auth-label">
-      QUICK ACTIONS
-    </span>
+        <span class="auth-label">
+          QUICK ACTIONS
+        </span>
 
-    <h2>
-      Keep New Gen moving.
-    </h2>
-
-  </div>
-
-
-  <div class="dashboard-actions">
-
-    <a
-      href="{{ url_for('calendar') }}"
-      class="dashboard-action"
-    >
-
-      <span>01</span>
-
-      <div>
-
-        <strong>
-          Events &amp; Calendar
-        </strong>
-
-        <small>
-          See upcoming New Gen activities.
-        </small>
+        <h2>
+          Keep New Gen moving.
+        </h2>
 
       </div>
 
-      <b>→</b>
 
-    </a>
+      <div class="dashboard-actions">
+
+        <a
+          href="{{ url_for('calendar') }}"
+          class="dashboard-action"
+        >
+
+          <span>01</span>
+
+          <div>
+
+            <strong>
+              Events &amp; Calendar
+            </strong>
+
+            <small>
+              See upcoming New Gen activities.
+            </small>
+
+          </div>
+
+          <b>→</b>
+
+        </a>
 
 
-    <a
-      href="{{ url_for('contact') }}"
-      class="dashboard-action"
-    >
+        <a
+          href="{{ url_for('contact') }}"
+          class="dashboard-action"
+        >
 
-      <span>02</span>
+          <span>02</span>
 
-      <div>
+          <div>
 
-        <strong>
-          Contact New Gen
-        </strong>
+            <strong>
+              Contact New Gen
+            </strong>
 
-        <small>
-          Coordinate ideas and communication.
-        </small>
+            <small>
+              Coordinate ideas and communication.
+            </small>
+
+          </div>
+
+          <b>→</b>
+
+        </a>
+
+
+        <a
+          href="{{ url_for('admin_login') }}"
+          class="dashboard-action"
+        >
+
+          <span>03</span>
+
+          <div>
+
+            <strong>
+              Administrator Area
+            </strong>
+
+            <small>
+              Restricted administrative controls.
+            </small>
+
+          </div>
+
+          <b>→</b>
+
+        </a>
 
       </div>
 
-      <b>→</b>
-
-    </a>
-
-
-    <a
-      href="{{ url_for('admin_login') }}"
-      class="dashboard-action"
-    >
-
-      <span>03</span>
-
-      <div>
-
-        <strong>
-          Administrator Area
-        </strong>
-
-        <small>
-          Restricted administrative controls.
-        </small>
-
-      </div>
-
-      <b>→</b>
-
-    </a>
-
-  </div>
-
-</div>
-```
+    </div>
 
   </section>
+
 
   <!-- FOOTER STATEMENT -->
 
   <section class="executive-dashboard-statement">
 
-```
-<div class="container">
+    <div class="container">
 
-  <span>
-    NEW GEN / LEADERSHIP
-  </span>
+      <span>
+        NEW GEN / LEADERSHIP
+      </span>
 
-  <h2>
-    African children<br>
-    <em>must speak.</em>
-  </h2>
+      <h2>
+        African child<br>
+        <em>must speak.</em>
+      </h2>
 
-  <p>
-    Lead with purpose. Create with courage.
-  </p>
+      <p>
+        Lead with purpose. Create with courage.
+      </p>
 
-</div>
-```
+    </div>
 
   </section>
 
+
   <div class="container executive-dashboard-footer">
 
-```
-<a
-  href="{{ url_for('member_dashboard') }}"
-  class="auth-link"
->
-  ← Back to my dashboard
-</a>
+    <a
+      href="{{ url_for('member_dashboard') }}"
+      class="auth-link"
+    >
+      ← Back to my dashboard
+    </a>
 
-<a
-  href="{{ url_for('logout') }}"
-  class="dashboard-logout"
->
-  Log out →
-</a>
-```
+    <a
+      href="{{ url_for('logout') }}"
+      class="dashboard-logout"
+    >
+      Log out →
+    </a>
 
   </div>
 
 </main>
 
 {% endblock %}
+

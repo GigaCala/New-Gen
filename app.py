@@ -111,10 +111,20 @@ BASE_DIR = os.path.dirname(
     os.path.abspath(__file__)
 )
 
-DATABASE_FILE = os.path.join(
-    BASE_DIR,
-    "users.db",
-)
+# Render's normal application directory is ephemeral.
+# For persistent production storage, set NEWGEN_DATABASE_PATH to
+# a mounted Render disk path such as /var/data/newgen.db.
+PERSISTENT_DATABASE_PATH = os.environ.get(
+    "NEWGEN_DATABASE_PATH",
+    "",
+).strip()
+
+if PERSISTENT_DATABASE_PATH:
+    DATABASE_FILE = PERSISTENT_DATABASE_PATH
+elif os.path.isdir("/var/data"):
+    DATABASE_FILE = os.path.join("/var/data", "newgen.db")
+else:
+    DATABASE_FILE = os.path.join(BASE_DIR, "users.db")
 
 EVENTS_FILE = os.path.join(
     BASE_DIR,
@@ -127,16 +137,19 @@ EVENTS_FILE = os.path.join(
 # ============================================================
 
 def get_db():
+    database_directory = os.path.dirname(DATABASE_FILE)
+
+    if database_directory:
+        os.makedirs(database_directory, exist_ok=True)
+
     connection = sqlite3.connect(
         DATABASE_FILE,
         timeout=20,
     )
 
     connection.row_factory = sqlite3.Row
-
-    connection.execute(
-        "PRAGMA foreign_keys = ON"
-    )
+    connection.execute("PRAGMA foreign_keys = ON")
+    connection.execute("PRAGMA busy_timeout = 20000")
 
     return connection
 
@@ -394,7 +407,50 @@ def init_database():
     connection.close()
 
 
+def ensure_env_admin_account():
+    """Keep the configured Render admin usable through the DB login."""
+    if not ADMIN_CREDENTIALS_CONFIGURED:
+        return
+
+    connection = get_db()
+    existing = connection.execute(
+        "SELECT id FROM users WHERE LOWER(username)=LOWER(?) LIMIT 1",
+        (ADMIN_USERNAME,),
+    ).fetchone()
+
+    password_hash = generate_password_hash(ADMIN_PASSWORD)
+
+    if existing:
+        connection.execute(
+            """UPDATE users
+               SET role='admin', position='Administrator',
+                   password_hash=?, email_verified=1, phone_verified=1
+             WHERE id=?""",
+            (password_hash, existing["id"]),
+        )
+    else:
+        now = datetime.now(timezone.utc).isoformat()
+        connection.execute(
+            """INSERT INTO users (
+                first_name,last_name,username,email,phone,school,
+                class_name,group_name,reason_for_joining,password_hash,
+                email_verified,phone_verified,role,position,created_at
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,1,1,'admin','Administrator',?)""",
+            (
+                "New Gen", "Administrator", ADMIN_USERNAME,
+                f"{ADMIN_USERNAME}@newgen.local", "", "New Gen",
+                "Administrator", "Tech", "System administrator account",
+                password_hash, now,
+            ),
+        )
+
+    connection.commit()
+    connection.close()
+
+
+
 init_database()
+ensure_env_admin_account()
 
 
 # ============================================================
@@ -989,6 +1045,7 @@ def signup():
                 form_error=(
                     "Please correct the highlighted fields."
                 ),
+                form_data=request.form,
             )
 
         # ----------------------------------------------------
@@ -1095,6 +1152,7 @@ def signup():
                 form_error=(
                     "Please correct the highlighted fields."
                 ),
+                form_data=request.form,
             )
 
         # ----------------------------------------------------
@@ -1143,6 +1201,7 @@ def signup():
                 form_error=(
                     "Please correct the highlighted fields."
                 ),
+                form_data=request.form,
             )
 
         # ----------------------------------------------------
@@ -1360,6 +1419,7 @@ def signup():
         "signup.html",
         errors={},
         form_error=None,
+        form_data=request.form,
     )
 
 
@@ -1414,6 +1474,7 @@ def login():
             return render_template(
                 "login.html",
                 errors=errors,
+                form_data={"login": login_value},
             )
 
         # ----------------------------------------------------
@@ -1424,15 +1485,12 @@ def login():
 
         user = connection.execute(
             """
-            SELECT *
-            FROM users
-            WHERE email = ?
-               OR username = ?
+            SELECT * FROM users
+            WHERE LOWER(email)=LOWER(?)
+               OR LOWER(username)=LOWER(?)
+            LIMIT 1
             """,
-            (
-                login_value.lower(),
-                login_value,
-            ),
+            (login_value, login_value),
         ).fetchone()
 
         connection.close()
@@ -1459,22 +1517,23 @@ def login():
                         "or password."
                     )
                 },
+                form_data={"login": login_value},
             )
 
         # ----------------------------------------------------
         # EMAIL VERIFICATION CHECK
         # ----------------------------------------------------
 
-        if not user["email_verified"]:
-
+        if user["role"] != "admin" and not user["email_verified"]:
             return render_template(
                 "login.html",
                 errors={
                     "login": (
-                        "Please verify your email "
-                        "before logging in."
+                        "Please verify your email before logging in. "
+                        "Use the verification email or resend it."
                     )
                 },
+                form_data={"login": login_value},
             )
 
         # ----------------------------------------------------
@@ -2097,100 +2156,79 @@ def executive_dashboard():
 def admin_login():
 
     if is_admin_logged_in():
-
-        return redirect(
-            url_for("admin_portal")
-        )
-
-    if not ADMIN_CREDENTIALS_CONFIGURED:
-
-        flash(
-            "Admin access is unavailable until secure "
-            "admin credentials are configured.",
-            "error",
-        )
-
-        return render_template(
-            "admin_login.html"
-        ), 503
+        return redirect(url_for("admin_portal"))
 
     errors = {}
 
     if request.method == "POST":
-
-        username = request.form.get(
-            "username",
-            "",
-        ).strip()
-
-        password = request.form.get(
-            "password",
-            "",
-        )
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
 
         if not username:
-
-            errors["username"] = (
-                "Administrator username is required."
-            )
-
+            errors["username"] = "Administrator username is required."
         if not password:
-
-            errors["password"] = (
-                "Administrator password is required."
-            )
+            errors["password"] = "Administrator password is required."
 
         if errors:
-
             return render_template(
                 "admin_login.html",
                 errors=errors,
+                form_data={"username": username},
             )
 
-        # Constant-time comparison prevents simple timing
-        # attacks against the configured admin credentials.
+        authenticated = False
+        admin_member_id = None
 
-        username_ok = secrets.compare_digest(
-            username,
-            ADMIN_USERNAME,
-        )
+        connection = get_db()
+        admin_user = connection.execute(
+            """SELECT * FROM users
+               WHERE LOWER(username)=LOWER(?) AND role='admin'
+               LIMIT 1""",
+            (username,),
+        ).fetchone()
+        connection.close()
 
-        password_ok = secrets.compare_digest(
-            password,
-            ADMIN_PASSWORD,
-        )
+        if admin_user:
+            try:
+                authenticated = check_password_hash(
+                    admin_user["password_hash"], password
+                )
+            except Exception:
+                authenticated = False
+            if authenticated:
+                admin_member_id = admin_user["id"]
 
-        if not (
-            username_ok
-            and password_ok
-        ):
+        if not authenticated and ADMIN_CREDENTIALS_CONFIGURED:
+            authenticated = (
+                secrets.compare_digest(username, ADMIN_USERNAME)
+                and secrets.compare_digest(password, ADMIN_PASSWORD)
+            )
 
+        if not authenticated:
             return render_template(
                 "admin_login.html",
                 errors={
-                    "username": (
-                        "Incorrect administrator username "
-                        "or password."
-                    )
+                    "username":
+                        "Administrator username or password is incorrect."
                 },
+                form_data={"username": username},
             )
 
         session.clear()
-
         session["admin_logged_in"] = True
 
-        flash(
-            "Admin access granted.",
-            "success",
-        )
+        if admin_member_id:
+            session["admin_member_id"] = admin_member_id
+            session["member_logged_in"] = True
+            session["member_id"] = admin_member_id
 
-        return redirect(
-            url_for("admin_portal")
-        )
+        flash("Administrator access granted.", "success")
+        return redirect(url_for("admin_portal"))
 
     return render_template(
         "admin_login.html",
         errors={},
+        form_data={},
     )
 
 

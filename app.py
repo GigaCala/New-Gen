@@ -1422,7 +1422,6 @@ def signup():
         form_data=request.form,
     )
 
-
 # ============================================================
 # MEMBER LOGIN
 # ============================================================
@@ -1434,12 +1433,18 @@ def signup():
 def login():
 
     if is_member_logged_in():
+        member = get_current_member()
 
-        return redirect(
-            url_for("home")
-        )
+        if member:
+            if member["role"] == "admin":
+                return redirect(url_for("admin_portal"))
 
-    errors = {}
+            if member["role"] == "executive":
+                return redirect(url_for("executive_dashboard"))
+
+            return redirect(url_for("member_dashboard"))
+
+        session.clear()
 
     if request.method == "POST":
 
@@ -1454,27 +1459,39 @@ def login():
         )
 
         # ----------------------------------------------------
-        # EMPTY LOGIN
+        # EMPTY FIELDS
         # ----------------------------------------------------
 
         if not login_value:
-
-            errors["login"] = (
-                "Enter your username or email."
+            flash(
+                "Please enter your username or email.",
+                "error",
             )
-
-        if not password:
-
-            errors["password"] = (
-                "Enter your password."
-            )
-
-        if errors:
 
             return render_template(
                 "login.html",
-                errors=errors,
-                form_data={"login": login_value},
+                errors={
+                    "login": "Username or email is required."
+                },
+                form_data={
+                    "login": login_value,
+                },
+            )
+
+        if not password:
+            flash(
+                "Please enter your password.",
+                "error",
+            )
+
+            return render_template(
+                "login.html",
+                errors={
+                    "password": "Password is required."
+                },
+                form_data={
+                    "login": login_value,
+                },
             )
 
         # ----------------------------------------------------
@@ -1485,59 +1502,88 @@ def login():
 
         user = connection.execute(
             """
-            SELECT * FROM users
-            WHERE LOWER(email)=LOWER(?)
-               OR LOWER(username)=LOWER(?)
+            SELECT *
+            FROM users
+            WHERE LOWER(email) = LOWER(?)
+               OR LOWER(username) = LOWER(?)
             LIMIT 1
             """,
-            (login_value, login_value),
+            (
+                login_value,
+                login_value,
+            ),
         ).fetchone()
 
         connection.close()
 
         # ----------------------------------------------------
-        # PASSWORD CHECK
+        # CHECK PASSWORD
         # ----------------------------------------------------
 
-        password_correct = bool(
-            user
-            and check_password_hash(
-                user["password_hash"],
-                password,
-            )
-        )
+        password_correct = False
+
+        if user:
+
+            try:
+                password_correct = check_password_hash(
+                    user["password_hash"],
+                    password,
+                )
+
+            except Exception as error:
+
+                print(
+                    "PASSWORD CHECK ERROR:",
+                    error,
+                )
+
+                password_correct = False
 
         if not password_correct:
 
+            flash(
+                "Incorrect username/email or password.",
+                "error",
+            )
+
             return render_template(
                 "login.html",
                 errors={
-                    "login": (
-                        "Incorrect username/email "
-                        "or password."
-                    )
+                    "login":
+                        "Incorrect username/email or password."
                 },
-                form_data={"login": login_value},
+                form_data={
+                    "login": login_value,
+                },
             )
 
         # ----------------------------------------------------
-        # EMAIL VERIFICATION CHECK
+        # EMAIL VERIFICATION
         # ----------------------------------------------------
 
-        if user["role"] != "admin" and not user["email_verified"]:
+        if (
+            user["role"] != "admin"
+            and not user["email_verified"]
+        ):
+
+            flash(
+                "Please verify your email before logging in.",
+                "error",
+            )
+
             return render_template(
                 "login.html",
                 errors={
-                    "login": (
-                        "Please verify your email before logging in. "
-                        "Use the verification email or resend it."
-                    )
+                    "login":
+                        "Please verify your email before logging in."
                 },
-                form_data={"login": login_value},
+                form_data={
+                    "login": login_value,
+                },
             )
 
         # ----------------------------------------------------
-        # SESSION
+        # CREATE SESSION
         # ----------------------------------------------------
 
         session.clear()
@@ -1590,9 +1636,14 @@ def login():
             url_for("member_dashboard")
         )
 
+    # --------------------------------------------------------
+    # GET LOGIN PAGE
+    # --------------------------------------------------------
+
     return render_template(
         "login.html",
         errors={},
+        form_data={},
     )
 
 
@@ -2058,7 +2109,6 @@ def executive_apply():
         errors={},
     )
 
-
 # ============================================================
 # EXECUTIVE DASHBOARD
 # ============================================================
@@ -2079,10 +2129,20 @@ def executive_dashboard():
 
     member = get_current_member()
 
-    if (
-        not member
-        or member["role"] != "executive"
-    ):
+    if not member:
+
+        session.clear()
+
+        flash(
+            "Your account could not be found.",
+            "error",
+        )
+
+        return redirect(
+            url_for("login")
+        )
+
+    if member["role"] != "executive":
 
         flash(
             "Executive access is restricted to approved "
@@ -2094,57 +2154,66 @@ def executive_dashboard():
             url_for("member_dashboard")
         )
 
+    # --------------------------------------------------------
+    # EXECUTIVE-ONLY INFORMATION
+    # --------------------------------------------------------
+    #
+    # Executives should NOT receive:
+    # - All member records
+    # - Member emails/phone numbers
+    # - All executive applications
+    # - Private applicant information
+    #
+    # Their dashboard should only contain information they
+    # actually need for their leadership role.
+    #
+
     connection = get_db()
 
-    applications = connection.execute(
-        """
-        SELECT
-            ea.*,
-            u.first_name,
-            u.last_name,
-            u.username,
-            u.email,
-            u.school,
-            u.class_name,
-            u.group_name
-        FROM executive_applications ea
-        JOIN users u
-            ON ea.user_id = u.id
-        ORDER BY ea.created_at DESC
-        """
-    ).fetchall()
-
-    members = connection.execute(
+    # Get the executive's own most recent application.
+    application = connection.execute(
         """
         SELECT
             id,
-            first_name,
-            last_name,
-            username,
-            email,
-            phone,
-            school,
-            class_name,
-            group_name,
-            reason_for_joining,
-            role,
             position,
-            email_verified,
-            phone_verified,
+            reason,
+            status,
             created_at
-        FROM users
+        FROM executive_applications
+        WHERE user_id = ?
         ORDER BY created_at DESC
+        LIMIT 1
+        """,
+        (member["id"],),
+    ).fetchone()
+
+    # Basic member count for useful club statistics.
+    member_count = connection.execute(
         """
-    ).fetchall()
+        SELECT COUNT(*) AS count
+        FROM users
+        WHERE role != 'admin'
+        """
+    ).fetchone()["count"]
+
+    executive_count = connection.execute(
+        """
+        SELECT COUNT(*) AS count
+        FROM users
+        WHERE role = 'executive'
+        """
+    ).fetchone()["count"]
 
     connection.close()
 
     return render_template(
         "executive_dashboard.html",
         member=member,
-        applications=applications,
-        members=members,
+        application=application,
+        member_count=member_count,
+        executive_count=executive_count,
     )
+
     # ============================================================
 # ADMIN LOGIN
 # ============================================================

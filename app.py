@@ -43,9 +43,14 @@ app.secret_key = SESSION_SECRET
 # Security / session settings
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SECURE"] = bool(
+    os.environ.get("RENDER")
+)
 
-if os.environ.get("RENDER") or os.environ.get("FLASK_ENV") == "production":
-    app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_NAME"] = "newgen_session"
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(
+    days=7
+)
 
 app.config["MAX_CONTENT_LENGTH"] = 2 * 1024 * 1024
 

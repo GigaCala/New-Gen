@@ -1,10 +1,13 @@
 import json
 import os
 import secrets
-import sqlite3
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone, timedelta
+
+import sqlite3
+import psycopg
+from psycopg.rows import dict_row
 
 from flask import (
     Flask,
@@ -107,32 +110,38 @@ MAILER_SECRET = os.environ.get(
     "",
 )
 
-
 # ============================================================
-# FILE PATHS
+# DATABASE CONFIGURATION
 # ============================================================
 
-BASE_DIR = os.path.dirname(
-    os.path.abspath(__file__)
-)
-
-# Render's normal application directory is ephemeral.
-# For persistent production storage, set NEWGEN_DATABASE_PATH to
-# a mounted Render disk path such as /var/data/newgen.db.
-PERSISTENT_DATABASE_PATH = os.environ.get(
-    "NEWGEN_DATABASE_PATH",
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL",
     "",
 ).strip()
 
-if PERSISTENT_DATABASE_PATH:
-    DATABASE_FILE = PERSISTENT_DATABASE_PATH
-elif os.path.isdir("/var/data"):
-    DATABASE_FILE = os.path.join("/var/data", "newgen.db")
-else:
-    DATABASE_FILE = os.path.join(BASE_DIR, "users.db")
+OLD_SQLITE_DATABASE = os.path.join(
+    os.path.dirname(
+        os.path.abspath(__file__)
+    ),
+    "users.db",
+)
 
 EVENTS_FILE = os.path.join(
-    BASE_DIR,
+    os.path.dirname(
+        os.path.abspath(__file__)
+    ),
+    "events.json",
+)
+
+if not DATABASE_URL:
+    raise RuntimeError(
+        "DATABASE_URL must be configured."
+    )
+
+EVENTS_FILE = os.path.join(
+    os.path.dirname(
+        os.path.abspath(__file__)
+    ),
     "events.json",
 )
 
@@ -142,21 +151,11 @@ EVENTS_FILE = os.path.join(
 # ============================================================
 
 def get_db():
-    database_directory = os.path.dirname(DATABASE_FILE)
 
-    if database_directory:
-        os.makedirs(database_directory, exist_ok=True)
-
-    connection = sqlite3.connect(
-        DATABASE_FILE,
-        timeout=20,
+    return psycopg.connect(
+        DATABASE_URL,
+        row_factory=dict_row,
     )
-
-    connection.row_factory = sqlite3.Row
-    connection.execute("PRAGMA foreign_keys = ON")
-    connection.execute("PRAGMA busy_timeout = 20000")
-
-    return connection
 
 
 # ============================================================
@@ -164,6 +163,7 @@ def get_db():
 # ============================================================
 
 def init_database():
+
     connection = get_db()
 
     # --------------------------------------------------------
@@ -173,7 +173,7 @@ def init_database():
     connection.execute(
         """
         CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id BIGSERIAL PRIMARY KEY,
 
             first_name TEXT NOT NULL,
             last_name TEXT NOT NULL,
@@ -181,7 +181,7 @@ def init_database():
             username TEXT NOT NULL UNIQUE,
             email TEXT NOT NULL UNIQUE,
 
-            phone TEXT NOT NULL,
+            phone TEXT NOT NULL DEFAULT '',
 
             school TEXT NOT NULL,
             class_name TEXT NOT NULL,
@@ -191,41 +191,16 @@ def init_database():
 
             password_hash TEXT NOT NULL,
 
-            email_verified INTEGER NOT NULL DEFAULT 0,
-            phone_verified INTEGER NOT NULL DEFAULT 0,
+            email_verified BOOLEAN NOT NULL DEFAULT FALSE,
+            phone_verified BOOLEAN NOT NULL DEFAULT FALSE,
 
             verification_token TEXT,
-            verification_expires_at TEXT,
+            verification_expires_at TIMESTAMPTZ,
 
             role TEXT NOT NULL DEFAULT 'member',
             position TEXT NOT NULL DEFAULT 'Member',
 
-            created_at TEXT NOT NULL
-        )
-        """
-    )
-
-    # --------------------------------------------------------
-    # EXECUTIVE APPLICATIONS
-    # --------------------------------------------------------
-
-    connection.execute(
-        """
-        CREATE TABLE IF NOT EXISTS executive_applications (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-            user_id INTEGER NOT NULL,
-
-            position TEXT NOT NULL,
-            reason TEXT NOT NULL,
-
-            status TEXT NOT NULL DEFAULT 'pending',
-
-            created_at TEXT NOT NULL,
-
-            FOREIGN KEY (user_id)
-                REFERENCES users(id)
-                ON DELETE CASCADE
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
         """
     )
@@ -237,98 +212,330 @@ def init_database():
     connection.execute(
         """
         CREATE TABLE IF NOT EXISTS events (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id BIGSERIAL PRIMARY KEY,
 
             event_key TEXT NOT NULL UNIQUE,
 
             title TEXT NOT NULL,
-            event_date TEXT NOT NULL,
+            event_date DATE NOT NULL,
 
             category TEXT NOT NULL DEFAULT '',
             location TEXT NOT NULL DEFAULT '',
             description TEXT NOT NULL DEFAULT '',
 
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
         """
     )
 
     # --------------------------------------------------------
-    # DATABASE MIGRATION FOR OLD USERS DATABASES
+    # OFFICIAL ROLES
     # --------------------------------------------------------
 
-    columns = connection.execute(
-        "PRAGMA table_info(users)"
-    ).fetchall()
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS official_roles (
+            id BIGSERIAL PRIMARY KEY,
 
-    existing_columns = {
-        column["name"]
-        for column in columns
-    }
+            first_name TEXT NOT NULL,
+            last_name TEXT NOT NULL,
 
-    migrations = {
-        "reason_for_joining": """
-            ALTER TABLE users
-            ADD COLUMN reason_for_joining
-            TEXT NOT NULL DEFAULT ''
-        """,
+            email TEXT NOT NULL UNIQUE,
+            phone TEXT NOT NULL UNIQUE,
 
-        "role": """
-            ALTER TABLE users
-            ADD COLUMN role
-            TEXT NOT NULL DEFAULT 'member'
-        """,
+            role TEXT NOT NULL
+                CHECK (role IN ('admin', 'executive')),
 
-        "position": """
-            ALTER TABLE users
-            ADD COLUMN position
-            TEXT NOT NULL DEFAULT 'Member'
-        """,
+            position TEXT NOT NULL DEFAULT '',
 
-        "phone_verified": """
-            ALTER TABLE users
-            ADD COLUMN phone_verified
-            INTEGER NOT NULL DEFAULT 0
-        """,
+            active BOOLEAN NOT NULL DEFAULT TRUE,
 
-        "verification_token": """
-            ALTER TABLE users
-            ADD COLUMN verification_token
-            TEXT
-        """,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+        """
+    )
 
-        "verification_expires_at": """
-            ALTER TABLE users
-            ADD COLUMN verification_expires_at
-            TEXT
-        """,
-    }
+    # --------------------------------------------------------
+    # INDEXES
+    # --------------------------------------------------------
 
-    for column_name, sql in migrations.items():
-        if column_name not in existing_columns:
-            connection.execute(sql)
+    connection.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_users_email
+        ON users (LOWER(email))
+        """
+    )
+
+    connection.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_users_username
+        ON users (LOWER(username))
+        """
+    )
+
+    connection.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_users_role
+        ON users (role)
+        """
+    )
+
+    connection.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_events_date
+        ON events (event_date)
+        """
+    )
+
+    connection.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_official_roles_email
+        ON official_roles (LOWER(email))
+        """
+    )
+
+    connection.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_official_roles_phone
+        ON official_roles (phone)
+        """
+    )
 
     connection.commit()
+    connection.close()
+
+
+# ============================================================
+# ENVIRONMENT ADMIN ACCOUNT
+# ============================================================
+
+def ensure_env_admin_account():
+    """Keep the configured Render admin usable through PostgreSQL."""
+
+    if not ADMIN_CREDENTIALS_CONFIGURED:
+        return
+
+    connection = get_db()
+
+    existing = connection.execute(
+        """
+        SELECT id
+        FROM users
+        WHERE LOWER(username) = LOWER(%s)
+        LIMIT 1
+        """,
+        (ADMIN_USERNAME,),
+    ).fetchone()
+
+    password_hash = generate_password_hash(
+        ADMIN_PASSWORD
+    )
+
+    if existing:
+
+        connection.execute(
+            """
+            UPDATE users
+            SET
+                role = 'admin',
+                position = 'Administrator',
+                password_hash = %s,
+                email_verified = TRUE,
+                phone_verified = TRUE
+            WHERE id = %s
+            """,
+            (
+                password_hash,
+                existing["id"],
+            ),
+        )
+
+    else:
+
+        connection.execute(
+            """
+            INSERT INTO users (
+                first_name,
+                last_name,
+                username,
+                email,
+                phone,
+                school,
+                class_name,
+                group_name,
+                reason_for_joining,
+                password_hash,
+                email_verified,
+                phone_verified,
+                role,
+                position
+            )
+            VALUES (
+                %s, %s, %s, %s, %s, %s,
+                %s, %s, %s, %s,
+                TRUE, TRUE,
+                'admin',
+                'Administrator'
+            )
+            """,
+            (
+                "New Gen",
+                "Administrator",
+                ADMIN_USERNAME,
+                f"{ADMIN_USERNAME}@newgen.local",
+                "",
+                "New Gen",
+                "Administrator",
+                "Tech",
+                "System administrator account",
+                password_hash,
+            ),
+        )
+
+    connection.commit()
+    connection.close()
+
+
+# ============================================================
+# SQLITE → POSTGRESQL MIGRATION
+# ============================================================
+
+def migrate_old_data():
+
+    if not os.path.exists(OLD_SQLITE_DATABASE):
+        return
+
+    try:
+        old_connection = sqlite3.connect(
+            OLD_SQLITE_DATABASE
+        )
+
+        old_connection.row_factory = sqlite3.Row
+
+        old_users = old_connection.execute(
+            "SELECT * FROM users"
+        ).fetchall()
+
+        old_connection.close()
+
+    except Exception as error:
+
+        print(
+            "OLD SQLITE USER MIGRATION ERROR:",
+            error,
+        )
+
+        old_users = []
+
+    connection = get_db()
 
     # --------------------------------------------------------
-    # MIGRATE OLD events.json INTO DATABASE
+    # USERS
     # --------------------------------------------------------
-    #
-    # This is deliberately done only when matching database
-    # events do not already exist.
-    #
-    # The JSON file becomes an import source rather than the
-    # permanent event database.
-    #
 
-    event_count = connection.execute(
-        "SELECT COUNT(*) AS count FROM events"
-    ).fetchone()["count"]
+    for old_user in old_users:
 
-    if event_count == 0 and os.path.exists(EVENTS_FILE):
+        existing = connection.execute(
+            """
+            SELECT id
+            FROM users
+            WHERE LOWER(email) = LOWER(%s)
+               OR LOWER(username) = LOWER(%s)
+            LIMIT 1
+            """,
+            (
+                old_user["email"],
+                old_user["username"],
+            ),
+        ).fetchone()
+
+        if existing:
+            continue
+
+        email_verified = bool(
+            old_user["email_verified"]
+        )
+
+        phone_verified = bool(
+            old_user["phone_verified"]
+        )
+
+        verification_expires_at = (
+            old_user["verification_expires_at"]
+            if "verification_expires_at"
+            in old_user.keys()
+            else None
+        )
+
+        created_at = (
+            old_user["created_at"]
+            if "created_at" in old_user.keys()
+            else None
+        )
+
+        if not created_at:
+            created_at = datetime.now(
+                timezone.utc
+            )
+
+        connection.execute(
+            """
+            INSERT INTO users (
+                first_name,
+                last_name,
+                username,
+                email,
+                phone,
+                school,
+                class_name,
+                group_name,
+                reason_for_joining,
+                password_hash,
+                email_verified,
+                phone_verified,
+                verification_token,
+                verification_expires_at,
+                role,
+                position,
+                created_at
+            )
+            VALUES (
+                %s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s,
+                %s, %s
+            )
+            """,
+            (
+                old_user["first_name"],
+                old_user["last_name"],
+                old_user["username"],
+                old_user["email"],
+                old_user["phone"],
+                old_user["school"],
+                old_user["class_name"],
+                old_user["group_name"],
+                old_user["reason_for_joining"],
+                old_user["password_hash"],
+                email_verified,
+                phone_verified,
+                old_user["verification_token"],
+                verification_expires_at,
+                old_user["role"] or "member",
+                old_user["position"] or "Member",
+                created_at,
+            ),
+        )
+
+    # --------------------------------------------------------
+    # OLD EVENTS JSON
+    # --------------------------------------------------------
+
+    if os.path.exists(EVENTS_FILE):
 
         try:
+
             with open(
                 EVENTS_FILE,
                 "r",
@@ -343,10 +550,6 @@ def init_database():
             old_events = []
 
         if isinstance(old_events, list):
-
-            now = datetime.now(
-                timezone.utc
-            ).isoformat()
 
             for old_event in old_events:
 
@@ -369,21 +572,34 @@ def init_database():
                     or secrets.token_urlsafe(12)
                 )
 
-                category = str(
-                    old_event.get("category", "")
-                ).strip()
+                existing_event = connection.execute(
+                    """
+                    SELECT id
+                    FROM events
+                    WHERE event_key = %s
+                    LIMIT 1
+                    """,
+                    (event_key,),
+                ).fetchone()
 
-                location = str(
-                    old_event.get("location", "")
-                ).strip()
+                if existing_event:
+                    continue
 
-                description = str(
-                    old_event.get("description", "")
-                ).strip()
+                try:
+                    parsed_date = datetime.strptime(
+                        event_date,
+                        "%Y-%m-%d",
+                    ).date()
+                except ValueError:
+                    continue
+
+                now = datetime.now(
+                    timezone.utc
+                )
 
                 connection.execute(
                     """
-                    INSERT OR IGNORE INTO events (
+                    INSERT INTO events (
                         event_key,
                         title,
                         event_date,
@@ -393,68 +609,43 @@ def init_database():
                         created_at,
                         updated_at
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (
+                        %s, %s, %s, %s, %s,
+                        %s, %s, %s
+                    )
                     """,
                     (
                         event_key,
                         title,
-                        event_date,
-                        category,
-                        location,
-                        description,
+                        parsed_date,
+                        str(
+                            old_event.get(
+                                "category",
+                                "",
+                            )
+                        ).strip(),
+                        str(
+                            old_event.get(
+                                "location",
+                                "",
+                            )
+                        ).strip(),
+                        str(
+                            old_event.get(
+                                "description",
+                                "",
+                            )
+                        ).strip(),
                         now,
                         now,
                     ),
                 )
 
-            connection.commit()
-
-    connection.close()
-
-
-def ensure_env_admin_account():
-    """Keep the configured Render admin usable through the DB login."""
-    if not ADMIN_CREDENTIALS_CONFIGURED:
-        return
-
-    connection = get_db()
-    existing = connection.execute(
-        "SELECT id FROM users WHERE LOWER(username)=LOWER(?) LIMIT 1",
-        (ADMIN_USERNAME,),
-    ).fetchone()
-
-    password_hash = generate_password_hash(ADMIN_PASSWORD)
-
-    if existing:
-        connection.execute(
-            """UPDATE users
-               SET role='admin', position='Administrator',
-                   password_hash=?, email_verified=1, phone_verified=1
-             WHERE id=?""",
-            (password_hash, existing["id"]),
-        )
-    else:
-        now = datetime.now(timezone.utc).isoformat()
-        connection.execute(
-            """INSERT INTO users (
-                first_name,last_name,username,email,phone,school,
-                class_name,group_name,reason_for_joining,password_hash,
-                email_verified,phone_verified,role,position,created_at
-            ) VALUES (?,?,?,?,?,?,?,?,?,?,1,1,'admin','Administrator',?)""",
-            (
-                "New Gen", "Administrator", ADMIN_USERNAME,
-                f"{ADMIN_USERNAME}@newgen.local", "", "New Gen",
-                "Administrator", "Tech", "System administrator account",
-                password_hash, now,
-            ),
-        )
-
     connection.commit()
     connection.close()
 
-
-
 init_database()
+migrate_old_data()
 ensure_env_admin_account()
 
 
@@ -463,11 +654,6 @@ ensure_env_admin_account()
 # ============================================================
 
 def load_events():
-    """
-    Read events from SQLite.
-
-    This replaces the old events.json-based system.
-    """
 
     connection = get_db()
 
@@ -476,7 +662,7 @@ def load_events():
         SELECT
             event_key AS id,
             title,
-            event_date AS date,
+            TO_CHAR(event_date, 'YYYY-MM-DD') AS date,
             category,
             location,
             description,
@@ -493,9 +679,9 @@ def load_events():
         dict(row)
         for row in rows
     ]
-
-
+    
 def get_event(event_id):
+
     connection = get_db()
 
     event = connection.execute(
@@ -503,14 +689,14 @@ def get_event(event_id):
         SELECT
             event_key AS id,
             title,
-            event_date AS date,
+            TO_CHAR(event_date, 'YYYY-MM-DD') AS date,
             category,
             location,
             description,
             created_at,
             updated_at
         FROM events
-        WHERE event_key = ?
+        WHERE event_key = %s
         """,
         (event_id,),
     ).fetchone()
@@ -518,21 +704,20 @@ def get_event(event_id):
     connection.close()
 
     return event
-
-
 # ============================================================
 # AUTHENTICATION HELPERS
 # ============================================================
 
 def is_member_logged_in():
+
     return (
-        session.get("member_logged_in")
-        is True
+        session.get("member_logged_in") is True
         and bool(session.get("member_id"))
     )
 
 
 def get_current_member():
+
     user_id = session.get("member_id")
 
     if not user_id:
@@ -544,7 +729,7 @@ def get_current_member():
         """
         SELECT *
         FROM users
-        WHERE id = ?
+        WHERE id = %s
         """,
         (user_id,),
     ).fetchone()
@@ -556,11 +741,17 @@ def get_current_member():
 
 def is_admin_logged_in():
 
-    # Direct admin session
+    # --------------------------------------------------------
+    # DIRECT ADMIN SESSION
+    # --------------------------------------------------------
+
     if session.get("admin_logged_in") is True:
         return True
 
-    # Admin who logged in through the member system
+    # --------------------------------------------------------
+    # ADMIN MEMBER SESSION
+    # --------------------------------------------------------
+
     admin_member_id = session.get(
         "admin_member_id"
     )
@@ -574,7 +765,7 @@ def is_admin_logged_in():
         """
         SELECT role
         FROM users
-        WHERE id = ?
+        WHERE id = %s
         """,
         (admin_member_id,),
     ).fetchone()
@@ -906,6 +1097,7 @@ def calendar():
 def signup():
 
     if is_member_logged_in():
+
         return redirect(
             url_for("home")
         )
@@ -958,11 +1150,6 @@ def signup():
             "",
         ).strip()
 
-        account_type = request.form.get(
-            "account_type",
-            "member",
-        ).strip().lower()
-
         reason_for_joining = request.form.get(
             "reason_for_joining",
             "",
@@ -979,7 +1166,7 @@ def signup():
         )
 
         # ----------------------------------------------------
-        # INLINE REQUIRED-FIELD VALIDATION
+        # REQUIRED FIELDS
         # ----------------------------------------------------
 
         required_fields = {
@@ -1015,10 +1202,6 @@ def signup():
                 group_name,
                 "Group",
             ),
-            "account_type": (
-                account_type,
-                "Account type",
-            ),
             "reason_for_joining": (
                 reason_for_joining,
                 "Reason for joining",
@@ -1033,70 +1216,61 @@ def signup():
             ),
         }
 
-        for field, data in required_fields.items():
-
-            value, label = data
+        for field, (value, label) in required_fields.items():
 
             if not value:
+
                 errors[field] = (
                     f"{label} is required."
                 )
 
-        if errors:
-
-            return render_template(
-                "signup.html",
-                errors=errors,
-                form_error=(
-                    "Please correct the highlighted fields."
-                ),
-                form_data=request.form,
-            )
-
         # ----------------------------------------------------
-        # BASIC USERNAME VALIDATION
+        # USERNAME
         # ----------------------------------------------------
 
-        if len(username) < 3:
+        if username:
 
-            errors["username"] = (
-                "Username must be at least 3 characters."
-            )
+            if len(username) < 3:
 
-        elif len(username) > 30:
+                errors["username"] = (
+                    "Username must be at least 3 characters."
+                )
 
-            errors["username"] = (
-                "Username must be 30 characters or fewer."
-            )
+            elif len(username) > 30:
 
-        elif not all(
-            character.isalnum()
-            or character in "_-"
-            for character in username
-        ):
+                errors["username"] = (
+                    "Username must be 30 characters or fewer."
+                )
 
-            errors["username"] = (
-                "Username may only contain letters, numbers, "
-                "underscores and hyphens."
-            )
+            elif not all(
+                character.isalnum()
+                or character in "_-"
+                for character in username
+            ):
+
+                errors["username"] = (
+                    "Username may only contain letters, numbers, "
+                    "underscores and hyphens."
+                )
 
         # ----------------------------------------------------
-        # EMAIL VALIDATION
+        # EMAIL
         # ----------------------------------------------------
 
-        if (
+        if email and (
             "@" not in email
             or "." not in email.rsplit("@", 1)[-1]
         ):
+
             errors["email"] = (
                 "Enter a valid email address."
             )
 
         # ----------------------------------------------------
-        # PASSWORD VALIDATION
+        # PASSWORD
         # ----------------------------------------------------
 
-        if len(password) < 8:
+        if password and len(password) < 8:
 
             errors["password"] = (
                 "Password must be at least 8 characters."
@@ -1109,7 +1283,7 @@ def signup():
             )
 
         # ----------------------------------------------------
-        # ALLOWED OPTIONS
+        # VALID OPTIONS
         # ----------------------------------------------------
 
         allowed_classes = {
@@ -1126,28 +1300,21 @@ def signup():
             "Fashion",
         }
 
-        allowed_account_types = {
-            "member",
-            "executive",
-        }
-
-        if class_name not in allowed_classes:
+        if class_name and class_name not in allowed_classes:
 
             errors["class_name"] = (
                 "Please select a valid class."
             )
 
-        if group_name not in allowed_groups:
+        if group_name and group_name not in allowed_groups:
 
             errors["group_name"] = (
                 "Please select a valid New Gen group."
             )
 
-        if account_type not in allowed_account_types:
-
-            errors["account_type"] = (
-                "Please select a valid account type."
-            )
+        # ----------------------------------------------------
+        # RETURN VALIDATION ERRORS
+        # ----------------------------------------------------
 
         if errors:
 
@@ -1161,7 +1328,7 @@ def signup():
             )
 
         # ----------------------------------------------------
-        # CHECK EXISTING EMAIL / USERNAME
+        # CHECK DUPLICATES
         # ----------------------------------------------------
 
         connection = get_db()
@@ -1170,7 +1337,8 @@ def signup():
             """
             SELECT id
             FROM users
-            WHERE email = ?
+            WHERE LOWER(email) = LOWER(%s)
+            LIMIT 1
             """,
             (email,),
         ).fetchone()
@@ -1179,7 +1347,8 @@ def signup():
             """
             SELECT id
             FROM users
-            WHERE username = ?
+            WHERE LOWER(username) = LOWER(%s)
+            LIMIT 1
             """,
             (username,),
         ).fetchone()
@@ -1210,6 +1379,58 @@ def signup():
             )
 
         # ----------------------------------------------------
+        # CHECK OFFICIAL ROLE
+        # ----------------------------------------------------
+        #
+        # IMPORTANT:
+        # The signup page does NOT decide whether someone is
+        # an administrator or executive.
+        #
+        # The official_roles table is the source of truth.
+        #
+        # Match by email or phone.
+        #
+
+        official_role = connection.execute(
+            """
+            SELECT
+                role,
+                position
+            FROM official_roles
+            WHERE active = TRUE
+              AND (
+                    LOWER(email) = LOWER(%s)
+                    OR phone = %s
+              )
+            LIMIT 1
+            """,
+            (
+                email,
+                phone,
+            ),
+        ).fetchone()
+
+        # ----------------------------------------------------
+        # DEFAULT ROLE
+        # ----------------------------------------------------
+
+        assigned_role = "member"
+        assigned_position = "Member"
+
+        if official_role:
+
+            assigned_role = official_role["role"]
+
+            assigned_position = (
+                official_role["position"]
+                or (
+                    "Administrator"
+                    if assigned_role == "admin"
+                    else "Executive"
+                )
+            )
+
+        # ----------------------------------------------------
         # PASSWORD HASH
         # ----------------------------------------------------
 
@@ -1230,53 +1451,11 @@ def signup():
             + timedelta(
                 hours=VERIFICATION_EXPIRY_HOURS
             )
-        ).isoformat()
+        )
 
         created_at = datetime.now(
             timezone.utc
-        ).isoformat()
-
-        # ----------------------------------------------------
-        # ROLE
-        # ----------------------------------------------------
-        #
-        # Executive selection NEVER grants executive access.
-        #
-
-        assigned_role = "member"
-        assigned_position = "Member"
-
-        leadership_match = get_leadership_match(
-            first_name,
-            last_name,
         )
-
-        # Only an explicitly registered official leader can
-        # receive a preconfigured role.
-        #
-        # Executive applicants still remain members until
-        # an administrator approves them.
-
-        if (
-            account_type == "member"
-            and leadership_match
-        ):
-            assigned_role = leadership_match.get(
-                "role",
-                "member",
-            )
-
-            assigned_position = leadership_match.get(
-                "position",
-                "Member",
-            )
-
-        if account_type == "executive":
-
-            assigned_role = "member"
-            assigned_position = (
-                "Executive Applicant"
-            )
 
         # ----------------------------------------------------
         # CREATE USER
@@ -1304,9 +1483,17 @@ def signup():
                 created_at
             )
             VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?, ?, ?
+                %s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s,
+                FALSE,
+                FALSE,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s
             )
+            RETURNING id
             """,
             (
                 first_name,
@@ -1319,8 +1506,6 @@ def signup():
                 group_name,
                 reason_for_joining,
                 password_hash,
-                0,
-                0,
                 verification_token,
                 verification_expires_at,
                 assigned_role,
@@ -1329,33 +1514,7 @@ def signup():
             ),
         )
 
-        user_id = cursor.lastrowid
-
-        # ----------------------------------------------------
-        # EXECUTIVE APPLICATION
-        # ----------------------------------------------------
-
-        if account_type == "executive":
-
-            connection.execute(
-                """
-                INSERT INTO executive_applications (
-                    user_id,
-                    position,
-                    reason,
-                    status,
-                    created_at
-                )
-                VALUES (?, ?, ?, ?, ?)
-                """,
-                (
-                    user_id,
-                    "Executive",
-                    reason_for_joining,
-                    "pending",
-                    created_at,
-                ),
-            )
+        user_id = cursor.fetchone()["id"]
 
         connection.commit()
         connection.close()
@@ -1420,11 +1579,15 @@ def signup():
             )
         )
 
+    # --------------------------------------------------------
+    # GET
+    # --------------------------------------------------------
+
     return render_template(
         "signup.html",
         errors={},
         form_error=None,
-        form_data=request.form,
+        form_data={},
     )
 
 # ============================================================
@@ -1974,147 +2137,6 @@ def verify_email(token):
         ),
     )
 
-
-# ============================================================
-# EXECUTIVE APPLICATION
-# ============================================================
-
-@app.route(
-    "/executive/apply",
-    methods=["GET", "POST"],
-)
-def executive_apply():
-
-    if not is_member_logged_in():
-
-        flash(
-            "You must have a New Gen member account "
-            "before applying to become an executive.",
-            "error",
-        )
-
-        return redirect(
-            url_for("login")
-        )
-
-    member = get_current_member()
-
-    if not member:
-
-        session.clear()
-
-        return redirect(
-            url_for("login")
-        )
-
-    if member["role"] == "executive":
-
-        return redirect(
-            url_for("executive_dashboard")
-        )
-
-    errors = {}
-
-    if request.method == "POST":
-
-        position = request.form.get(
-            "position",
-            "",
-        ).strip()
-
-        reason = request.form.get(
-            "reason",
-            "",
-        ).strip()
-
-        if not position:
-
-            errors["position"] = (
-                "Please select a position."
-            )
-
-        if not reason:
-
-            errors["reason"] = (
-                "Please explain why you should be an executive."
-            )
-
-        if errors:
-
-            return render_template(
-                "executive_apply.html",
-                member=member,
-                errors=errors,
-            )
-
-        connection = get_db()
-
-        existing_application = connection.execute(
-            """
-            SELECT id
-            FROM executive_applications
-            WHERE user_id = ?
-              AND status = 'pending'
-            """,
-            (member["id"],),
-        ).fetchone()
-
-        if existing_application:
-
-            connection.close()
-
-            flash(
-                "You already have a pending executive application.",
-                "error",
-            )
-
-            return redirect(
-                url_for("member_dashboard")
-            )
-
-        created_at = datetime.now(
-            timezone.utc
-        ).isoformat()
-
-        connection.execute(
-            """
-            INSERT INTO executive_applications (
-                user_id,
-                position,
-                reason,
-                status,
-                created_at
-            )
-            VALUES (?, ?, ?, ?, ?)
-            """,
-            (
-                member["id"],
-                position,
-                reason,
-                "pending",
-                created_at,
-            ),
-        )
-
-        connection.commit()
-        connection.close()
-
-        flash(
-            "Your executive application has been submitted "
-            "for review.",
-            "success",
-        )
-
-        return redirect(
-            url_for("member_dashboard")
-        )
-
-    return render_template(
-        "executive_apply.html",
-        member=member,
-        errors={},
-    )
-
 # ============================================================
 # EXECUTIVE DASHBOARD
 # ============================================================
@@ -2435,30 +2457,6 @@ def admin_portal():
         WHERE role = 'executive'
         """
     ).fetchone()["count"]
-
-    pending_count = connection.execute(
-        """
-        SELECT COUNT(*) AS count
-        FROM executive_applications
-        WHERE status = 'pending'
-        """
-    ).fetchone()["count"]
-
-    connection.close()
-
-    return render_template(
-        "admin.html",
-        members=members,
-        applications=applications,
-        events=load_events(),
-        event_count=event_count,
-        member_count=member_count,
-        executive_count=executive_count,
-        pending_count=pending_count,
-        mode="Create",
-        event=None,
-    )
-
 
 # ============================================================
 # OLD ADMIN ROUTE
@@ -2979,29 +2977,6 @@ def admin_members():
         """
     ).fetchall()
 
-    applications = connection.execute(
-        """
-        SELECT
-            ea.id,
-            ea.user_id,
-            ea.position,
-            ea.reason,
-            ea.status,
-            ea.created_at,
-
-            u.first_name,
-            u.last_name,
-            u.username,
-            u.email,
-            u.school,
-            u.class_name,
-            u.group_name
-        FROM executive_applications ea
-        JOIN users u
-            ON ea.user_id = u.id
-        ORDER BY ea.created_at DESC
-        """
-    ).fetchall()
 
     connection.close()
 
@@ -3010,208 +2985,6 @@ def admin_members():
     members=members,
     applications=applications,
 )
-
-
-# ============================================================
-# APPROVE EXECUTIVE
-# ============================================================
-
-@app.route(
-    "/admin/executive/<int:application_id>/approve",
-    methods=["POST"],
-)
-def approve_executive(
-    application_id
-):
-
-    if not is_admin_logged_in():
-
-        flash(
-            "Administrator access required.",
-            "error",
-        )
-
-        return redirect(
-            url_for("admin_login")
-        )
-
-    connection = get_db()
-
-    application = connection.execute(
-        """
-        SELECT *
-        FROM executive_applications
-        WHERE id = ?
-        """,
-        (application_id,),
-    ).fetchone()
-
-    if not application:
-
-        connection.close()
-
-        flash(
-            "Executive application not found.",
-            "error",
-        )
-
-        return redirect(
-            url_for("admin_members")
-        )
-
-    if application["status"] != "pending":
-
-        connection.close()
-
-        flash(
-            "This application has already been reviewed.",
-            "error",
-        )
-
-        return redirect(
-            url_for("admin_members")
-        )
-
-    # --------------------------------------------------------
-    # APPROVE APPLICATION
-    # --------------------------------------------------------
-
-    connection.execute(
-        """
-        UPDATE executive_applications
-        SET status = 'approved'
-        WHERE id = ?
-        """,
-        (application_id,),
-    )
-
-    # --------------------------------------------------------
-    # GRANT EXECUTIVE ROLE
-    # --------------------------------------------------------
-
-    connection.execute(
-        """
-        UPDATE users
-        SET
-            role = 'executive',
-            position = ?
-        WHERE id = ?
-        """,
-        (
-            application["position"],
-            application["user_id"],
-        ),
-    )
-
-    connection.commit()
-    connection.close()
-
-    flash(
-        "Executive application approved. "
-        "The member now has executive access.",
-        "success",
-    )
-
-    return redirect(
-        url_for("admin_members")
-    )
-
-
-# ============================================================
-# REJECT EXECUTIVE
-# ============================================================
-
-@app.route(
-    "/admin/executive/<int:application_id>/reject",
-    methods=["POST"],
-)
-def reject_executive(
-    application_id
-):
-
-    if not is_admin_logged_in():
-
-        flash(
-            "Administrator access required.",
-            "error",
-        )
-
-        return redirect(
-            url_for("admin_login")
-        )
-
-    connection = get_db()
-
-    application = connection.execute(
-        """
-        SELECT *
-        FROM executive_applications
-        WHERE id = ?
-        """,
-        (application_id,),
-    ).fetchone()
-
-    if not application:
-
-        connection.close()
-
-        flash(
-            "Executive application not found.",
-            "error",
-        )
-
-        return redirect(
-            url_for("admin_members")
-        )
-
-    if application["status"] != "pending":
-
-        connection.close()
-
-        flash(
-            "This application has already been reviewed.",
-            "error",
-        )
-
-        return redirect(
-            url_for("admin_members")
-        )
-
-    connection.execute(
-        """
-        UPDATE executive_applications
-        SET status = 'rejected'
-        WHERE id = ?
-        """,
-        (application_id,),
-    )
-
-    # Make absolutely sure a rejected applicant remains
-    # a normal member.
-
-    connection.execute(
-        """
-        UPDATE users
-        SET
-            role = 'member',
-            position = 'Member'
-        WHERE id = ?
-          AND role = 'member'
-        """,
-        (application["user_id"],),
-    )
-
-    connection.commit()
-    connection.close()
-
-    flash(
-        "Executive application rejected.",
-        "success",
-    )
-
-    return redirect(
-        url_for("admin_members")
-    )
 
 
 # ============================================================

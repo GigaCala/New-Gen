@@ -1,0 +1,1807 @@
+{% extends "base.html" %}
+
+{% block title %}Member Management | New Gen Admin{% endblock %}
+
+{% block content %}
+
+<main class="admin-members-page">
+
+  <!-- =====================================================
+       HERO
+  ====================================================== -->
+
+  <section class="admin-members-hero">
+
+    <div class="container admin-members-hero-inner">
+
+      <div>
+
+        <div class="admin-members-eyebrow">
+          <span></span>
+          NEW GEN / ADMINISTRATION
+        </div>
+
+        <h1>
+          Know your
+          <span>community.</span>
+        </h1>
+
+        <p>
+          Manage New Gen accounts, leadership roles,
+          verification and executive applications from one place.
+        </p>
+
+      </div>
+
+
+      <div class="admin-members-hero-card">
+
+        <span>MEMBER CONTROL</span>
+
+        <strong>
+          {{ members|length }}
+        </strong>
+
+        <small>
+          accounts currently loaded
+        </small>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       FLASH MESSAGES
+  ====================================================== -->
+
+  <section class="container admin-members-notices">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+      {% if messages %}
+
+        {% for category, message in messages %}
+
+          <div class="admin-members-notice {{ category }}">
+
+            <span class="admin-members-notice-icon">
+              {% if category == "success" %}
+                ✓
+              {% else %}
+                !
+              {% endif %}
+            </span>
+
+            <span>
+              {{ message }}
+            </span>
+
+          </div>
+
+        {% endfor %}
+
+      {% endif %}
+
+    {% endwith %}
+
+  </section>
+
+
+  <!-- =====================================================
+       STATS
+  ====================================================== -->
+
+  <section class="container admin-members-section">
+
+    <div class="admin-members-section-heading">
+
+      <div>
+        <span>MEMBER OVERVIEW</span>
+        <h2>The community, at a glance.</h2>
+      </div>
+
+    </div>
+
+
+    <div class="admin-members-stats">
+
+      <article class="admin-members-stat">
+        <small>TOTAL ACCOUNTS</small>
+        <strong>{{ members|length }}</strong>
+        <span>All accounts currently in the database.</span>
+      </article>
+
+
+      <article class="admin-members-stat">
+
+        <small>VERIFIED</small>
+
+        <strong>
+          {{ members|selectattr("email_verified")|list|length }}
+        </strong>
+
+        <span>
+          Members who completed email verification.
+        </span>
+
+      </article>
+
+
+      <article class="admin-members-stat">
+
+        <small>EXECUTIVES</small>
+
+        <strong>
+          {{ members|selectattr("role", "equalto", "executive")|list|length }}
+        </strong>
+
+        <span>
+          Approved New Gen leadership accounts.
+        </span>
+
+      </article>
+
+
+      <article class="admin-members-stat">
+
+        <small>PENDING APPLICATIONS</small>
+
+        <strong>
+          {{ applications|selectattr("status", "equalto", "pending")|list|length }}
+        </strong>
+
+        <span>
+          Leadership applications waiting for review.
+        </span>
+
+      </article>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       MEMBER MANAGEMENT
+  ====================================================== -->
+
+  <section class="container admin-members-section">
+
+    <div class="admin-members-section-heading">
+
+      <div>
+
+        <span>ACCOUNT MANAGEMENT</span>
+
+        <h2>
+          Members.
+        </h2>
+
+      </div>
+
+      <a
+        href="{{ url_for('admin_portal') }}"
+        class="admin-members-back"
+      >
+        ← Back to control center
+      </a>
+
+    </div>
+
+
+    <!-- SEARCH -->
+
+    <form
+      method="get"
+      action="{{ url_for('admin_search') }}"
+      class="admin-members-search"
+    >
+
+      <div class="admin-members-search-box">
+
+        <span>⌕</span>
+
+        <input
+          type="search"
+          name="q"
+          value="{{ search_query|default('') }}"
+          placeholder="Search name, username, school or group..."
+          aria-label="Search members"
+        >
+
+      </div>
+
+      <button type="submit">
+        Search
+      </button>
+
+      {% if search_query|default('') %}
+        <a href="{{ url_for('admin_members') }}">
+          Clear
+        </a>
+      {% endif %}
+
+    </form>
+
+
+    <!-- MEMBER TABLE -->
+
+    <div class="admin-members-table-card">
+
+      {% if members %}
+
+        <div class="admin-members-table-scroll">
+
+          <table class="admin-members-table">
+
+            <thead>
+
+              <tr>
+                <th>Member</th>
+                <th>Username</th>
+                <th>School / Form</th>
+                <th>Group</th>
+                <th>Role</th>
+                <th>Verification</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              {% for person in members %}
+
+                <tr>
+
+                  <!-- MEMBER -->
+
+                  <td>
+
+                    <div class="admin-person">
+
+                      <div class="admin-person-avatar">
+                        {{ person.first_name[:1]|upper }}{{ person.last_name[:1]|upper }}
+                      </div>
+
+                      <div>
+
+                        <strong>
+                          {{ person.first_name }}
+                          {{ person.last_name }}
+                        </strong>
+
+                        <small>
+                          {{ person.email }}
+                        </small>
+
+                      </div>
+
+                    </div>
+
+                  </td>
+
+
+                  <!-- USERNAME -->
+
+                  <td>
+                    <span class="admin-member-username">
+                      @{{ person.username }}
+                    </span>
+                  </td>
+
+
+                  <!-- SCHOOL -->
+
+                  <td>
+
+                    <div class="admin-member-school">
+
+                      <strong>
+                        {{ person.school }}
+                      </strong>
+
+                      <span>
+                        {{ person.class_name }}
+                      </span>
+
+                    </div>
+
+                  </td>
+
+
+                  <!-- GROUP -->
+
+                  <td>
+
+                    <span class="admin-group-pill">
+                      {{ person.group_name }}
+                    </span>
+
+                  </td>
+
+
+                  <!-- ROLE -->
+
+                  <td>
+
+                    <div class="admin-role-control">
+
+                      <form
+                        method="post"
+                        action="{{ url_for('change_member_role', user_id=person.id) }}"
+                      >
+
+                        <select
+                          name="role"
+                          aria-label="Change role for {{ person.first_name }} {{ person.last_name }}"
+                          onchange="this.form.submit()"
+                        >
+
+                          <option
+                            value="member"
+                            {% if person.role == "member" %}selected{% endif %}
+                          >
+                            Member
+                          </option>
+
+                          <option
+                            value="executive"
+                            {% if person.role == "executive" %}selected{% endif %}
+                          >
+                            Executive
+                          </option>
+
+                          <option
+                            value="admin"
+                            {% if person.role == "admin" %}selected{% endif %}
+                          >
+                            Administrator
+                          </option>
+
+                        </select>
+
+                      </form>
+
+                      {% if person.position %}
+
+                        <small>
+                          {{ person.position }}
+                        </small>
+
+                      {% endif %}
+
+                    </div>
+
+                  </td>
+
+
+                  <!-- VERIFICATION -->
+
+                  <td>
+
+                    <div class="admin-verification-stack">
+
+                      {% if person.email_verified %}
+
+                        <span class="admin-verified">
+                          ✓ Email verified
+                        </span>
+
+                      {% else %}
+
+                        <span class="admin-unverified">
+                          ! Email unverified
+                        </span>
+
+                      {% endif %}
+
+
+                      {% if person.phone_verified %}
+
+                        <span class="admin-verified-soft">
+                          ✓ Phone verified
+                        </span>
+
+                      {% else %}
+
+                        <span class="admin-unverified-soft">
+                          Phone not verified
+                        </span>
+
+                      {% endif %}
+
+                    </div>
+
+                  </td>
+
+
+                  <!-- JOIN DATE -->
+
+                  <td>
+
+                    <span class="admin-joined-date">
+                      {{ format_display_date(person.created_at[:10]) }}
+                    </span>
+
+                  </td>
+
+
+                  <!-- ACTIONS -->
+
+                  <td>
+
+                    {% if person.role == "admin" %}
+
+                      <span class="admin-protected-account">
+                        Protected
+                      </span>
+
+                    {% else %}
+
+                      <div class="admin-member-actions">
+
+                        <a
+                          href="{{ url_for('delete_member_page', user_id=person.id) }}"
+                          class="admin-delete-member"
+                        >
+                          Delete
+                        </a>
+
+                      </div>
+
+                    {% endif %}
+
+                  </td>
+
+                </tr>
+
+              {% endfor %}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      {% else %}
+
+        <div class="admin-members-empty">
+
+          <div class="admin-members-empty-icon">
+            ◌
+          </div>
+
+          <span>NO MEMBERS FOUND</span>
+
+          <h3>
+            Nothing matches this search.
+          </h3>
+
+          <p>
+            Try another name, username, school or group.
+          </p>
+
+          <a href="{{ url_for('admin_members') }}">
+            View all members →
+          </a>
+
+        </div>
+
+      {% endif %}
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       EXECUTIVE APPLICATIONS
+  ====================================================== -->
+
+  <section class="container admin-members-section">
+
+    <div class="admin-members-section-heading">
+
+      <div>
+
+        <span>LEADERSHIP</span>
+
+        <h2>
+          Executive applications.
+        </h2>
+
+      </div>
+
+    </div>
+
+
+    <div class="admin-applications-card">
+
+      {% if applications %}
+
+        <div class="admin-applications-list">
+
+          {% for application in applications %}
+
+            <article class="admin-application">
+
+              <div class="admin-application-main">
+
+                <div class="admin-application-person">
+
+                  <div class="admin-application-avatar">
+                    {{ application.first_name[:1]|upper }}{{ application.last_name[:1]|upper }}
+                  </div>
+
+                  <div>
+
+                    <strong>
+                      {{ application.first_name }}
+                      {{ application.last_name }}
+                    </strong>
+
+                    <span>
+                      @{{ application.username }}
+                    </span>
+
+                  </div>
+
+                </div>
+
+
+                <div class="admin-application-position">
+
+                  <small>
+                    APPLIED POSITION
+                  </small>
+
+                  <strong>
+                    {{ application.position }}
+                  </strong>
+
+                </div>
+
+
+                <div class="admin-application-status">
+
+                  {% if application.status == "pending" %}
+
+                    <span class="application-status pending">
+                      Pending
+                    </span>
+
+                  {% elif application.status == "approved" %}
+
+                    <span class="application-status approved">
+                      Approved
+                    </span>
+
+                  {% else %}
+
+                    <span class="application-status rejected">
+                      Rejected
+                    </span>
+
+                  {% endif %}
+
+                </div>
+
+              </div>
+
+
+              <div class="admin-application-reason">
+
+                <span>
+                  WHY THEY WANT TO LEAD
+                </span>
+
+                <p>
+                  {{ application.reason }}
+                </p>
+
+              </div>
+
+
+              <div class="admin-application-meta">
+
+                <span>
+                  {{ application.school }}
+                </span>
+
+                <span>
+                  {{ application.class_name }}
+                </span>
+
+                <span>
+                  {{ application.group_name }}
+                </span>
+
+                <span>
+                  {{ application.email }}
+                </span>
+
+              </div>
+
+
+              {% if application.status == "pending" %}
+
+                <div class="admin-application-actions">
+
+                  <form
+                    method="post"
+                    action="{{ url_for('approve_executive', application_id=application.id) }}"
+                  >
+
+                    <button
+                      type="submit"
+                      class="admin-approve-btn"
+                    >
+                      Approve executive
+                      <span>→</span>
+                    </button>
+
+                  </form>
+
+
+                  <form
+                    method="post"
+                    action="{{ url_for('reject_executive', application_id=application.id) }}"
+                    onsubmit="return confirm('Reject this executive application?');"
+                  >
+
+                    <button
+                      type="submit"
+                      class="admin-reject-btn"
+                    >
+                      Reject
+                    </button>
+
+                  </form>
+
+                </div>
+
+              {% endif %}
+
+            </article>
+
+          {% endfor %}
+
+        </div>
+
+      {% else %}
+
+        <div class="admin-members-empty">
+
+          <div class="admin-members-empty-icon">
+            ✓
+          </div>
+
+          <span>NO APPLICATIONS</span>
+
+          <h3>
+            No executive applications yet.
+          </h3>
+
+          <p>
+            New leadership applications will appear here.
+          </p>
+
+        </div>
+
+      {% endif %}
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       ADMIN FOOTER
+  ====================================================== -->
+
+  <section class="container admin-members-bottom">
+
+    <div>
+
+      <span>
+        NEW GEN / ADMINISTRATION
+      </span>
+
+      <strong>
+        African child must speak.
+      </strong>
+
+    </div>
+
+    <a
+      href="{{ url_for('admin_logout') }}"
+      class="admin-members-logout"
+    >
+      Log out of administration
+      <span>↪</span>
+    </a>
+
+  </section>
+
+</main>
+
+
+<style>
+
+/* =========================================================
+   ADMIN MEMBERS PAGE
+========================================================= */
+
+.admin-members-page {
+  padding-bottom: 90px;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.admin-members-hero {
+  border-bottom: 1px solid var(--line);
+
+  background:
+    radial-gradient(
+      circle at 80% 25%,
+      var(--pattern-glow),
+      transparent 34%
+    ),
+    var(--bg);
+}
+
+.admin-members-hero-inner {
+  min-height: 365px;
+
+  padding-top: 65px;
+  padding-bottom: 60px;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 30px;
+}
+
+.admin-members-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  margin-bottom: 18px;
+
+  font-size: .68rem;
+  font-weight: 900;
+  letter-spacing: .15em;
+
+  color: var(--muted);
+}
+
+.admin-members-eyebrow span {
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: var(--accent);
+}
+
+.admin-members-hero h1 {
+  max-width: 800px;
+
+  margin: 0;
+
+  font-size: clamp(
+    3rem,
+    6vw,
+    6rem
+  );
+
+  line-height: .9;
+  letter-spacing: -.065em;
+}
+
+.admin-members-hero h1 span {
+  color: var(--accent);
+}
+
+.admin-members-hero p {
+  max-width: 620px;
+
+  margin: 25px 0 0;
+
+  color: var(--muted);
+
+  font-size: .93rem;
+  line-height: 1.75;
+}
+
+.admin-members-hero-card {
+  min-width: 190px;
+
+  padding: 20px;
+
+  border: 1px solid var(--line);
+  border-radius: 17px;
+
+  background: var(--surface);
+}
+
+.admin-members-hero-card span,
+.admin-members-hero-card small {
+  display: block;
+
+  color: var(--muted);
+
+  font-size: .6rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.admin-members-hero-card strong {
+  display: block;
+
+  margin: 10px 0 3px;
+
+  font-size: 3rem;
+
+  line-height: .9;
+  letter-spacing: -.05em;
+}
+
+
+/* =========================================================
+   NOTICES
+========================================================= */
+
+.admin-members-notices {
+  padding-top: 18px;
+
+  display: grid;
+  gap: 10px;
+}
+
+.admin-members-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 13px 15px;
+
+  border: 1px solid var(--line);
+  border-radius: 12px;
+
+  background: var(--surface);
+
+  font-size: .82rem;
+}
+
+.admin-members-notice-icon {
+  width: 23px;
+  height: 23px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid var(--line);
+  border-radius: 50%;
+
+  font-size: .68rem;
+  font-weight: 900;
+}
+
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+.admin-members-section {
+  padding-top: 68px;
+}
+
+.admin-members-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  gap: 25px;
+
+  margin-bottom: 22px;
+}
+
+.admin-members-section-heading span {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: var(--muted);
+
+  font-size: .64rem;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+
+.admin-members-section-heading h2 {
+  margin: 0;
+
+  font-size: clamp(
+    1.9rem,
+    3vw,
+    2.8rem
+  );
+
+  line-height: .98;
+  letter-spacing: -.05em;
+}
+
+.admin-members-back {
+  text-decoration: none;
+
+  color: var(--muted);
+
+  font-size: .74rem;
+  font-weight: 800;
+}
+
+.admin-members-back:hover {
+  color: var(--text);
+}
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.admin-members-stats {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 12px;
+}
+
+.admin-members-stat {
+  min-height: 190px;
+
+  padding: 20px;
+
+  border: 1px solid var(--line);
+  border-radius: 17px;
+
+  background: var(--surface);
+
+  display: flex;
+  flex-direction: column;
+
+  transition:
+    transform .2s ease,
+    border-color .2s ease;
+}
+
+.admin-members-stat:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+}
+
+.admin-members-stat small {
+  font-size: .6rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+  color: var(--muted);
+}
+
+.admin-members-stat strong {
+  margin-top: auto;
+
+  font-size: 3rem;
+  line-height: .9;
+
+  letter-spacing: -.06em;
+}
+
+.admin-members-stat span {
+  margin-top: 10px;
+
+  color: var(--muted);
+
+  font-size: .7rem;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.admin-members-search {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  margin-bottom: 14px;
+}
+
+.admin-members-search-box {
+  flex: 1;
+
+  min-height: 48px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 0 14px;
+
+  border: 1px solid var(--line);
+  border-radius: 12px;
+
+  background: var(--surface);
+}
+
+.admin-members-search-box span {
+  color: var(--muted);
+  font-size: 1.2rem;
+}
+
+.admin-members-search-box input {
+  width: 100%;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+
+  color: var(--text);
+
+  font: inherit;
+  font-size: .82rem;
+}
+
+.admin-members-search button,
+.admin-members-search > a {
+  min-height: 48px;
+
+  padding: 0 15px;
+
+  border-radius: 12px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  text-decoration: none;
+
+  font-size: .71rem;
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+.admin-members-search button {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.admin-members-search > a {
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.admin-members-table-card {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+
+  background: var(--surface);
+
+  overflow: hidden;
+}
+
+.admin-members-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.admin-members-table {
+  width: 100%;
+  min-width: 1180px;
+
+  border-collapse: collapse;
+}
+
+.admin-members-table th {
+  padding: 14px 15px;
+
+  background: var(--bg);
+
+  border-bottom: 1px solid var(--line);
+
+  text-align: left;
+
+  color: var(--muted);
+
+  font-size: .59rem;
+  font-weight: 900;
+  letter-spacing: .11em;
+}
+
+.admin-members-table td {
+  padding: 16px 15px;
+
+  border-bottom: 1px solid var(--line);
+
+  vertical-align: middle;
+
+  font-size: .75rem;
+}
+
+.admin-members-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-members-table tbody tr {
+  transition: background .2s ease;
+}
+
+.admin-members-table tbody tr:hover {
+  background: var(--bg);
+}
+
+
+/* =========================================================
+   PERSON
+========================================================= */
+
+.admin-person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  min-width: 220px;
+}
+
+.admin-person-avatar,
+.admin-application-avatar {
+  flex: 0 0 auto;
+
+  width: 38px;
+  height: 38px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid var(--line);
+  border-radius: 11px;
+
+  background: var(--bg);
+
+  font-size: .65rem;
+  font-weight: 900;
+}
+
+.admin-person strong,
+.admin-person small {
+  display: block;
+}
+
+.admin-person strong {
+  font-size: .79rem;
+}
+
+.admin-person small {
+  max-width: 210px;
+
+  margin-top: 3px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  color: var(--muted);
+  font-size: .62rem;
+}
+
+
+/* =========================================================
+   MEMBER DETAILS
+========================================================= */
+
+.admin-member-username {
+  color: var(--muted);
+  font-size: .68rem;
+}
+
+.admin-member-school strong,
+.admin-member-school span {
+  display: block;
+}
+
+.admin-member-school strong {
+  font-size: .74rem;
+}
+
+.admin-member-school span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: .63rem;
+}
+
+.admin-group-pill {
+  display: inline-flex;
+
+  padding: 6px 8px;
+
+  border: 1px solid var(--line);
+  border-radius: 8px;
+
+  font-size: .61rem;
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   ROLE
+========================================================= */
+
+.admin-role-control form {
+  margin: 0;
+}
+
+.admin-role-control select {
+  min-width: 125px;
+  min-height: 34px;
+
+  padding: 0 8px;
+
+  border: 1px solid var(--line);
+  border-radius: 8px;
+
+  background: var(--bg);
+  color: var(--text);
+
+  font: inherit;
+  font-size: .64rem;
+
+  outline: none;
+}
+
+.admin-role-control select:focus {
+  border-color: var(--accent);
+}
+
+.admin-role-control small {
+  display: block;
+
+  margin-top: 5px;
+
+  color: var(--muted);
+
+  font-size: .57rem;
+}
+
+
+/* =========================================================
+   VERIFICATION
+========================================================= */
+
+.admin-verification-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  white-space: nowrap;
+}
+
+.admin-verified,
+.admin-unverified,
+.admin-verified-soft,
+.admin-unverified-soft {
+  font-size: .58rem;
+}
+
+.admin-verified {
+  color: var(--text);
+}
+
+.admin-unverified {
+  color: var(--muted);
+}
+
+.admin-verified-soft,
+.admin-unverified-soft {
+  color: var(--muted);
+}
+
+.admin-joined-date {
+  color: var(--muted);
+  font-size: .62rem;
+}
+
+.admin-protected-account {
+  display: inline-flex;
+
+  padding: 6px 8px;
+
+  border: 1px solid var(--line);
+  border-radius: 8px;
+
+  color: var(--muted);
+
+  font-size: .58rem;
+  font-weight: 800;
+}
+
+.admin-member-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.admin-delete-member {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 32px;
+  padding: 0 9px;
+
+  border: 1px solid var(--line);
+  border-radius: 8px;
+
+  text-decoration: none;
+
+  color: var(--muted);
+
+  font-size: .61rem;
+  font-weight: 800;
+
+  transition:
+    border-color .2s ease,
+    color .2s ease;
+}
+
+.admin-delete-member:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+
+/* =========================================================
+   EMPTY STATES
+========================================================= */
+
+.admin-members-empty {
+  min-height: 300px;
+
+  padding: 45px 25px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+.admin-members-empty-icon {
+  width: 50px;
+  height: 50px;
+
+  display: grid;
+  place-items: center;
+
+  margin-bottom: 15px;
+
+  border: 1px dashed var(--line);
+  border-radius: 14px;
+
+  color: var(--muted);
+
+  font-size: 1.2rem;
+}
+
+.admin-members-empty > span {
+  color: var(--muted);
+
+  font-size: .59rem;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+
+.admin-members-empty h3 {
+  margin: 10px 0 0;
+
+  font-size: 1.15rem;
+}
+
+.admin-members-empty p {
+  max-width: 320px;
+
+  margin: 8px 0 15px;
+
+  color: var(--muted);
+
+  font-size: .75rem;
+  line-height: 1.55;
+}
+
+.admin-members-empty a {
+  text-decoration: none;
+
+  color: var(--text);
+
+  font-size: .72rem;
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   APPLICATIONS
+========================================================= */
+
+.admin-applications-card {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+
+  background: var(--surface);
+
+  overflow: hidden;
+}
+
+.admin-applications-list {
+  display: grid;
+}
+
+.admin-application {
+  padding: 22px;
+
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-application:last-child {
+  border-bottom: 0;
+}
+
+.admin-application-main {
+  display: grid;
+
+  grid-template-columns:
+    1.3fr
+    1fr
+    auto;
+
+  gap: 20px;
+
+  align-items: center;
+}
+
+.admin-application-person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-application-person strong,
+.admin-application-person span {
+  display: block;
+}
+
+.admin-application-person strong {
+  font-size: .84rem;
+}
+
+.admin-application-person span {
+  margin-top: 3px;
+
+  color: var(--muted);
+
+  font-size: .63rem;
+}
+
+.admin-application-position small,
+.admin-application-position strong {
+  display: block;
+}
+
+.admin-application-position small {
+  margin-bottom: 5px;
+
+  color: var(--muted);
+
+  font-size: .56rem;
+  font-weight: 900;
+  letter-spacing: .11em;
+}
+
+.admin-application-position strong {
+  font-size: .8rem;
+}
+
+.application-status {
+  display: inline-flex;
+
+  padding: 7px 9px;
+
+  border: 1px solid var(--line);
+  border-radius: 9px;
+
+  font-size: .59rem;
+  font-weight: 900;
+}
+
+.application-status.pending {
+  color: var(--text);
+}
+
+.application-status.approved {
+  background: var(--pattern-glow);
+}
+
+.application-status.rejected {
+  color: var(--muted);
+}
+
+.admin-application-reason {
+  margin-top: 20px;
+
+  padding: 15px;
+
+  border: 1px solid var(--line);
+  border-radius: 12px;
+
+  background: var(--bg);
+}
+
+.admin-application-reason > span {
+  font-size: .57rem;
+  font-weight: 900;
+  letter-spacing: .1em;
+  color: var(--muted);
+}
+
+.admin-application-reason p {
+  margin: 8px 0 0;
+
+  color: var(--text);
+
+  font-size: .74rem;
+  line-height: 1.65;
+}
+
+.admin-application-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  margin-top: 14px;
+}
+
+.admin-application-meta span {
+  padding: 6px 8px;
+
+  border: 1px solid var(--line);
+  border-radius: 7px;
+
+  color: var(--muted);
+
+  font-size: .58rem;
+}
+
+.admin-application-actions {
+  display: flex;
+  gap: 8px;
+
+  margin-top: 18px;
+}
+
+.admin-application-actions form {
+  margin: 0;
+}
+
+.admin-approve-btn,
+.admin-reject-btn {
+  min-height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  padding: 0 13px;
+
+  border-radius: 10px;
+
+  font: inherit;
+  font-size: .65rem;
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+.admin-approve-btn {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.admin-reject-btn {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+}
+
+
+/* =========================================================
+   BOTTOM
+========================================================= */
+
+.admin-members-bottom {
+  margin-top: 65px;
+  padding-top: 25px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  border-top: 1px solid var(--line);
+}
+
+.admin-members-bottom span,
+.admin-members-bottom strong {
+  display: block;
+}
+
+.admin-members-bottom span {
+  margin-bottom: 5px;
+
+  color: var(--muted);
+
+  font-size: .59rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.admin-members-bottom strong {
+  font-size: .76rem;
+}
+
+.admin-members-logout {
+  min-height: 42px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 0 13px;
+
+  border: 1px solid var(--line);
+  border-radius: 10px;
+
+  text-decoration: none;
+
+  color: var(--muted);
+
+  font-size: .65rem;
+  font-weight: 900;
+}
+
+.admin-members-logout:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1050px) {
+
+  .admin-members-stats {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+
+@media (max-width: 780px) {
+
+  .admin-members-hero-inner {
+    min-height: auto;
+
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    padding-top: 50px;
+  }
+
+  .admin-members-hero-card {
+    width: 100%;
+  }
+
+  .admin-members-section-heading {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .admin-members-search {
+    flex-wrap: wrap;
+  }
+
+  .admin-members-search-box {
+    flex-basis: 100%;
+  }
+
+  .admin-members-search button,
+  .admin-members-search > a {
+    flex: 1;
+  }
+
+  .admin-application-main {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-members-bottom {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+}
+
+
+@media (max-width: 560px) {
+
+  .admin-members-page {
+    padding-bottom: 55px;
+  }
+
+  .admin-members-hero h1 {
+    font-size: 3.2rem;
+  }
+
+  .admin-members-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-members-stat {
+    min-height: 160px;
+  }
+
+  .admin-application {
+    padding: 17px;
+  }
+
+  .admin-application-actions {
+    flex-direction: column;
+  }
+
+  .admin-approve-btn,
+  .admin-reject-btn {
+    width: 100%;
+  }
+
+}
+
+</style>
+
+{% endblock %}

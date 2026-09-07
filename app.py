@@ -2220,7 +2220,7 @@ def executive_dashboard():
         executive_count=executive_count,
     )
 
-    # ============================================================
+# ============================================================
 # ADMIN LOGIN
 # ============================================================
 
@@ -2840,40 +2840,6 @@ def admin_search():
         members=members,
         applications=applications,
         search_query=query
-    )
-# ============================================================
-# PUBLIC MEMBERS DIRECTORY
-# ============================================================
-
-@app.route("/members")
-def members():
-
-    connection = get_db()
-
-    members = connection.execute(
-        """
-        SELECT
-            id,
-            first_name,
-            last_name,
-            username,
-            school,
-            class_name,
-            group_name,
-            role,
-            position,
-            created_at
-        FROM users
-        WHERE role != 'admin'
-        ORDER BY created_at DESC
-        """
-    ).fetchall()
-
-    connection.close()
-
-    return render_template(
-        "members.html",
-        members=members,
     )
 
 

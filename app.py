@@ -2842,6 +2842,99 @@ def admin_search():
         search_query=query
     )
 
+# ============================================================
+# MEMBERS DIRECTORY
+# ============================================================
+
+@app.route("/members")
+def members():
+
+    # --------------------------------------------------------
+    # LOGIN REQUIRED
+    # --------------------------------------------------------
+
+    if not is_member_logged_in():
+
+        flash(
+            "Please log in to view the New Gen members directory.",
+            "error",
+        )
+
+        return redirect(
+            url_for("login")
+        )
+
+    # --------------------------------------------------------
+    # GET CURRENT MEMBER
+    # --------------------------------------------------------
+
+    member = get_current_member()
+
+    if not member:
+
+        session.clear()
+
+        flash(
+            "Your account could not be found. Please log in again.",
+            "error",
+        )
+
+        return redirect(
+            url_for("login")
+        )
+
+    # --------------------------------------------------------
+    # EMAIL VERIFICATION REQUIRED
+    # --------------------------------------------------------
+
+    if (
+        member["role"] != "admin"
+        and not member["email_verified"]
+    ):
+
+        flash(
+            "Please verify your email before viewing the members directory.",
+            "error",
+        )
+
+        return redirect(
+            url_for(
+                "verify_notice",
+                email=member["email"],
+            )
+        )
+
+    # --------------------------------------------------------
+    # LOAD MEMBERS
+    # --------------------------------------------------------
+
+    connection = get_db()
+
+    members = connection.execute(
+        """
+        SELECT
+            id,
+            first_name,
+            last_name,
+            username,
+            school,
+            class_name,
+            group_name,
+            role,
+            position,
+            created_at
+        FROM users
+        WHERE role != 'admin'
+        ORDER BY created_at DESC
+        """
+    ).fetchall()
+
+    connection.close()
+
+    return render_template(
+        "members.html",
+        members=members,
+    )
 
 # ============================================================
 # ADMIN MEMBERS

@@ -1593,9 +1593,10 @@ def login():
 
         session.clear()
 
+        session.permanent = True
+
         session["member_logged_in"] = True
         session["member_id"] = user["id"]
-
         # ----------------------------------------------------
         # ADMIN
         # ----------------------------------------------------

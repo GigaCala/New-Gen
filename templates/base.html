@@ -24,8 +24,6 @@
     href="{{ url_for('static', filename='css/style.css') }}"
   />
 
-
-
   {% block head %}{% endblock %}
 </head>
 
@@ -94,8 +92,6 @@
 
     <div class="container nav">
 
-      <!-- BRAND -->
-
       <a
         href="{{ url_for('home') }}"
         class="brand"
@@ -115,16 +111,12 @@
       </a>
 
 
-      <!-- DESKTOP NAVIGATION -->
-
       <nav
         class="nav-links"
         aria-label="Main navigation"
       >
 
-        <a href="{{ url_for('home') }}">
-          Home
-        </a>
+        <a href="{{ url_for('home') }}">Home</a>
 
         <a href="{{ url_for('music_dance') }}">
           Music &amp; Dance
@@ -156,8 +148,6 @@
 
       </nav>
 
-
-      <!-- ACCOUNT AREA -->
 
       <div class="nav-account">
 
@@ -209,8 +199,6 @@
       </div>
 
 
-      <!-- MOBILE MENU BUTTON -->
-
       <button
         class="menu-toggle"
         aria-label="Open menu"
@@ -258,43 +246,83 @@
 
 
   <!-- =====================================================
-       COMPACT FOOTER
+       NEW GEN FOOTER
        ===================================================== -->
 
   <footer class="site-footer">
 
-    <div class="container footer-wrap">
+    <!-- Decorative African-inspired pattern -->
 
-      <!-- FOOTER BRAND -->
+    <div
+      class="footer-pattern"
+      aria-hidden="true"
+    ></div>
 
-      <div class="footer-brand">
 
-        <span class="footer-kicker">
-          NEW GEN / OUR VOICE
-        </span>
+    <div class="container footer-main">
 
-        <strong>
-          African child must speak.
-        </strong>
+      <!-- BRAND STATEMENT -->
 
-        <p>
-          Our voices. Our stories. Our future.
-        </p>
+      <div class="footer-identity">
 
-        <span class="footer-signature">
-          Made in Africa.
-        </span>
+        <div class="footer-mark">
+          NG
+        </div>
+
+        <div class="footer-identity-text">
+
+          <span class="footer-kicker">
+            NEW GEN / OUR VOICE
+          </span>
+
+          <h2>
+            African child
+            <span>must speak.</span>
+          </h2>
+
+          <p>
+            Our voices. Our stories. Our future.
+          </p>
+
+        </div>
 
       </div>
 
 
       <!-- FOOTER NAVIGATION -->
 
-      <div class="footer-links">
+      <div class="footer-column">
+
+        <span class="footer-column-title">
+          Explore
+        </span>
 
         <a href="{{ url_for('home') }}">
           Home
         </a>
+
+        <a href="{{ url_for('calendar') }}">
+          Events
+        </a>
+
+        <a href="{{ url_for('contact') }}">
+          Contact
+        </a>
+
+        <a href="{{ url_for('members') }}">
+          Members
+        </a>
+
+      </div>
+
+
+      <!-- CREATIVE WORLDS -->
+
+      <div class="footer-column">
+
+        <span class="footer-column-title">
+          Our Worlds
+        </span>
 
         <a href="{{ url_for('music_dance') }}">
           Music &amp; Dance
@@ -316,20 +344,16 @@
           Fashion
         </a>
 
-        <a href="{{ url_for('calendar') }}">
-          Events
-        </a>
-
-        <a href="{{ url_for('contact') }}">
-          Contact
-        </a>
-
       </div>
 
 
-      <!-- ACCOUNT LINKS -->
+      <!-- ACCOUNT -->
 
-      <div class="footer-account">
+      <div class="footer-column">
+
+        <span class="footer-column-title">
+          Access
+        </span>
 
         {% if member %}
 
@@ -370,17 +394,27 @@
     </div>
 
 
-    <!-- COPYRIGHT -->
+    <!-- FOOTER BOTTOM -->
 
     <div class="footer-bottom">
 
-      <div class="container">
+      <div class="container footer-bottom-inner">
 
-        <span>
+        <div class="footer-origin">
+
+          <span class="footer-star">✦</span>
+
+          <span>
+            Made in Africa
+          </span>
+
+        </div>
+
+        <span class="footer-copyright">
           © 2026 New Gen
         </span>
 
-        <span>
+        <span class="footer-slogan">
           African child must speak.
         </span>
 

@@ -2836,11 +2836,11 @@ def admin_search():
     connection.close()
 
     return render_template(
-        "members.html",
-        members=members,
-        applications=applications,
-        search_query=query
-    )
+    "admin_members.html",
+    members=members,
+    applications=applications,
+    search_query=query,
+)
 
 # ============================================================
 # MEMBERS DIRECTORY
@@ -3006,10 +3006,10 @@ def admin_members():
     connection.close()
 
     return render_template(
-        "members.html",
-        members=members,
-        applications=applications,
-    )
+    "admin_members.html",
+    members=members,
+    applications=applications,
+)
 
 
 # ============================================================

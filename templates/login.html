@@ -11,7 +11,6 @@
         <div class="login-panel-inner">
 
             <!-- BRAND -->
-
             <div class="login-brand">
 
                 <div class="login-mark">
@@ -27,7 +26,6 @@
 
 
             <!-- HEADING -->
-
             <div class="login-heading">
 
                 <span class="login-label">
@@ -46,16 +44,54 @@
             </div>
 
 
-            <!-- LOGIN FORM -->
+            <!-- LOGIN MESSAGES -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="login-messages" aria-live="polite">
 
+                        {% for category, message in messages %}
+
+                            <div
+                                class="login-message
+                                {% if category == 'success' %}
+                                    login-message-success
+                                {% elif category == 'warning' %}
+                                    login-message-warning
+                                {% else %}
+                                    login-message-error
+                                {% endif %}"
+                            >
+                                <span class="login-message-icon">
+                                    {% if category == 'success' %}
+                                        ✓
+                                    {% elif category == 'warning' %}
+                                        !
+                                    {% else %}
+                                        !
+                                    {% endif %}
+                                </span>
+
+                                <span>
+                                    {{ message }}
+                                </span>
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+
+            <!-- LOGIN FORM -->
             <form
                 method="POST"
                 action="{{ url_for('login') }}"
                 class="login-form"
+                novalidate
             >
 
                 <!-- USERNAME / EMAIL -->
-
                 <div class="login-field">
 
                     <label for="login">
@@ -70,33 +106,46 @@
                         autocomplete="username"
                         value="{{ request.form.get('login', '') }}"
                         required
+                        autofocus
                     >
 
                 </div>
 
 
                 <!-- PASSWORD -->
-
                 <div class="login-field">
 
                     <label for="password">
                         Password
                     </label>
 
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Your password"
-                        autocomplete="current-password"
-                        required
-                    >
+                    <div class="password-input-wrap">
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Your password"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            id="passwordToggle"
+                            aria-label="Show password"
+                            aria-pressed="false"
+                        >
+                            SHOW
+                        </button>
+
+                    </div>
 
                 </div>
 
 
                 <!-- SUBMIT -->
-
                 <button
                     type="submit"
                     class="login-button"
@@ -109,7 +158,6 @@
 
 
             <!-- REGISTER -->
-
             <div class="login-register">
 
                 <p>
@@ -125,7 +173,6 @@
 
 
             <!-- ADMIN -->
-
             <div class="login-admin">
 
                 <a href="{{ url_for('admin_login') }}">
@@ -139,5 +186,126 @@
     </section>
 
 </main>
+
+
+<style>
+    .login-messages {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 0 0 22px;
+    }
+
+    .login-message {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 13px 14px;
+        border: 1px solid var(--line, rgba(255,255,255,.12));
+        border-radius: 12px;
+        font-size: 0.9rem;
+        line-height: 1.45;
+        background: rgba(255,255,255,.035);
+    }
+
+    .login-message-icon {
+        flex: 0 0 auto;
+        width: 22px;
+        height: 22px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        font-weight: 800;
+        font-size: 0.78rem;
+    }
+
+    .login-message-error {
+        border-color: rgba(255, 90, 90, .35);
+    }
+
+    .login-message-error .login-message-icon {
+        background: rgba(255, 90, 90, .14);
+    }
+
+    .login-message-warning {
+        border-color: rgba(255, 196, 70, .35);
+    }
+
+    .login-message-warning .login-message-icon {
+        background: rgba(255, 196, 70, .14);
+    }
+
+    .login-message-success {
+        border-color: rgba(90, 210, 140, .35);
+    }
+
+    .login-message-success .login-message-icon {
+        background: rgba(90, 210, 140, .14);
+    }
+
+    .password-input-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .password-input-wrap input {
+        width: 100%;
+        padding-right: 72px;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: 0;
+        background: transparent;
+        color: var(--muted, #999);
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: .08em;
+        cursor: pointer;
+        padding: 6px;
+    }
+
+    .password-toggle:hover {
+        color: var(--text, #fff);
+    }
+</style>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const passwordInput = document.getElementById("password");
+        const passwordToggle = document.getElementById("passwordToggle");
+
+        if (!passwordInput || !passwordToggle) {
+            return;
+        }
+
+        passwordToggle.addEventListener("click", function () {
+
+            const showing = passwordInput.type === "text";
+
+            passwordInput.type = showing ? "password" : "text";
+
+            passwordToggle.textContent = showing ? "SHOW" : "HIDE";
+
+            passwordToggle.setAttribute(
+                "aria-label",
+                showing ? "Show password" : "Hide password"
+            );
+
+            passwordToggle.setAttribute(
+                "aria-pressed",
+                String(!showing)
+            );
+
+        });
+
+    });
+</script>
 
 {% endblock %}

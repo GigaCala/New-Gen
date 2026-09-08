@@ -14,7 +14,7 @@
             <div>
 
                 <span class="signup-kicker">
-                    NEW GEN / MEMBERSHIP
+                    NEW GEN | MEMBERSHIP
                 </span>
                 
             </div>
@@ -39,12 +39,11 @@
                 </span>
 
                 <h2>
-                    Your voice matters.
+                    Chale<strong> Join </strong>the dream team.
                 </h2>
 
                 <p>
-                    Every member belongs to one creative group and can later
-                    apply for executive leadership.
+                    Join your creative family, build your skills and build your nation.
                 </p>
 
                 <div class="signup-note">
@@ -83,7 +82,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Last Name</label>
+                                <label>Surname</label>
                                 <input type="text" name="last_name" value="{{ request.form.last_name }}">
                                 {% if errors.last_name %}
                                 <small class="field-error">{{ errors.last_name }}</small>
@@ -187,7 +186,7 @@
                                 <input type="radio" name="account_type" value="executive"
                                     {% if request.form.account_type=="executive" %}checked{% endif %}>
                                 <strong>Executive</strong>
-                                <span>Requires admin approval</span>
+                                <span>Executive Portal — Built for New Gen leaders.</span>
                             </label>
 
                         </div>
@@ -238,7 +237,7 @@
                     </div>
 
                     <button class="signup-submit" type="submit">
-                        Create Account →
+                        Join the family →
                     </button>
 
                 </form>

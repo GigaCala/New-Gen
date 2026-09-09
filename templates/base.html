@@ -149,9 +149,34 @@
       </nav>
 
 
+      <!-- =================================================
+           ACCOUNT NAVIGATION
+           ================================================= -->
+
       <div class="nav-account">
 
-        {% if member %}
+        {% if is_admin %}
+
+          <!-- ADMIN -->
+
+          <a
+            href="{{ url_for('admin_portal') }}"
+            class="nav-account-link"
+          >
+            Dashboard
+          </a>
+
+          <a
+            href="{{ url_for('admin_logout') }}"
+            class="nav-logout"
+          >
+            Logout
+          </a>
+
+
+        {% elif member %}
+
+          <!-- NORMAL MEMBER -->
 
           <a
             href="{{ url_for('member_dashboard') }}"
@@ -178,7 +203,10 @@
             Logout
           </a>
 
+
         {% else %}
+
+          <!-- VISITOR -->
 
           <a
             href="{{ url_for('login') }}"
@@ -251,8 +279,6 @@
 
   <footer class="site-footer">
 
-    <!-- Decorative African-inspired pattern -->
-
     <div
       class="footer-pattern"
       aria-hidden="true"
@@ -261,20 +287,21 @@
 
     <div class="container footer-main">
 
+
       <!-- BRAND STATEMENT -->
 
       <div class="footer-identity">
 
-      <img
-        src="{{ url_for('static', filename='images/logo.jpeg') }}"
-        alt="New Gen logo"
-        class="footer-mark"
-      />
+        <img
+          src="{{ url_for('static', filename='images/logo.jpeg') }}"
+          alt="New Gen logo"
+          class="footer-mark"
+        />
 
         <div class="footer-identity-text">
 
           <span class="footer-kicker">
-            NEW GEN / OUR VOICE
+            NEW GEN | OUR VOICE
           </span>
 
           <h2>
@@ -311,9 +338,13 @@
           Contact
         </a>
 
-        <a href="{{ url_for('members') }}">
-          Members
-        </a>
+        {% if member or is_admin %}
+
+          <a href="{{ url_for('members') }}">
+            Members
+          </a>
+
+        {% endif %}
 
       </div>
 
@@ -357,7 +388,23 @@
           Access
         </span>
 
-        {% if member %}
+
+        {% if is_admin %}
+
+          <a href="{{ url_for('admin_portal') }}">
+            Admin Dashboard
+          </a>
+
+          <a href="{{ url_for('admin_members') }}">
+            Manage Members
+          </a>
+
+          <a href="{{ url_for('admin_logout') }}">
+            Logout
+          </a>
+
+
+        {% elif member %}
 
           <a href="{{ url_for('member_dashboard') }}">
             My Dashboard
@@ -375,6 +422,7 @@
             Logout
           </a>
 
+
         {% else %}
 
           <a href="{{ url_for('login') }}">
@@ -385,18 +433,20 @@
             Become a Member
           </a>
 
-        {% endif %}
+          <a href="{{ url_for('admin_login') }}">
+            Admin
+          </a>
 
-        <a href="{{ url_for('admin_login') }}">
-          Admin
-        </a>
+        {% endif %}
 
       </div>
 
     </div>
 
 
-    <!-- FOOTER BOTTOM -->
+    <!-- =====================================================
+         FOOTER BOTTOM
+         ===================================================== -->
 
     <div class="footer-bottom">
 

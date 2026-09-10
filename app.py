@@ -2585,7 +2585,7 @@ def admin_logout():
     )
 
     return redirect(
-        url_for("admin_login")
+        url_for("home")
     )
 
 

@@ -27,8 +27,8 @@
         </h1>
 
         <p>
-          Manage New Gen accounts, leadership roles,
-          verification and executive applications from one place.
+          Manage New Gen accounts, leadership roles and
+          verification from one place.
         </p>
 
       </div>
@@ -68,11 +68,13 @@
           <div class="admin-members-notice {{ category }}">
 
             <span class="admin-members-notice-icon">
+
               {% if category == "success" %}
                 ✓
               {% else %}
                 !
               {% endif %}
+
             </span>
 
             <span>
@@ -99,8 +101,13 @@
     <div class="admin-members-section-heading">
 
       <div>
+
         <span>MEMBER OVERVIEW</span>
-        <h2>The community, at a glance.</h2>
+
+        <h2>
+          The community, at a glance.
+        </h2>
+
       </div>
 
     </div>
@@ -108,16 +115,32 @@
 
     <div class="admin-members-stats">
 
+      <!-- TOTAL -->
+
       <article class="admin-members-stat">
-        <small>TOTAL ACCOUNTS</small>
-        <strong>{{ members|length }}</strong>
-        <span>All accounts currently in the database.</span>
+
+        <small>
+          TOTAL ACCOUNTS
+        </small>
+
+        <strong>
+          {{ members|length }}
+        </strong>
+
+        <span>
+          All accounts currently in the database.
+        </span>
+
       </article>
 
 
+      <!-- VERIFIED -->
+
       <article class="admin-members-stat">
 
-        <small>VERIFIED</small>
+        <small>
+          VERIFIED
+        </small>
 
         <strong>
           {{ members|selectattr("email_verified")|list|length }}
@@ -130,31 +153,39 @@
       </article>
 
 
+      <!-- EXECUTIVES -->
+
       <article class="admin-members-stat">
 
-        <small>EXECUTIVES</small>
+        <small>
+          EXECUTIVES
+        </small>
 
         <strong>
           {{ members|selectattr("role", "equalto", "executive")|list|length }}
         </strong>
 
         <span>
-          Approved New Gen leadership accounts.
+          Members currently assigned to New Gen leadership.
         </span>
 
       </article>
 
 
+      <!-- ADMINS -->
+
       <article class="admin-members-stat">
 
-        <small>PENDING APPLICATIONS</small>
+        <small>
+          ADMINISTRATORS
+        </small>
 
         <strong>
-          {{ applications|selectattr("status", "equalto", "pending")|list|length }}
+          {{ members|selectattr("role", "equalto", "admin")|list|length }}
         </strong>
 
         <span>
-          Leadership applications waiting for review.
+          Accounts with New Gen administration access.
         </span>
 
       </article>
@@ -174,13 +205,16 @@
 
       <div>
 
-        <span>ACCOUNT MANAGEMENT</span>
+        <span>
+          ACCOUNT MANAGEMENT
+        </span>
 
         <h2>
           Members.
         </h2>
 
       </div>
+
 
       <a
         href="{{ url_for('admin_portal') }}"
@@ -192,7 +226,9 @@
     </div>
 
 
-    <!-- SEARCH -->
+    <!-- =================================================
+         SEARCH
+    ================================================== -->
 
     <form
       method="get"
@@ -202,32 +238,40 @@
 
       <div class="admin-members-search-box">
 
-        <span>⌕</span>
+        <span>
+          ⌕
+        </span>
 
         <input
           type="search"
           name="q"
           value="{{ search_query|default('') }}"
-          placeholder="Search name, username, school or group..."
+          placeholder="Search name, username, school, group or email..."
           aria-label="Search members"
         >
 
       </div>
 
+
       <button type="submit">
         Search
       </button>
 
+
       {% if search_query|default('') %}
+
         <a href="{{ url_for('admin_members') }}">
           Clear
         </a>
+
       {% endif %}
 
     </form>
 
 
-    <!-- MEMBER TABLE -->
+    <!-- =================================================
+         MEMBER TABLE
+    ================================================== -->
 
     <div class="admin-members-table-card">
 
@@ -240,14 +284,55 @@
             <thead>
 
               <tr>
-                <th>Member</th>
-                <th>Username</th>
-                <th>School / Form</th>
-                <th>Group</th>
-                <th>Role</th>
-                <th>Verification</th>
-                <th>Joined</th>
-                <th>Actions</th>
+
+                <th>
+                  NAME
+                </th>
+
+                <th>
+                  USERNAME
+                </th>
+
+                <th>
+                  SCHOOL
+                </th>
+
+                <th>
+                  FORM
+                </th>
+
+                <th>
+                  GROUP
+                </th>
+
+                <th>
+                  EMAIL
+                </th>
+
+                <th>
+                  PHONE
+                </th>
+
+                <th>
+                  REASON FOR JOINING
+                </th>
+
+                <th>
+                  ROLE
+                </th>
+
+                <th>
+                  VERIFICATION
+                </th>
+
+                <th>
+                  JOINED
+                </th>
+
+                <th>
+                  ACTIONS
+                </th>
+
               </tr>
 
             </thead>
@@ -259,26 +344,30 @@
 
                 <tr>
 
-                  <!-- MEMBER -->
+
+                  <!-- =====================================
+                       NAME
+                  ====================================== -->
 
                   <td>
 
                     <div class="admin-person">
 
                       <div class="admin-person-avatar">
+
                         {{ person.first_name[:1]|upper }}{{ person.last_name[:1]|upper }}
+
                       </div>
+
 
                       <div>
 
                         <strong>
+
                           {{ person.first_name }}
                           {{ person.last_name }}
-                        </strong>
 
-                        <small>
-                          {{ person.email }}
-                        </small>
+                        </strong>
 
                       </div>
 
@@ -287,16 +376,24 @@
                   </td>
 
 
-                  <!-- USERNAME -->
+                  <!-- =====================================
+                       USERNAME
+                  ====================================== -->
 
                   <td>
+
                     <span class="admin-member-username">
+
                       @{{ person.username }}
+
                     </span>
+
                   </td>
 
 
-                  <!-- SCHOOL -->
+                  <!-- =====================================
+                       SCHOOL
+                  ====================================== -->
 
                   <td>
 
@@ -306,27 +403,121 @@
                         {{ person.school }}
                       </strong>
 
-                      <span>
-                        {{ person.class_name }}
+                    </div>
+
+                  </td>
+
+
+                  <!-- =====================================
+                       FORM
+                  ====================================== -->
+
+                  <td>
+
+                    <span class="admin-form-pill">
+
+                      {{ person.class_name }}
+
+                    </span>
+
+                  </td>
+
+
+                  <!-- =====================================
+                       GROUP
+                  ====================================== -->
+
+                  <td>
+
+                    <span class="admin-group-pill">
+
+                      {{ person.group_name }}
+
+                    </span>
+
+                  </td>
+
+
+                  <!-- =====================================
+                       EMAIL
+                  ====================================== -->
+
+                  <td>
+
+                    <a
+                      href="mailto:{{ person.email }}"
+                      class="admin-member-email"
+                    >
+
+                      {{ person.email }}
+
+                    </a>
+
+                  </td>
+
+
+                  <!-- =====================================
+                       PHONE
+                  ====================================== -->
+
+                  <td>
+
+                    {% if person.phone %}
+
+                      <a
+                        href="tel:{{ person.phone }}"
+                        class="admin-member-phone"
+                      >
+
+                        {{ person.phone }}
+
+                      </a>
+
+                    {% else %}
+
+                      <span class="admin-no-data">
+                        Not provided
                       </span>
+
+                    {% endif %}
+
+                  </td>
+
+
+                  <!-- =====================================
+                       REASON FOR JOINING
+                  ====================================== -->
+
+                  <td>
+
+                    <div class="admin-member-reason">
+
+                      {% if person.reason_for_joining %}
+
+                        <span
+                          title="{{ person.reason_for_joining }}"
+                        >
+
+                          {{ person.reason_for_joining }}
+
+                        </span>
+
+                      {% else %}
+
+                        <span class="admin-no-data">
+                          Not provided
+                        </span>
+
+                      {% endif %}
 
                     </div>
 
                   </td>
 
 
-                  <!-- GROUP -->
-
-                  <td>
-
-                    <span class="admin-group-pill">
-                      {{ person.group_name }}
-                    </span>
-
-                  </td>
-
-
-                  <!-- ROLE -->
+                  <!-- =====================================
+                       ROLE
+                  ====================================== -->
 
                   <td>
 
@@ -345,21 +536,29 @@
 
                           <option
                             value="member"
-                            {% if person.role == "member" %}selected{% endif %}
+                            {% if person.role == "member" %}
+                              selected
+                            {% endif %}
                           >
                             Member
                           </option>
 
+
                           <option
                             value="executive"
-                            {% if person.role == "executive" %}selected{% endif %}
+                            {% if person.role == "executive" %}
+                              selected
+                            {% endif %}
                           >
                             Executive
                           </option>
 
+
                           <option
                             value="admin"
-                            {% if person.role == "admin" %}selected{% endif %}
+                            {% if person.role == "admin" %}
+                              selected
+                            {% endif %}
                           >
                             Administrator
                           </option>
@@ -367,6 +566,7 @@
                         </select>
 
                       </form>
+
 
                       {% if person.position %}
 
@@ -381,11 +581,14 @@
                   </td>
 
 
-                  <!-- VERIFICATION -->
+                  <!-- =====================================
+                       VERIFICATION
+                  ====================================== -->
 
                   <td>
 
                     <div class="admin-verification-stack">
+
 
                       {% if person.email_verified %}
 
@@ -421,18 +624,24 @@
                   </td>
 
 
-                  <!-- JOIN DATE -->
+                  <!-- =====================================
+                       JOIN DATE
+                  ====================================== -->
 
                   <td>
 
                     <span class="admin-joined-date">
-                      {{ format_display_date(person.created_at[:10]) }}
+
+                      {{ format_display_date(person.created_at) }}
+
                     </span>
 
                   </td>
 
 
-                  <!-- ACTIONS -->
+                  <!-- =====================================
+                       ACTIONS
+                  ====================================== -->
 
                   <td>
 
@@ -471,20 +680,27 @@
 
       {% else %}
 
+
+        <!-- =============================================
+             EMPTY STATE
+        ============================================== -->
+
         <div class="admin-members-empty">
 
           <div class="admin-members-empty-icon">
             ◌
           </div>
 
-          <span>NO MEMBERS FOUND</span>
+          <span>
+            NO MEMBERS FOUND
+          </span>
 
           <h3>
             Nothing matches this search.
           </h3>
 
           <p>
-            Try another name, username, school or group.
+            Try another name, username, school, group or email.
           </p>
 
           <a href="{{ url_for('admin_members') }}">
@@ -501,7 +717,7 @@
 
 
   <!-- =====================================================
-       EXECUTIVE APPLICATIONS
+       OFFICIAL LEADERSHIP
   ====================================================== -->
 
   <section class="container admin-members-section">
@@ -510,10 +726,12 @@
 
       <div>
 
-        <span>LEADERSHIP</span>
+        <span>
+          LEADERSHIP
+        </span>
 
         <h2>
-          Executive applications.
+          Official New Gen leadership.
         </h2>
 
       </div>
@@ -521,180 +739,60 @@
     </div>
 
 
-    <div class="admin-applications-card">
+    <div class="admin-leadership-card">
 
-      {% if applications %}
-
-        <div class="admin-applications-list">
-
-          {% for application in applications %}
-
-            <article class="admin-application">
-
-              <div class="admin-application-main">
-
-                <div class="admin-application-person">
-
-                  <div class="admin-application-avatar">
-                    {{ application.first_name[:1]|upper }}{{ application.last_name[:1]|upper }}
-                  </div>
-
-                  <div>
-
-                    <strong>
-                      {{ application.first_name }}
-                      {{ application.last_name }}
-                    </strong>
-
-                    <span>
-                      @{{ application.username }}
-                    </span>
-
-                  </div>
-
-                </div>
+      <div class="admin-leadership-icon">
+        ★
+      </div>
 
 
-                <div class="admin-application-position">
+      <div class="admin-leadership-content">
 
-                  <small>
-                    APPLIED POSITION
-                  </small>
+        <span>
+          LEADERSHIP SYSTEM
+        </span>
 
-                  <strong>
-                    {{ application.position }}
-                  </strong>
+        <h3>
+          Leadership is assigned through the official roster.
+        </h3>
 
-                </div>
+        <p>
+          Executive positions are not applied for through the
+          website. An administrator assigns leadership using
+          the official New Gen leadership roster.
+        </p>
 
+        <div class="admin-leadership-points">
 
-                <div class="admin-application-status">
-
-                  {% if application.status == "pending" %}
-
-                    <span class="application-status pending">
-                      Pending
-                    </span>
-
-                  {% elif application.status == "approved" %}
-
-                    <span class="application-status approved">
-                      Approved
-                    </span>
-
-                  {% else %}
-
-                    <span class="application-status rejected">
-                      Rejected
-                    </span>
-
-                  {% endif %}
-
-                </div>
-
-              </div>
-
-
-              <div class="admin-application-reason">
-
-                <span>
-                  WHY THEY WANT TO LEAD
-                </span>
-
-                <p>
-                  {{ application.reason }}
-                </p>
-
-              </div>
-
-
-              <div class="admin-application-meta">
-
-                <span>
-                  {{ application.school }}
-                </span>
-
-                <span>
-                  {{ application.class_name }}
-                </span>
-
-                <span>
-                  {{ application.group_name }}
-                </span>
-
-                <span>
-                  {{ application.email }}
-                </span>
-
-              </div>
-
-
-              {% if application.status == "pending" %}
-
-                <div class="admin-application-actions">
-
-                  <form
-                    method="post"
-                    action="{{ url_for('approve_executive', application_id=application.id) }}"
-                  >
-
-                    <button
-                      type="submit"
-                      class="admin-approve-btn"
-                    >
-                      Approve executive
-                      <span>→</span>
-                    </button>
-
-                  </form>
-
-
-                  <form
-                    method="post"
-                    action="{{ url_for('reject_executive', application_id=application.id) }}"
-                    onsubmit="return confirm('Reject this executive application?');"
-                  >
-
-                    <button
-                      type="submit"
-                      class="admin-reject-btn"
-                    >
-                      Reject
-                    </button>
-
-                  </form>
-
-                </div>
-
-              {% endif %}
-
-            </article>
-
-          {% endfor %}
-
-        </div>
-
-      {% else %}
-
-        <div class="admin-members-empty">
-
-          <div class="admin-members-empty-icon">
-            ✓
+          <div>
+            <strong>01</strong>
+            <span>
+              Official identity is matched using registered
+              email and phone information.
+            </span>
           </div>
 
-          <span>NO APPLICATIONS</span>
 
-          <h3>
-            No executive applications yet.
-          </h3>
+          <div>
+            <strong>02</strong>
+            <span>
+              Official executives receive their assigned
+              leadership position.
+            </span>
+          </div>
 
-          <p>
-            New leadership applications will appear here.
-          </p>
+
+          <div>
+            <strong>03</strong>
+            <span>
+              Members remain members unless they are officially
+              assigned a leadership role.
+            </span>
+          </div>
 
         </div>
 
-      {% endif %}
+      </div>
 
     </div>
 
@@ -719,12 +817,18 @@
 
     </div>
 
+
     <a
       href="{{ url_for('admin_logout') }}"
       class="admin-members-logout"
     >
+
       Log out of administration
-      <span>↪</span>
+
+      <span>
+        ↪
+      </span>
+
     </a>
 
   </section>
@@ -990,6 +1094,7 @@
 
 .admin-members-stat:hover {
   transform: translateY(-3px);
+
   border-color: var(--accent);
 }
 
@@ -997,6 +1102,7 @@
   font-size: .6rem;
   font-weight: 900;
   letter-spacing: .12em;
+
   color: var(--muted);
 }
 
@@ -1004,6 +1110,7 @@
   margin-top: auto;
 
   font-size: 3rem;
+
   line-height: .9;
 
   letter-spacing: -.06em;
@@ -1051,6 +1158,7 @@
 
 .admin-members-search-box span {
   color: var(--muted);
+
   font-size: 1.2rem;
 }
 
@@ -1090,12 +1198,15 @@
 
 .admin-members-search button {
   border: 1px solid var(--accent);
+
   background: var(--accent);
+
   color: var(--bg);
 }
 
 .admin-members-search > a {
   border: 1px solid var(--line);
+
   color: var(--muted);
 }
 
@@ -1115,12 +1226,14 @@
 
 .admin-members-table-scroll {
   width: 100%;
+
   overflow-x: auto;
 }
 
 .admin-members-table {
   width: 100%;
-  min-width: 1180px;
+
+  min-width: 1850px;
 
   border-collapse: collapse;
 }
@@ -1138,7 +1251,10 @@
 
   font-size: .59rem;
   font-weight: 900;
+
   letter-spacing: .11em;
+
+  white-space: nowrap;
 }
 
 .admin-members-table td {
@@ -1173,11 +1289,10 @@
   align-items: center;
   gap: 10px;
 
-  min-width: 220px;
+  min-width: 190px;
 }
 
-.admin-person-avatar,
-.admin-application-avatar {
+.admin-person-avatar {
   flex: 0 0 auto;
 
   width: 38px;
@@ -1195,25 +1310,12 @@
   font-weight: 900;
 }
 
-.admin-person strong,
-.admin-person small {
-  display: block;
-}
-
 .admin-person strong {
+  display: block;
+
   font-size: .79rem;
-}
 
-.admin-person small {
-  max-width: 210px;
-
-  margin-top: 3px;
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  color: var(--muted);
-  font-size: .62rem;
+  white-space: nowrap;
 }
 
 
@@ -1223,24 +1325,21 @@
 
 .admin-member-username {
   color: var(--muted);
+
   font-size: .68rem;
+
+  white-space: nowrap;
 }
 
-.admin-member-school strong,
-.admin-member-school span {
-  display: block;
+.admin-member-school {
+  min-width: 150px;
 }
 
 .admin-member-school strong {
   font-size: .74rem;
 }
 
-.admin-member-school span {
-  margin-top: 3px;
-  color: var(--muted);
-  font-size: .63rem;
-}
-
+.admin-form-pill,
 .admin-group-pill {
   display: inline-flex;
 
@@ -1251,6 +1350,57 @@
 
   font-size: .61rem;
   font-weight: 800;
+
+  white-space: nowrap;
+}
+
+.admin-group-pill {
+  max-width: 140px;
+}
+
+.admin-member-email,
+.admin-member-phone {
+  color: var(--muted);
+
+  text-decoration: none;
+
+  font-size: .67rem;
+
+  white-space: nowrap;
+}
+
+.admin-member-email:hover,
+.admin-member-phone:hover {
+  color: var(--text);
+}
+
+.admin-member-reason {
+  width: 270px;
+  max-width: 270px;
+}
+
+.admin-member-reason span {
+  display: -webkit-box;
+
+  overflow: hidden;
+
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+
+  color: var(--muted);
+
+  font-size: .67rem;
+  line-height: 1.5;
+
+  cursor: help;
+}
+
+.admin-no-data {
+  color: var(--muted);
+
+  font-size: .61rem;
+
+  font-style: italic;
 }
 
 
@@ -1264,6 +1414,7 @@
 
 .admin-role-control select {
   min-width: 125px;
+
   min-height: 34px;
 
   padding: 0 8px;
@@ -1272,9 +1423,11 @@
   border-radius: 8px;
 
   background: var(--bg);
+
   color: var(--text);
 
   font: inherit;
+
   font-size: .64rem;
 
   outline: none;
@@ -1292,6 +1445,8 @@
   color: var(--muted);
 
   font-size: .57rem;
+
+  white-space: nowrap;
 }
 
 
@@ -1301,7 +1456,9 @@
 
 .admin-verification-stack {
   display: flex;
+
   flex-direction: column;
+
   gap: 4px;
 
   white-space: nowrap;
@@ -1329,8 +1486,16 @@
 
 .admin-joined-date {
   color: var(--muted);
+
   font-size: .62rem;
+
+  white-space: nowrap;
 }
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
 
 .admin-protected-account {
   display: inline-flex;
@@ -1348,15 +1513,18 @@
 
 .admin-member-actions {
   display: flex;
+
   gap: 6px;
 }
 
 .admin-delete-member {
   display: inline-flex;
+
   align-items: center;
   justify-content: center;
 
   min-height: 32px;
+
   padding: 0 9px;
 
   border: 1px solid var(--line);
@@ -1376,12 +1544,13 @@
 
 .admin-delete-member:hover {
   border-color: var(--accent);
+
   color: var(--text);
 }
 
 
 /* =========================================================
-   EMPTY STATES
+   EMPTY STATE
 ========================================================= */
 
 .admin-members-empty {
@@ -1390,7 +1559,9 @@
   padding: 45px 25px;
 
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
   justify-content: center;
 
@@ -1418,7 +1589,9 @@
   color: var(--muted);
 
   font-size: .59rem;
+
   font-weight: 900;
+
   letter-spacing: .14em;
 }
 
@@ -1429,13 +1602,14 @@
 }
 
 .admin-members-empty p {
-  max-width: 320px;
+  max-width: 350px;
 
   margin: 8px 0 15px;
 
   color: var(--muted);
 
   font-size: .75rem;
+
   line-height: 1.55;
 }
 
@@ -1445,120 +1619,94 @@
   color: var(--text);
 
   font-size: .72rem;
+
   font-weight: 800;
 }
 
 
 /* =========================================================
-   APPLICATIONS
+   OFFICIAL LEADERSHIP
 ========================================================= */
 
-.admin-applications-card {
+.admin-leadership-card {
+  display: grid;
+
+  grid-template-columns: auto 1fr;
+
+  gap: 25px;
+
+  padding: 28px;
+
   border: 1px solid var(--line);
   border-radius: 18px;
 
   background: var(--surface);
-
-  overflow: hidden;
 }
 
-.admin-applications-list {
+.admin-leadership-icon {
+  width: 55px;
+  height: 55px;
+
   display: grid;
+  place-items: center;
+
+  border: 1px solid var(--line);
+  border-radius: 15px;
+
+  background: var(--bg);
+
+  color: var(--accent);
+
+  font-size: 1.2rem;
 }
 
-.admin-application {
-  padding: 22px;
+.admin-leadership-content > span {
+  display: block;
 
-  border-bottom: 1px solid var(--line);
+  margin-bottom: 7px;
+
+  color: var(--muted);
+
+  font-size: .59rem;
+
+  font-weight: 900;
+
+  letter-spacing: .13em;
 }
 
-.admin-application:last-child {
-  border-bottom: 0;
+.admin-leadership-content h3 {
+  margin: 0;
+
+  font-size: 1.25rem;
+
+  letter-spacing: -.025em;
 }
 
-.admin-application-main {
+.admin-leadership-content > p {
+  max-width: 700px;
+
+  margin: 10px 0 0;
+
+  color: var(--muted);
+
+  font-size: .76rem;
+
+  line-height: 1.65;
+}
+
+.admin-leadership-points {
   display: grid;
 
   grid-template-columns:
-    1.3fr
-    1fr
-    auto;
+    repeat(3, minmax(0, 1fr));
 
-  gap: 20px;
-
-  align-items: center;
-}
-
-.admin-application-person {
-  display: flex;
-  align-items: center;
   gap: 10px;
+
+  margin-top: 22px;
 }
 
-.admin-application-person strong,
-.admin-application-person span {
-  display: block;
-}
-
-.admin-application-person strong {
-  font-size: .84rem;
-}
-
-.admin-application-person span {
-  margin-top: 3px;
-
-  color: var(--muted);
-
-  font-size: .63rem;
-}
-
-.admin-application-position small,
-.admin-application-position strong {
-  display: block;
-}
-
-.admin-application-position small {
-  margin-bottom: 5px;
-
-  color: var(--muted);
-
-  font-size: .56rem;
-  font-weight: 900;
-  letter-spacing: .11em;
-}
-
-.admin-application-position strong {
-  font-size: .8rem;
-}
-
-.application-status {
-  display: inline-flex;
-
-  padding: 7px 9px;
-
-  border: 1px solid var(--line);
-  border-radius: 9px;
-
-  font-size: .59rem;
-  font-weight: 900;
-}
-
-.application-status.pending {
-  color: var(--text);
-}
-
-.application-status.approved {
-  background: var(--pattern-glow);
-}
-
-.application-status.rejected {
-  color: var(--muted);
-}
-
-.admin-application-reason {
-  margin-top: 20px;
-
-  padding: 15px;
+.admin-leadership-points > div {
+  padding: 14px;
 
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -1566,82 +1714,24 @@
   background: var(--bg);
 }
 
-.admin-application-reason > span {
-  font-size: .57rem;
-  font-weight: 900;
-  letter-spacing: .1em;
-  color: var(--muted);
+.admin-leadership-points strong {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: var(--accent);
+
+  font-size: .67rem;
 }
 
-.admin-application-reason p {
-  margin: 8px 0 0;
-
-  color: var(--text);
-
-  font-size: .74rem;
-  line-height: 1.65;
-}
-
-.admin-application-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-
-  margin-top: 14px;
-}
-
-.admin-application-meta span {
-  padding: 6px 8px;
-
-  border: 1px solid var(--line);
-  border-radius: 7px;
+.admin-leadership-points span {
+  display: block;
 
   color: var(--muted);
 
-  font-size: .58rem;
-}
+  font-size: .64rem;
 
-.admin-application-actions {
-  display: flex;
-  gap: 8px;
-
-  margin-top: 18px;
-}
-
-.admin-application-actions form {
-  margin: 0;
-}
-
-.admin-approve-btn,
-.admin-reject-btn {
-  min-height: 40px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-
-  padding: 0 13px;
-
-  border-radius: 10px;
-
-  font: inherit;
-  font-size: .65rem;
-  font-weight: 900;
-
-  cursor: pointer;
-}
-
-.admin-approve-btn {
-  border: 1px solid var(--accent);
-  background: var(--accent);
-  color: var(--bg);
-}
-
-.admin-reject-btn {
-  border: 1px solid var(--line);
-  background: transparent;
-  color: var(--muted);
+  line-height: 1.55;
 }
 
 
@@ -1651,9 +1741,11 @@
 
 .admin-members-bottom {
   margin-top: 65px;
+
   padding-top: 25px;
 
   display: flex;
+
   align-items: center;
   justify-content: space-between;
 
@@ -1673,7 +1765,9 @@
   color: var(--muted);
 
   font-size: .59rem;
+
   font-weight: 900;
+
   letter-spacing: .12em;
 }
 
@@ -1685,7 +1779,9 @@
   min-height: 42px;
 
   display: inline-flex;
+
   align-items: center;
+
   gap: 12px;
 
   padding: 0 13px;
@@ -1698,11 +1794,13 @@
   color: var(--muted);
 
   font-size: .65rem;
+
   font-weight: 900;
 }
 
 .admin-members-logout:hover {
   border-color: var(--accent);
+
   color: var(--text);
 }
 
@@ -1716,6 +1814,10 @@
   .admin-members-stats {
     grid-template-columns:
       repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-leadership-points {
+    grid-template-columns: 1fr;
   }
 
 }
@@ -1756,7 +1858,7 @@
     flex: 1;
   }
 
-  .admin-application-main {
+  .admin-leadership-card {
     grid-template-columns: 1fr;
   }
 
@@ -1785,19 +1887,6 @@
 
   .admin-members-stat {
     min-height: 160px;
-  }
-
-  .admin-application {
-    padding: 17px;
-  }
-
-  .admin-application-actions {
-    flex-direction: column;
-  }
-
-  .admin-approve-btn,
-  .admin-reject-btn {
-    width: 100%;
   }
 
 }

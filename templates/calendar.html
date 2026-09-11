@@ -3,70 +3,611 @@
 {% block title %}New Gen | Calendar{% endblock %}
 
 {% block content %}
+
+<style>
+/* =========================================================
+   NEW GEN CALENDAR
+========================================================= */
+
+.calendar-page {
+  background:
+    radial-gradient(circle at 85% 10%, rgba(212, 175, 55, 0.10), transparent 28%),
+    radial-gradient(circle at 10% 40%, rgba(255, 255, 255, 0.035), transparent 30%),
+    #080808;
+  min-height: 100vh;
+  padding-bottom: 100px;
+}
+
+/* HERO */
+
+.calendar-page .page-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 110px 0 80px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.calendar-page .page-hero::before {
+  content: "NEW GEN";
+  position: absolute;
+  right: -40px;
+  bottom: -55px;
+  font-size: clamp(100px, 18vw, 260px);
+  font-weight: 900;
+  letter-spacing: -0.08em;
+  color: rgba(255,255,255,0.018);
+  pointer-events: none;
+}
+
+.calendar-page .hero-split {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 50px;
+}
+
+.calendar-page .eyebrow {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #d4af37;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.calendar-page .page-hero h1 {
+  margin: 0;
+  max-width: 850px;
+  color: #f4f1e8;
+  font-size: clamp(4rem, 8vw, 8rem);
+  line-height: 0.88;
+  letter-spacing: -0.065em;
+}
+
+.calendar-page .page-hero p {
+  margin: 28px 0 0;
+  max-width: 540px;
+  color: #999;
+  font-size: 1.08rem;
+  line-height: 1.7;
+}
+
+/* SUMMARY */
+
+.calendar-summary {
+  min-width: 230px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+}
+
+.summary-pill {
+  padding: 20px 22px;
+  border: 1px solid rgba(212,175,55,0.25);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.035);
+  backdrop-filter: blur(12px);
+}
+
+.summary-pill strong {
+  display: block;
+  color: #f4f1e8;
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.summary-pill span {
+  display: block;
+  margin-top: 7px;
+  color: #888;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.calendar-summary .btn {
+  width: 100%;
+  text-align: center;
+}
+
+/* SECTIONS */
+
+.calendar-page .content-section {
+  padding-top: 70px;
+}
+
+/* FEATURED EVENT */
+
+.featured-event {
+  position: relative;
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  min-height: 360px;
+  overflow: hidden;
+  border: 1px solid rgba(212,175,55,0.28);
+  border-radius: 28px;
+  background:
+    linear-gradient(120deg, rgba(212,175,55,0.09), transparent 45%),
+    #111;
+  box-shadow: 0 25px 70px rgba(0,0,0,0.35);
+}
+
+.featured-event::after {
+  content: "01";
+  position: absolute;
+  right: 30px;
+  bottom: -35px;
+  color: rgba(212,175,55,0.06);
+  font-size: 180px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.featured-date {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 35px;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.18);
+}
+
+.featured-date span {
+  color: #d4af37;
+  font-size: clamp(4rem, 7vw, 7rem);
+  font-weight: 900;
+  line-height: 0.85;
+  letter-spacing: -0.07em;
+}
+
+.featured-date small {
+  margin-top: 18px;
+  color: #aaa;
+  font-size: 0.7rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.featured-body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 55px 65px;
+}
+
+.event-tag {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 7px 11px;
+  border: 1px solid rgba(212,175,55,0.25);
+  border-radius: 999px;
+  color: #d4af37;
+  background: rgba(212,175,55,0.07);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.featured-body h2 {
+  margin: 20px 0 15px;
+  max-width: 750px;
+  color: #f4f1e8;
+  font-size: clamp(2.2rem, 5vw, 5rem);
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+}
+
+.featured-body p {
+  max-width: 680px;
+  margin: 0;
+  color: #999;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.event-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.event-meta-row span {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  color: #ccc;
+  font-size: 0.78rem;
+}
+
+/* EVENT GRID */
+
+.event-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.event-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 105px 1fr;
+  min-height: 300px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 22px;
+  background: #101010;
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease,
+    background 0.3s ease;
+}
+
+.event-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(212,175,55,0.35);
+  background: #141414;
+}
+
+.event-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 28px 15px;
+  border-right: 1px solid rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.018);
+}
+
+.event-date span {
+  color: #d4af37;
+  font-size: 3.2rem;
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+}
+
+.event-date small {
+  margin-top: 14px;
+  color: #777;
+  font-size: 0.62rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+}
+
+.event-body {
+  padding: 30px;
+}
+
+.event-body h2 {
+  margin: 16px 0 12px;
+  color: #f1eee6;
+  font-size: 1.65rem;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+
+.event-body p {
+  margin: 0;
+  color: #888;
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.event-meta {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  color: #777;
+  font-size: 0.75rem;
+}
+
+.event-meta strong {
+  color: #bbb;
+}
+
+/* EMPTY */
+
+.empty-state {
+  padding: 90px 30px;
+  border: 1px dashed rgba(255,255,255,0.14);
+  border-radius: 24px;
+  text-align: center;
+  background: rgba(255,255,255,0.018);
+}
+
+.empty-state h2 {
+  margin: 0;
+  color: #f4f1e8;
+  font-size: 2.2rem;
+  letter-spacing: -0.04em;
+}
+
+.empty-state p {
+  margin: 15px auto 0;
+  max-width: 450px;
+  color: #888;
+  line-height: 1.7;
+}
+
+/* MOBILE */
+
+@media (max-width: 850px) {
+
+  .calendar-page .page-hero {
+    padding: 75px 0 55px;
+  }
+
+  .calendar-page .hero-split {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .calendar-summary {
+    width: 100%;
+  }
+
+  .featured-event {
+    grid-template-columns: 1fr;
+  }
+
+  .featured-date {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 20px;
+    padding: 25px 30px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .featured-date span {
+    font-size: 4rem;
+  }
+
+  .featured-date small {
+    margin-top: 0;
+    text-align: left;
+  }
+
+  .featured-body {
+    padding: 35px 30px 45px;
+  }
+
+  .event-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+
+  .calendar-page .page-hero h1 {
+    font-size: 4rem;
+  }
+
+  .featured-body h2 {
+    font-size: 2.5rem;
+  }
+
+  .event-card {
+    grid-template-columns: 82px 1fr;
+  }
+
+  .event-date span {
+    font-size: 2.5rem;
+  }
+
+  .event-body {
+    padding: 22px;
+  }
+
+}
+</style>
+
+
 <main class="page-main calendar-page">
+
+  <!-- =====================================================
+       HERO
+  ====================================================== -->
+
   <section class="page-hero reveal">
+
     <div class="container hero-split">
+
       <div>
-        <span class="eyebrow">Calendar</span>
-        <h1>Upcoming...</h1>
-        <p>Get ready to witness New Gen</p>
+
+        <span class="eyebrow">
+          Calendar
+        </span>
+
+        <h1>
+          Upcoming...
+        </h1>
+
+        <p>
+          Get ready to witness New Gen
+        </p>
+
       </div>
+
+
       <div class="calendar-summary">
+
         <div class="summary-pill">
-          <strong>{{ events|length }}</strong>
-          <span>scheduled events</span>
+
+          <strong>
+            {{ events|length }}
+          </strong>
+
+          <span>
+            scheduled events
+          </span>
+
         </div>
-        <a href="{{ url_for('admin') }}" class="btn btn-primary">Manage</a>
+
+
+        <a
+          href="{{ url_for('admin') }}"
+          class="btn btn-primary"
+        >
+          Manage
+        </a>
+
       </div>
+
     </div>
+
   </section>
+
+
+  <!-- =====================================================
+       FEATURED EVENT
+  ====================================================== -->
 
   {% if featured_event %}
-  <section class="container content-section reveal">
-    <div class="featured-event">
-      <div class="featured-date">
-        <span>{{ featured_event.date[8:10] }}</span>
-        <small>{{ format_display_date(featured_event.date) }}</small>
-      </div>
-      <div class="featured-body">
-        <span class="event-tag">Featured event</span>
-        <h2>{{ featured_event.title }}</h2>
-        <p>{{ featured_event.description or 'A New Gen event for students to create, connect, and celebrate.' }}</p>
-        <div class="event-meta-row">
-          <span>{{ featured_event.category or 'Club Event' }}</span>
-          <span>{{ featured_event.location or 'School campus' }}</span>
-        </div>
-      </div>
-    </div>
-  </section>
-  {% endif %}
 
   <section class="container content-section reveal">
-    {% if events %}
-      <div class="event-grid">
-        {% for event in events %}
-          <article class="event-card">
-            <div class="event-date">
-              <span>{{ event.date[8:10] }}</span>
-              <small>{{ format_display_date(event.date) }}</small>
-            </div>
-            <div class="event-body">
-              <span class="event-tag">{{ event.category or 'Club Event' }}</span>
-              <h2>{{ event.title }}</h2>
-              <p>{{ event.description or 'A New Gen event for students to create, connect, and celebrate.' }}</p>
-              <div class="event-meta">
-                <strong>Location:</strong> {{ event.location or 'School campus' }}
-              </div>
-            </div>
-          </article>
-        {% endfor %}
+
+    <div class="featured-event">
+
+      <div class="featured-date">
+
+        <span>
+          {{ featured_event.date[8:10] }}
+        </span>
+
+        <small>
+          {{ format_display_date(featured_event.date) }}
+        </small>
+
       </div>
-    {% else %}
-      <div class="empty-state">
-        <h2>No events yet</h2>
-        <p>Use the admin page to add your first club event.</p>
+
+
+      <div class="featured-body">
+
+        <span class="event-tag">
+          Featured event
+        </span>
+
+        <h2>
+          {{ featured_event.title }}
+        </h2>
+
+        <p>
+          {{ featured_event.description or 'A New Gen event for students to create, connect, and celebrate.' }}
+        </p>
+
+
+        <div class="event-meta-row">
+
+          <span>
+            {{ featured_event.category or 'Club Event' }}
+          </span>
+
+          <span>
+            {{ featured_event.location or 'School campus' }}
+          </span>
+
+        </div>
+
       </div>
-    {% endif %}
+
+    </div>
+
   </section>
+
+  {% endif %}
+
+
+  <!-- =====================================================
+       ALL EVENTS
+  ====================================================== -->
+
+  <section class="container content-section reveal">
+
+    {% if events %}
+
+      <div class="event-grid">
+
+        {% for event in events %}
+
+          <article class="event-card">
+
+            <div class="event-date">
+
+              <span>
+                {{ event.date[8:10] }}
+              </span>
+
+              <small>
+                {{ format_display_date(event.date) }}
+              </small>
+
+            </div>
+
+
+            <div class="event-body">
+
+              <span class="event-tag">
+                {{ event.category or 'Club Event' }}
+              </span>
+
+              <h2>
+                {{ event.title }}
+              </h2>
+
+              <p>
+                {{ event.description or 'A New Gen event for students to create, connect, and celebrate.' }}
+              </p>
+
+              <div class="event-meta">
+
+                <strong>
+                  Location:
+                </strong>
+
+                {{ event.location or 'School campus' }}
+
+              </div>
+
+            </div>
+
+          </article>
+
+        {% endfor %}
+
+      </div>
+
+    {% else %}
+
+      <div class="empty-state">
+
+        <h2>
+          No events yet
+        </h2>
+
+        <p>
+          Use the admin page to add your first club event.
+        </p>
+
+      </div>
+
+    {% endif %}
+
+  </section>
+
 </main>
+
 {% endblock %}

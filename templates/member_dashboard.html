@@ -474,3 +474,53 @@
             class="auth-submit"
           >
             Explore Poetry
+            Explore Poetry
+            <span>→</span>
+          </a>
+
+        {% elif member.group_name == "Fashion" %}
+
+          <a
+            href="{{ url_for('fashion') }}"
+            class="auth-submit"
+          >
+            Explore Fashion
+            <span>→</span>
+          </a>
+
+        {% endif %}
+
+      </section>
+
+      <!-- LOGOUT -->
+      <div class="dashboard-footer">
+
+        {% if member.role == "admin" %}
+
+          <a
+            href="{{ url_for('admin_logout') }}"
+            class="dashboard-logout"
+          >
+            Log out of administration →
+          </a>
+
+        {% else %}
+
+          <a
+            href="{{ url_for('logout') }}"
+            class="dashboard-logout"
+          >
+            Log out of New Gen →
+          </a>
+
+        {% endif %}
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+{% endblock %}

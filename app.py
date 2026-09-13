@@ -184,8 +184,49 @@ def init_database():
             role TEXT NOT NULL DEFAULT 'member',
             position TEXT NOT NULL DEFAULT 'Member',
 
+            account_status TEXT NOT NULL DEFAULT 'active',
+            review_token TEXT,
+            review_expires_at TIMESTAMPTZ,
+            review_message TEXT NOT NULL DEFAULT '',
+            review_submitted_at TIMESTAMPTZ,
+            removal_reason TEXT NOT NULL DEFAULT '',
+            removed_at TIMESTAMPTZ,
+
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
+        """
+    )
+
+    # --------------------------------------------------------
+    # ACCOUNT LIFECYCLE MIGRATION
+    # --------------------------------------------------------
+
+    connection.execute(
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS account_status TEXT NOT NULL DEFAULT 'active'"
+    )
+    connection.execute(
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS review_token TEXT"
+    )
+    connection.execute(
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS review_expires_at TIMESTAMPTZ"
+    )
+    connection.execute(
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS review_message TEXT NOT NULL DEFAULT ''"
+    )
+    connection.execute(
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS review_submitted_at TIMESTAMPTZ"
+    )
+    connection.execute(
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS removal_reason TEXT NOT NULL DEFAULT ''"
+    )
+    connection.execute(
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS removed_at TIMESTAMPTZ"
+    )
+
+    connection.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_users_account_status
+        ON users (account_status)
         """
     )
 
@@ -284,6 +325,10 @@ def init_database():
         CREATE INDEX IF NOT EXISTS idx_official_roles_phone
         ON official_roles (phone)
         """
+    )
+
+    connection.execute(
+        "UPDATE users SET account_status = 'active' WHERE account_status IS NULL OR account_status = ''"
     )
 
     connection.commit()
@@ -972,17 +1017,13 @@ def is_member_logged_in():
 
     return (
         session.get("member_logged_in") is True
-        and bool(
-            session.get("member_id")
-        )
+        and bool(session.get("member_id"))
     )
 
 
 def get_current_member():
 
-    user_id = session.get(
-        "member_id"
-    )
+    user_id = session.get("member_id")
 
     if not user_id:
         return None
@@ -1002,6 +1043,24 @@ def get_current_member():
     connection.close()
 
     return user
+
+
+def get_dashboard_endpoint_for_user(user):
+    """Return the one dashboard that matches the user's real role."""
+
+    if not user:
+        return "login"
+
+    if user["account_status"] != "active":
+        return "login"
+
+    if user["role"] == "admin":
+        return "admin_portal"
+
+    if user["role"] == "executive":
+        return "executive_dashboard"
+
+    return "member_dashboard"
 
 
 def is_admin_logged_in():
@@ -1193,6 +1252,89 @@ def send_verification_email(
         raise RuntimeError(
             "Could not reach email service: "
             f"{error.reason}"
+        )
+
+
+# ============================================================
+# GENERAL EMAIL DELIVERY
+# ============================================================
+
+def send_mailer_email(
+    recipient,
+    first_name,
+    subject,
+    message,
+    email_type,
+    review_url="",
+    reason="",
+):
+    """Send a non-verification New Gen email through the existing relay.
+
+    The relay receives the complete message metadata so the Apps Script can
+    choose the correct subject/body template without exposing credentials.
+    """
+
+    if not MAILER_URL:
+        raise RuntimeError(
+            "NEWGEN_MAILER_URL is not configured."
+        )
+
+    if not MAILER_SECRET:
+        raise RuntimeError(
+            "NEWGEN_MAIL_SECRET is not configured."
+        )
+
+    payload = {
+        "type": email_type,
+        "recipient": recipient,
+        "first_name": first_name,
+        "subject": subject,
+        "message": message,
+        "review_url": review_url,
+        "reason": reason,
+        "secret": MAILER_SECRET,
+    }
+
+    request_data = json.dumps(payload).encode("utf-8")
+
+    request_object = urllib.request.Request(
+        MAILER_URL,
+        data=request_data,
+        headers={
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+
+    try:
+        with urllib.request.urlopen(
+            request_object,
+            timeout=30,
+        ) as response:
+            response_body = response.read().decode("utf-8")
+            result = json.loads(response_body)
+
+            if not result.get("success"):
+                raise RuntimeError(
+                    result.get(
+                        "error",
+                        "Email service failed.",
+                    )
+                )
+
+    except urllib.error.HTTPError as error:
+        try:
+            error_body = error.read().decode("utf-8")
+        except Exception:
+            error_body = ""
+
+        raise RuntimeError(
+            f"Email service HTTP error: {error.code} {error_body}"
+        )
+
+    except urllib.error.URLError as error:
+        raise RuntimeError(
+            f"Could not reach email service: {error.reason}"
         )
 
 
@@ -1890,6 +2032,28 @@ def login():
             (user["id"],),
         ).fetchone()
 
+        if user["account_status"] != "active":
+            connection.close()
+
+            if user["account_status"] == "under_review":
+                message = (
+                    "Your account is currently under review. "
+                    "Please use the review link sent to your email."
+                )
+            else:
+                message = (
+                    "This account is no longer active. "
+                    "Please contact New Gen if you believe this is an error."
+                )
+
+            flash(message, "error")
+
+            return render_template(
+                "login.html",
+                errors={"login": message},
+                form_data={"login": login_value},
+            )
+
         password_correct = False
 
         try:
@@ -1959,29 +2123,8 @@ def login():
         session["member_id"] = user["id"]
 
         if user["role"] == "admin":
-
             session["admin_logged_in"] = True
             session["admin_member_id"] = user["id"]
-
-            flash(
-                f"Welcome back, {user['first_name']}!",
-                "success",
-            )
-
-            return redirect(
-                url_for("admin_portal")
-            )
-
-        if user["role"] == "executive":
-
-            flash(
-                f"Welcome back, {user['first_name']}!",
-                "success",
-            )
-
-            return redirect(
-                url_for("executive_dashboard")
-            )
 
         flash(
             f"Welcome back, {user['first_name']}!",
@@ -1989,7 +2132,7 @@ def login():
         )
 
         return redirect(
-            url_for("member_dashboard")
+            url_for(get_dashboard_endpoint_for_user(user))
         )
 
     return render_template(
@@ -2032,26 +2175,31 @@ def member_dashboard():
             url_for("login")
         )
 
-    if (
-        member["role"] != "admin"
-        and not member["email_verified"]
-    ):
-
+    if member["account_status"] != "active":
         session.clear()
+        flash(
+            "Your account is not currently active. Please use the review link sent to your email.",
+            "error",
+        )
+        return redirect(url_for("login"))
 
+    if member["role"] == "admin":
+        session["admin_logged_in"] = True
+        session["admin_member_id"] = member["id"]
+        return redirect(url_for("admin_portal"))
+
+    if member["role"] == "executive":
+        return redirect(url_for("executive_dashboard"))
+
+    if not member["email_verified"]:
+        session.clear()
         flash(
             "Please verify your email before accessing your dashboard.",
             "error",
         )
+        return redirect(url_for("login"))
 
-        return redirect(
-            url_for("login")
-        )
-
-    return render_template(
-        "member_dashboard.html",
-        member=member,
-    )
+    return render_template("member_dashboard.html", member=member)
 
 
 # ============================================================
@@ -2597,79 +2745,70 @@ def admin_logout():
 def admin_portal():
 
     if not is_admin_logged_in():
-
-        flash(
-            "Administrator access required.",
-            "error",
-        )
-
-        return redirect(
-            url_for("admin_login")
-        )
+        flash("Administrator access required.", "error")
+        return redirect(url_for("admin_login"))
 
     connection = get_db()
 
     members = connection.execute(
         """
         SELECT
-            id,
-            first_name,
-            last_name,
-            username,
-            email,
-            phone,
-            school,
-            class_name,
-            group_name,
-            reason_for_joining,
-            role,
-            position,
-            email_verified,
-            phone_verified,
-            created_at
+            id, first_name, last_name, username, email, phone,
+            school, class_name, group_name, reason_for_joining,
+            role, position, email_verified, phone_verified,
+            account_status, review_message, review_submitted_at,
+            removal_reason, created_at, removed_at
         FROM users
         ORDER BY created_at DESC
         """
     ).fetchall()
 
+    counts = connection.execute(
+        """
+        SELECT
+            COUNT(*) FILTER (WHERE role != 'admin' AND account_status = 'active') AS active_members,
+            COUNT(*) FILTER (WHERE role != 'admin' AND account_status = 'active' AND email_verified = TRUE) AS verified_members,
+            COUNT(*) FILTER (WHERE role != 'admin' AND account_status = 'active' AND email_verified = FALSE) AS unverified_members,
+            COUNT(*) FILTER (WHERE role = 'executive' AND account_status = 'active') AS executive_count,
+            COUNT(*) FILTER (WHERE role = 'admin' AND account_status = 'active') AS admin_count,
+            COUNT(*) FILTER (WHERE account_status = 'under_review') AS review_count
+        FROM users
+        """
+    ).fetchone()
+
     event_count = connection.execute(
-        """
-        SELECT COUNT(*) AS count
-        FROM events
-        """
+        "SELECT COUNT(*) AS count FROM events"
     ).fetchone()["count"]
 
-    member_count = connection.execute(
+    review_users = connection.execute(
         """
-        SELECT COUNT(*) AS count
+        SELECT
+            id, first_name, last_name, username, email, phone,
+            role, position, account_status, review_message,
+            review_submitted_at, removal_reason, created_at, removed_at
         FROM users
-        WHERE role != 'admin'
+        WHERE account_status = 'under_review'
+        ORDER BY COALESCE(review_submitted_at, removed_at, created_at) DESC
         """
-    ).fetchone()["count"]
-
-    executive_count = connection.execute(
-        """
-        SELECT COUNT(*) AS count
-        FROM users
-        WHERE role = 'executive'
-        """
-    ).fetchone()["count"]
+    ).fetchall()
 
     connection.close()
 
     return render_template(
         "admin.html",
         members=members,
-        applications=[],
+        review_users=review_users,
         events=load_events(),
         event_count=event_count,
-        member_count=member_count,
-        executive_count=executive_count,
-        pending_count=0,
+        member_count=counts["active_members"],
+        verified_count=counts["verified_members"],
+        unverified_count=counts["unverified_members"],
+        executive_count=counts["executive_count"],
+        admin_count=counts["admin_count"],
+        review_count=counts["review_count"],
         mode="Create",
         event=None,
     )
-
 
 # ============================================================
 # ADMIN EVENT CREATE / EDIT
@@ -2695,6 +2834,9 @@ def admin(event_id=None):
         return redirect(
             url_for("admin_login")
         )
+
+    if request.method == "GET" and event_id is None:
+        return redirect(url_for("admin_portal"))
 
     current_event = (
         get_event(event_id)
@@ -2780,7 +2922,7 @@ def admin(event_id=None):
             return render_template(
                 "admin.html",
                 members=[],
-                applications=[],
+                review_users=[],
                 events=events,
                 event=current_event,
                 mode=(
@@ -2792,7 +2934,10 @@ def admin(event_id=None):
                 event_count=len(events),
                 member_count=0,
                 executive_count=0,
-                pending_count=0,
+                review_count=0,
+                verified_count=0,
+                unverified_count=0,
+                admin_count=0,
             )
 
         try:
@@ -2807,7 +2952,7 @@ def admin(event_id=None):
             return render_template(
                 "admin.html",
                 members=[],
-                applications=[],
+                review_users=[],
                 events=events,
                 event=current_event,
                 mode=(
@@ -2822,7 +2967,10 @@ def admin(event_id=None):
                 event_count=len(events),
                 member_count=0,
                 executive_count=0,
-                pending_count=0,
+                review_count=0,
+                verified_count=0,
+                unverified_count=0,
+                admin_count=0,
             )
 
         now = datetime.now(
@@ -2920,7 +3068,7 @@ def admin(event_id=None):
     return render_template(
         "admin.html",
         members=[],
-        applications=[],
+        review_users=[],
         events=events,
         event=current_event,
         mode=(
@@ -2932,7 +3080,6 @@ def admin(event_id=None):
         event_count=len(events),
         member_count=0,
         executive_count=0,
-        pending_count=0,
     )
 
 
@@ -3040,7 +3187,12 @@ def admin_members():
             position,
             email_verified,
             phone_verified,
-            created_at
+            account_status,
+            review_message,
+            review_submitted_at,
+            removal_reason,
+            created_at,
+            removed_at
         FROM users
         ORDER BY created_at DESC
         """
@@ -3051,7 +3203,6 @@ def admin_members():
     return render_template(
         "admin_members.html",
         members=members,
-        applications=[],
         search_query="",
     )
 
@@ -3099,7 +3250,12 @@ def admin_search():
             position,
             email_verified,
             phone_verified,
-            created_at
+            account_status,
+            review_message,
+            review_submitted_at,
+            removal_reason,
+            created_at,
+            removed_at
         FROM users
         WHERE
             first_name ILIKE %s
@@ -3108,9 +3264,15 @@ def admin_search():
             OR email ILIKE %s
             OR school ILIKE %s
             OR group_name ILIKE %s
+            OR phone ILIKE %s
+            OR reason_for_joining ILIKE %s
+            OR account_status ILIKE %s
         ORDER BY created_at DESC
         """,
         (
+            f"%{query}%",
+            f"%{query}%",
+            f"%{query}%",
             f"%{query}%",
             f"%{query}%",
             f"%{query}%",
@@ -3125,7 +3287,6 @@ def admin_search():
     return render_template(
         "admin_members.html",
         members=members,
-        applications=[],
         search_query=query,
     )
 
@@ -3197,6 +3358,7 @@ def members():
             created_at
         FROM users
         WHERE role != 'admin'
+          AND account_status = 'active'
         ORDER BY created_at DESC
         """
     ).fetchall()
@@ -3219,18 +3381,10 @@ def members():
 def delete_member_page(user_id):
 
     if not is_admin_logged_in():
-
-        flash(
-            "Administrator access required.",
-            "error",
-        )
-
-        return redirect(
-            url_for("admin_login")
-        )
+        flash("Administrator access required.", "error")
+        return redirect(url_for("admin_login"))
 
     connection = get_db()
-
     member = connection.execute(
         """
         SELECT *
@@ -3240,40 +3394,22 @@ def delete_member_page(user_id):
         """,
         (user_id,),
     ).fetchone()
-
     connection.close()
 
     if not member:
-
-        flash(
-            "Member not found.",
-            "error",
-        )
-
-        return redirect(
-            url_for("admin_members")
-        )
+        flash("Member not found.", "error")
+        return redirect(url_for("admin_members"))
 
     if member["role"] == "admin":
+        flash("Administrator accounts cannot be removed from this panel.", "error")
+        return redirect(url_for("admin_members"))
 
-        flash(
-            "Administrator accounts cannot be deleted from this panel.",
-            "error",
-        )
+    if member["account_status"] == "under_review":
+        flash("This account is already under review.", "error")
+        return redirect(url_for("admin_members"))
 
-        return redirect(
-            url_for("admin_members")
-        )
+    return render_template("delete_confirm.html", person=member)
 
-    return render_template(
-        "delete_confirm.html",
-        person=member,
-    )
-
-
-# ============================================================
-# ADMIN MEMBER DELETE
-# ============================================================
 
 @app.route(
     "/admin/member/<int:user_id>/delete/confirm",
@@ -3282,49 +3418,19 @@ def delete_member_page(user_id):
 def delete_member(user_id):
 
     if not is_admin_logged_in():
+        flash("Administrator access required.", "error")
+        return redirect(url_for("admin_login"))
 
-        flash(
-            "Administrator access required.",
-            "error",
-        )
+    confirmation = request.form.get("confirm", "").strip().lower()
 
-        return redirect(
-            url_for("admin_login")
-        )
-
-    confirmation = request.form.get(
-        "confirm",
-        "",
-    ).strip().lower()
-
-    if confirmation not in {
-        "yes",
-        "true",
-        "1",
-        "delete",
-        "confirm",
-    }:
-
-        flash(
-            "Account deletion cancelled. "
-            "You must confirm permanent deletion.",
-            "error",
-        )
-
-        return redirect(
-            url_for("admin_members")
-        )
+    if confirmation not in {"yes", "true", "1", "delete", "confirm"}:
+        flash("Account removal cancelled. No data was changed.", "error")
+        return redirect(url_for("admin_members"))
 
     connection = get_db()
-
     user = connection.execute(
         """
-        SELECT
-            id,
-            first_name,
-            last_name,
-            username,
-            role
+        SELECT id, first_name, last_name, username, email, role, account_status
         FROM users
         WHERE id = %s
         LIMIT 1
@@ -3333,52 +3439,329 @@ def delete_member(user_id):
     ).fetchone()
 
     if not user:
-
         connection.close()
-
-        flash(
-            "Member not found.",
-            "error",
-        )
-
-        return redirect(
-            url_for("admin_members")
-        )
+        flash("Member not found.", "error")
+        return redirect(url_for("admin_members"))
 
     if user["role"] == "admin":
-
         connection.close()
+        flash("Administrator accounts cannot be removed from this panel.", "error")
+        return redirect(url_for("admin_members"))
 
-        flash(
-            "Administrator accounts cannot be deleted "
-            "from this panel.",
-            "error",
-        )
-
-        return redirect(
-            url_for("admin_members")
-        )
+    review_token = secrets.token_urlsafe(32)
+    review_expires_at = datetime.now(timezone.utc) + timedelta(days=14)
+    removed_at = datetime.now(timezone.utc)
 
     connection.execute(
         """
-        DELETE FROM users
+        UPDATE users
+        SET
+            account_status = 'under_review',
+            review_token = %s,
+            review_expires_at = %s,
+            review_message = '',
+            review_submitted_at = NULL,
+            removal_reason = '',
+            removed_at = %s
+        WHERE id = %s
+        """,
+        (
+            review_token,
+            review_expires_at,
+            removed_at,
+            user_id,
+        ),
+    )
+    connection.commit()
+    connection.close()
+
+    review_url = url_for(
+        "account_review",
+        token=review_token,
+        _external=True,
+    )
+
+    email_sent = True
+    try:
+        send_mailer_email(
+            user["email"],
+            user["first_name"],
+            "Your New Gen account is under review",
+            (
+                f"Hi {user['first_name']},\n\n"
+                "We are sorry for the inconvenience. Your New Gen account "
+                "has been placed under review following an account removal decision. "
+                "Your profile data has NOT been permanently deleted.\n\n"
+                "You have 14 days to request an account review and explain why the "
+                "account should be restored.\n\n"
+                f"Review your account here:\n{review_url}\n\n"
+                "If you do not submit a review, New Gen may make a final removal decision "
+                "according to its account policies.\n\n"
+                "— New Gen"
+            ),
+            "account_under_review",
+            review_url=review_url,
+        )
+    except Exception as error:
+        email_sent = False
+        print("ACCOUNT REVIEW EMAIL ERROR:", error)
+
+    if email_sent:
+        flash(
+            f"{user['first_name']} {user['last_name']} was placed under review. "
+            "An account-review email was sent and the data remains intact.",
+            "success",
+        )
+    else:
+        flash(
+            f"{user['first_name']} {user['last_name']} was placed under review, "
+            "but the review email could not be sent. The account data remains intact.",
+            "error",
+        )
+
+    return redirect(url_for("admin_members"))
+
+
+@app.route(
+    "/account-review/<token>",
+    methods=["GET", "POST"],
+)
+def account_review(token):
+
+    connection = get_db()
+    user = connection.execute(
+        """
+        SELECT *
+        FROM users
+        WHERE review_token = %s
+          AND account_status = 'under_review'
+        LIMIT 1
+        """,
+        (token,),
+    ).fetchone()
+
+    if not user:
+        connection.close()
+        return render_template(
+            "account_review.html",
+            valid=False,
+            message="This account-review link is invalid or is no longer active.",
+        )
+
+    expires_at = user["review_expires_at"]
+    if expires_at and expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+
+    if expires_at and datetime.now(timezone.utc) > expires_at:
+        connection.close()
+        return render_template(
+            "account_review.html",
+            valid=False,
+            message="This account-review link has expired. Please contact New Gen for help.",
+        )
+
+    if request.method == "POST":
+        review_message = request.form.get("review_message", "").strip()
+
+        if len(review_message) < 20:
+            connection.close()
+            return render_template(
+                "account_review.html",
+                valid=True,
+                submitted=False,
+                user=user,
+                token=token,
+                error="Please explain your situation in at least 20 characters.",
+            )
+
+        submitted_at = datetime.now(timezone.utc)
+        connection.execute(
+            """
+            UPDATE users
+            SET
+                review_message = %s,
+                review_submitted_at = %s
+            WHERE id = %s
+            """,
+            (review_message, submitted_at, user["id"]),
+        )
+        connection.commit()
+        connection.close()
+
+        try:
+            send_mailer_email(
+                user["email"],
+                user["first_name"],
+                "New Gen received your account review",
+                (
+                    f"Hi {user['first_name']},\n\n"
+                    "We have received your account-review request. Your information remains "
+                    "intact while the New Gen team reviews it.\n\n"
+                    "You will receive a further email with the final decision.\n\n"
+                    "— New Gen"
+                ),
+                "account_review_received",
+            )
+        except Exception as error:
+            print("ACCOUNT REVIEW RECEIVED EMAIL ERROR:", error)
+
+        return render_template(
+            "account_review.html",
+            valid=True,
+            submitted=True,
+            user=user,
+        )
+
+    connection.close()
+    return render_template(
+        "account_review.html",
+        valid=True,
+        submitted=False,
+        user=user,
+        token=token,
+        error=None,
+    )
+
+
+@app.route(
+    "/admin/member/<int:user_id>/restore",
+    methods=["POST"],
+)
+def restore_member(user_id):
+
+    if not is_admin_logged_in():
+        flash("Administrator access required.", "error")
+        return redirect(url_for("admin_login"))
+
+    connection = get_db()
+    user = connection.execute(
+        "SELECT * FROM users WHERE id = %s LIMIT 1",
+        (user_id,),
+    ).fetchone()
+
+    if not user:
+        connection.close()
+        flash("Member not found.", "error")
+        return redirect(url_for("admin_members"))
+
+    if user["account_status"] != "under_review":
+        connection.close()
+        flash("This account is not awaiting review.", "error")
+        return redirect(url_for("admin_members"))
+
+    connection.execute(
+        """
+        UPDATE users
+        SET
+            account_status = 'active',
+            review_token = NULL,
+            review_expires_at = NULL,
+            removal_reason = '',
+            removed_at = NULL
         WHERE id = %s
         """,
         (user_id,),
     )
-
     connection.commit()
     connection.close()
 
+    try:
+        send_mailer_email(
+            user["email"],
+            user["first_name"],
+            "Your New Gen account has been restored",
+            (
+                f"Hi {user['first_name']},\n\n"
+                "Your New Gen account has been reviewed and restored. "
+                "Your existing account data has been kept intact.\n\n"
+                "You can log in again using your existing credentials.\n\n"
+                "We apologise for the inconvenience.\n\n"
+                "— New Gen"
+            ),
+            "account_restored",
+        )
+    except Exception as error:
+        print("ACCOUNT RESTORED EMAIL ERROR:", error)
+
     flash(
-        f"Member {user['first_name']} "
-        f"{user['last_name']} was permanently deleted.",
+        f"{user['first_name']} {user['last_name']}'s account was restored.",
         "success",
     )
+    return redirect(url_for("admin_members"))
 
-    return redirect(
-        url_for("admin_members")
+
+@app.route(
+    "/admin/member/<int:user_id>/finalize-removal",
+    methods=["POST"],
+)
+def finalize_member_removal(user_id):
+
+    if not is_admin_logged_in():
+        flash("Administrator access required.", "error")
+        return redirect(url_for("admin_login"))
+
+    reason = request.form.get("reason", "").strip()
+    if len(reason) < 10:
+        flash("Please provide a clear removal explanation of at least 10 characters.", "error")
+        return redirect(url_for("admin_members"))
+
+    connection = get_db()
+    user = connection.execute(
+        "SELECT * FROM users WHERE id = %s LIMIT 1",
+        (user_id,),
+    ).fetchone()
+
+    if not user:
+        connection.close()
+        flash("Member not found.", "error")
+        return redirect(url_for("admin_members"))
+
+    if user["account_status"] != "under_review":
+        connection.close()
+        flash("This account is not awaiting final review.", "error")
+        return redirect(url_for("admin_members"))
+
+    connection.execute(
+        """
+        UPDATE users
+        SET
+            account_status = 'rejected',
+            removal_reason = %s,
+            review_token = NULL,
+            review_expires_at = NULL,
+            removed_at = COALESCE(removed_at, NOW())
+        WHERE id = %s
+        """,
+        (reason, user_id),
     )
+    connection.commit()
+    connection.close()
+
+    try:
+        send_mailer_email(
+            user["email"],
+            user["first_name"],
+            "Final decision regarding your New Gen account",
+            (
+                f"Hi {user['first_name']},\n\n"
+                "Thank you for giving New Gen the opportunity to review your account.\n\n"
+                "After review, the account will remain removed from active New Gen access.\n\n"
+                f"Reason provided by New Gen:\n{reason}\n\n"
+                "If you believe this decision was made in error, please contact New Gen "
+                "and provide further information for consideration.\n\n"
+                "— New Gen"
+            ),
+            "account_removal_final",
+            reason=reason,
+        )
+    except Exception as error:
+        print("FINAL ACCOUNT REMOVAL EMAIL ERROR:", error)
+
+    flash(
+        f"{user['first_name']} {user['last_name']}'s account was given a final removal decision.",
+        "success",
+    )
+    return redirect(url_for("admin_members"))
 
 
 # ============================================================

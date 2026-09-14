@@ -3651,3 +3651,377 @@ body[data-theme="clean"] .music-page .info-card {
 
 }
 
+/* =========================================================
+NEW GEN — TECH WORLD
+Theme-aware technology laboratory
+========================================================= */
+
+.tech-page {
+position: relative;
+overflow: hidden;
+}
+
+.tech-hero {
+position: relative;
+}
+
+.tech-hero::before {
+content: "";
+position: absolute;
+width: 420px;
+height: 420px;
+right: -160px;
+top: 30px;
+border-radius: 50%;
+background: radial-gradient(
+circle,
+var(--glow-1),
+transparent 68%
+);
+opacity: .35;
+pointer-events: none;
+}
+
+.tech-visual {
+position: relative;
+min-height: 430px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.tech-lab-frame {
+position: relative;
+z-index: 2;
+width: min(100%, 470px);
+min-height: 370px;
+padding: 24px;
+border: 1px solid var(--border);
+border-radius: 24px;
+background:
+linear-gradient(
+145deg,
+var(--card),
+var(--bg-soft)
+);
+box-shadow: var(--shadow);
+overflow: hidden;
+}
+
+.tech-lab-frame::before {
+content: "";
+position: absolute;
+inset: 0;
+background:
+linear-gradient(
+90deg,
+transparent 49.5%,
+var(--border) 50%,
+transparent 50.5%
+),
+linear-gradient(
+0deg,
+transparent 49.5%,
+var(--border) 50%,
+transparent 50.5%
+);
+background-size: 44px 44px;
+opacity: .22;
+pointer-events: none;
+}
+
+.tech-lab-header,
+.tech-lab-main,
+.tech-lab-lines,
+.tech-command {
+position: relative;
+z-index: 2;
+}
+
+.tech-lab-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 15px;
+padding-bottom: 18px;
+border-bottom: 1px solid var(--border);
+}
+
+.tech-status,
+.tech-lab-label {
+font-size: .68rem;
+font-weight: 800;
+letter-spacing: .14em;
+text-transform: uppercase;
+}
+
+.tech-status {
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.tech-status-dot {
+width: 7px;
+height: 7px;
+border-radius: 50%;
+background: var(--accent);
+box-shadow: 0 0 12px var(--accent);
+}
+
+.tech-lab-label {
+color: var(--muted);
+}
+
+.tech-lab-main {
+min-height: 175px;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 25px;
+}
+
+.tech-lab-symbol {
+display: flex;
+align-items: center;
+gap: 3px;
+font-size: 4rem;
+line-height: 1;
+font-weight: 900;
+color: var(--accent);
+}
+
+.tech-lab-symbol strong {
+color: var(--text);
+font-size: 3.2rem;
+}
+
+.tech-lab-message {
+display: flex;
+flex-direction: column;
+gap: 7px;
+}
+
+.tech-lab-message span {
+color: var(--muted);
+font-size: .65rem;
+font-weight: 800;
+letter-spacing: .15em;
+}
+
+.tech-lab-message strong {
+max-width: 170px;
+font-size: 1.05rem;
+line-height: 1.2;
+}
+
+.tech-lab-lines {
+display: grid;
+gap: 8px;
+}
+
+.tech-lab-lines div {
+display: grid;
+grid-template-columns: 30px 1fr auto;
+align-items: center;
+gap: 10px;
+padding: 9px 11px;
+border: 1px solid var(--border);
+border-radius: 9px;
+background: var(--bg-soft);
+font-size: .7rem;
+}
+
+.tech-lab-lines span:first-child {
+color: var(--muted);
+font-weight: 800;
+}
+
+.tech-lab-lines span:nth-child(2) {
+color: var(--text);
+}
+
+.tech-lab-lines strong {
+color: var(--accent);
+font-size: .65rem;
+text-transform: uppercase;
+letter-spacing: .08em;
+}
+
+.tech-command {
+margin-top: 18px;
+padding-top: 15px;
+border-top: 1px solid var(--border);
+font-family: monospace;
+font-size: .78rem;
+color: var(--muted);
+}
+
+.tech-command strong {
+color: var(--accent);
+}
+
+.tech-orbit {
+position: absolute;
+width: 430px;
+height: 430px;
+border: 1px solid var(--border);
+border-radius: 50%;
+opacity: .45;
+transform: rotate(-18deg);
+pointer-events: none;
+}
+
+.tech-feature-card {
+position: relative;
+overflow: hidden;
+}
+
+.tech-feature-card::after {
+content: "";
+position: absolute;
+width: 100px;
+height: 100px;
+right: -45px;
+bottom: -45px;
+border-radius: 50%;
+background: var(--glow-1);
+opacity: .22;
+pointer-events: none;
+}
+
+.tech-impact-grid {
+align-items: stretch;
+}
+
+.tech-impact-card {
+position: relative;
+overflow: hidden;
+}
+
+.tech-impact-card::after {
+content: "01";
+position: absolute;
+right: 25px;
+bottom: -22px;
+font-size: 8rem;
+font-weight: 900;
+line-height: 1;
+color: var(--accent);
+opacity: .06;
+}
+
+.tech-process-card {
+position: relative;
+}
+
+.tech-process-card .feature-list {
+margin-top: 25px;
+}
+
+.tech-process-card .feature-list li {
+display: flex;
+align-items: center;
+gap: 7px;
+}
+
+.tech-process-card .feature-list li span {
+flex: 0 0 auto;
+}
+
+.tech-process-card .feature-list li strong {
+color: var(--text);
+}
+
+.mindset-card {
+position: relative;
+overflow: hidden;
+}
+
+.mindset-card .feature-number {
+margin-bottom: 22px;
+}
+
+.tech-cta {
+position: relative;
+overflow: hidden;
+}
+
+.tech-cta::after {
+content: "</>";
+position: absolute;
+right: 30px;
+bottom: -45px;
+font-family: monospace;
+font-size: 9rem;
+font-weight: 900;
+color: var(--accent);
+opacity: .06;
+pointer-events: none;
+}
+
+/* =========================================================
+LUXURY
+Premium technology laboratory
+========================================================= */
+
+body[data-theme="luxury"] .tech-page {
+background:
+radial-gradient(
+circle at 75% 8%,
+rgba(196, 157, 82, .09),
+transparent 28%
+),
+var(--bg);
+}
+
+body[data-theme="luxury"] .tech-hero::before {
+background: radial-gradient(
+circle,
+rgba(196, 157, 82, .18),
+transparent 68%
+);
+opacity: 1;
+}
+
+body[data-theme="luxury"] .tech-lab-frame {
+background:
+linear-gradient(
+145deg,
+#15120e,
+#0b0a08
+);
+border-color: rgba(196, 157, 82, .25);
+box-shadow:
+0 30px 80px rgba(0, 0, 0, .55),
+inset 0 1px 0 rgba(255, 255, 255, .035);
+}
+
+body[data-theme="luxury"] .tech-lab-frame::before {
+background:
+linear-gradient(
+90deg,
+transparent 49.5%,
+rgba(196, 157, 82, .10) 50%,
+transparent 50.5%
+),
+linear-gradient(
+0deg,
+transparent 49.5%,
+rgba(196, 157, 82, .10) 50%,
+transparent 50.5%
+);
+}
+
+body[data-theme="luxury"] .tech-status-dot {
+background: #c49d52;
+box-shadow: 0 0 12px rgba(196, 157, 82, .5);
+}
+
+body[data-theme="luxury"] .tech-lab-symbol {
+color: #c49d52;
+}
+
+body[data-theme="luxury"] .tech-lab-lines strong,
+body[data-theme="luxury"] .tech-co
+

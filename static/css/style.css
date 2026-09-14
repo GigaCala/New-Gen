@@ -4023,5 +4023,139 @@ color: #c49d52;
 }
 
 body[data-theme="luxury"] .tech-lab-lines strong,
-body[data-theme="luxury"] .tech-co
+body[data-theme="luxury"] .tech-command strong {
+color: #c49d52;
+}
+
+body[data-theme="luxury"] .tech-feature-card,
+body[data-theme="luxury"] .tech-impact-card,
+body[data-theme="luxury"] .tech-process-card,
+body[data-theme="luxury"] .mindset-card {
+background:
+linear-gradient(
+145deg,
+#15120e,
+#0e0c09
+);
+border-color: rgba(196, 157, 82, .18);
+}
+
+body[data-theme="luxury"] .tech-feature-card:hover,
+body[data-theme="luxury"] .mindset-card:hover {
+border-color: rgba(196, 157, 82, .45);
+box-shadow:
+0 22px 55px rgba(0, 0, 0, .38);
+}
+
+body[data-theme="luxury"] .tech-feature-card::after {
+background: rgba(196, 157, 82, .2);
+}
+
+body[data-theme="luxury"] .tech-orbit {
+border-color: rgba(196, 157, 82, .16);
+}
+
+body[data-theme="luxury"] .tech-cta {
+border-color: rgba(196, 157, 82, .22);
+background:
+linear-gradient(
+135deg,
+#17130d,
+#0c0b09
+);
+}
+
+/* =========================================================
+CLEAN
+========================================================= */
+
+body[data-theme="clean"] .tech-lab-frame {
+background: var(--card);
+box-shadow: 0 20px 55px rgba(0, 0, 0, .08);
+}
+
+body[data-theme="clean"] .tech-lab-frame::before {
+opacity: .12;
+}
+
+body[data-theme="clean"] .tech-feature-card:hover,
+body[data-theme="clean"] .mindset-card:hover {
+box-shadow: 0 18px 45px rgba(0, 0, 0, .08);
+}
+
+/* =========================================================
+MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+.tech-visual {
+min-height: 350px;
+}
+
+.tech-lab-frame {
+min-height: 330px;
+padding: 18px;
+border-radius: 18px;
+}
+
+.tech-lab-main {
+min-height: 145px;
+gap: 16px;
+}
+
+.tech-lab-symbol {
+font-size: 2.8rem;
+}
+
+.tech-lab-symbol strong {
+font-size: 2.3rem;
+}
+
+.tech-lab-message strong {
+font-size: .9rem;
+}
+
+.tech-lab-lines div {
+grid-template-columns: 25px 1fr;
+}
+
+.tech-lab-lines strong {
+display: none;
+}
+
+.tech-orbit {
+width: 320px;
+height: 320px;
+}
+
+.tech-cta::after {
+font-size: 6rem;
+}
+}
+
+@media (max-width: 480px) {
+
+.tech-lab-header {
+align-items: flex-start;
+flex-direction: column;
+}
+
+.tech-lab-main {
+justify-content: flex-start;
+}
+
+.tech-lab-symbol {
+font-size: 2.3rem;
+}
+
+.tech-lab-message strong {
+max-width: 130px;
+}
+
+.tech-lab-frame {
+min-height: 315px;
+}
+
+}
 

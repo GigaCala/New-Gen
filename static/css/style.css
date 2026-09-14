@@ -3027,3 +3027,378 @@ body[data-theme="clean"] .event-card{
   }
 
 }
+
+/* =========================================================
+   NEW GEN — LUXURY MUSIC & TECH
+   Premium visual system
+========================================================= */
+
+/* ---------------------------------------------------------
+   MUSIC — LUXURY
+--------------------------------------------------------- */
+
+body[data-theme="luxury"] .music-page {
+  background:
+    radial-gradient(
+      circle at 15% 10%,
+      rgba(217, 177, 90, 0.13),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 85% 55%,
+      rgba(128, 91, 42, 0.10),
+      transparent 28%
+    ),
+    linear-gradient(
+      180deg,
+      #090909 0%,
+      #0d0b08 52%,
+      #17120b 100%
+    );
+}
+
+body[data-theme="luxury"] .music-page .gradient-text {
+  background:
+    linear-gradient(
+      110deg,
+      #f5dfaa,
+      #d9b15a,
+      #fff2c7
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+body[data-theme="luxury"] .music-page .eyebrow {
+  border-color: rgba(217,177,90,.28);
+  background: rgba(217,177,90,.055);
+  color: #e4c982;
+}
+
+body[data-theme="luxury"] .music-page .eyebrow::before {
+  background: #d9b15a;
+  box-shadow: 0 0 16px rgba(217,177,90,.55);
+}
+
+body[data-theme="luxury"] .music-page .feature-card {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.045),
+      rgba(217,177,90,.025)
+    );
+  border-color: rgba(217,177,90,.17);
+  box-shadow:
+    0 24px 55px rgba(0,0,0,.28);
+}
+
+body[data-theme="luxury"] .music-page .feature-card:hover {
+  border-color: rgba(217,177,90,.42);
+  box-shadow:
+    0 28px 65px rgba(0,0,0,.34),
+    0 0 35px rgba(217,177,90,.055);
+}
+
+body[data-theme="luxury"] .music-page .mini-badges span {
+  background: rgba(217,177,90,.045);
+  border-color: rgba(217,177,90,.18);
+  color: #d8c38e;
+}
+
+body[data-theme="luxury"] .music-page .music-visual {
+  background:
+    radial-gradient(
+      circle at 25% 50%,
+      rgba(217,177,90,.18),
+      transparent 22%
+    ),
+    radial-gradient(
+      circle at 72% 40%,
+      rgba(255,225,155,.08),
+      transparent 26%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(217,177,90,.10) 0 1px,
+      transparent 1px 30px
+    ),
+    linear-gradient(
+      135deg,
+      #090909,
+      #17120b
+    );
+  border-color: rgba(217,177,90,.20);
+  box-shadow:
+    inset 0 0 45px rgba(217,177,90,.045);
+}
+
+body[data-theme="luxury"] .music-page .read-more {
+  color: #d9b15a;
+}
+
+body[data-theme="luxury"] .music-page .info-card {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.035),
+      rgba(217,177,90,.025)
+    );
+  border-color: rgba(217,177,90,.16);
+}
+
+body[data-theme="luxury"] .music-page .info-card.highlight {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(217,177,90,.11),
+      transparent 38%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.035),
+      rgba(217,177,90,.025)
+    );
+}
+
+body[data-theme="luxury"] .music-page .gallery-item {
+  border-color: rgba(217,177,90,.17);
+  box-shadow:
+    0 20px 45px rgba(0,0,0,.24);
+}
+
+
+/* ---------------------------------------------------------
+   TECH — LUXURY
+--------------------------------------------------------- */
+
+body[data-theme="luxury"] .tech-page {
+  background:
+    radial-gradient(
+      circle at 12% 12%,
+      rgba(217,177,90,.12),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 90% 60%,
+      rgba(255,215,140,.055),
+      transparent 26%
+    ),
+    linear-gradient(
+      180deg,
+      #080909 0%,
+      #0b0d0c 52%,
+      #11100c 100%
+    );
+}
+
+body[data-theme="luxury"] .tech-page .gradient-text {
+  background:
+    linear-gradient(
+      110deg,
+      #f7e6b5,
+      #d9b15a,
+      #fff4d1
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+body[data-theme="luxury"] .tech-page .eyebrow {
+  border-color: rgba(217,177,90,.28);
+  background: rgba(217,177,90,.05);
+  color: #e4c982;
+}
+
+body[data-theme="luxury"] .tech-page .eyebrow::before {
+  background: #d9b15a;
+  box-shadow: 0 0 16px rgba(217,177,90,.55);
+}
+
+body[data-theme="luxury"] .tech-page .feature-card {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.04),
+      rgba(217,177,90,.02)
+    );
+  border-color: rgba(217,177,90,.16);
+  box-shadow:
+    0 24px 55px rgba(0,0,0,.28);
+}
+
+body[data-theme="luxury"] .tech-page .feature-card:hover {
+  border-color: rgba(217,177,90,.42);
+  box-shadow:
+    0 28px 65px rgba(0,0,0,.34),
+    0 0 35px rgba(217,177,90,.055);
+}
+
+body[data-theme="luxury"] .tech-page .mini-badges span {
+  background: rgba(217,177,90,.045);
+  border-color: rgba(217,177,90,.18);
+  color: #d8c38e;
+}
+
+body[data-theme="luxury"] .tech-page .tech-visual {
+  background:
+    linear-gradient(
+      rgba(217,177,90,.055) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(217,177,90,.055) 1px,
+      transparent 1px
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(217,177,90,.12),
+      transparent 32%
+    ),
+    linear-gradient(
+      135deg,
+      #080909,
+      #14120d
+    );
+
+  background-size:
+    34px 34px,
+    34px 34px,
+    auto,
+    auto;
+
+  border-color: rgba(217,177,90,.20);
+
+  box-shadow:
+    inset 0 0 55px rgba(217,177,90,.045);
+}
+
+body[data-theme="luxury"] .tech-page .read-more {
+  color: #d9b15a;
+}
+
+body[data-theme="luxury"] .tech-page .info-card {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.035),
+      rgba(217,177,90,.02)
+    );
+  border-color: rgba(217,177,90,.16);
+}
+
+body[data-theme="luxury"] .tech-page .info-card.highlight {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(217,177,90,.10),
+      transparent 38%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.035),
+      rgba(217,177,90,.02)
+    );
+}
+
+body[data-theme="luxury"] .tech-page .gallery-item {
+  border-color: rgba(217,177,90,.17);
+  box-shadow:
+    0 20px 45px rgba(0,0,0,.24);
+}
+
+
+/* ---------------------------------------------------------
+   LUXURY BUTTONS ON MUSIC + TECH
+--------------------------------------------------------- */
+
+body[data-theme="luxury"] .music-page .btn-primary,
+body[data-theme="luxury"] .tech-page .btn-primary {
+  background:
+    linear-gradient(
+      135deg,
+      #b98a32,
+      #e4c36b,
+      #a87524
+    );
+
+  color: #171108;
+
+  box-shadow:
+    0 14px 30px rgba(217,177,90,.16);
+}
+
+body[data-theme="luxury"] .music-page .btn-primary:hover,
+body[data-theme="luxury"] .tech-page .btn-primary:hover {
+  box-shadow:
+    0 18px 38px rgba(217,177,90,.24);
+}
+
+
+/* ---------------------------------------------------------
+   LUXURY GROUP PAGE SECTION DIVIDERS
+--------------------------------------------------------- */
+
+body[data-theme="luxury"] .music-page .section,
+body[data-theme="luxury"] .tech-page .section {
+  position: relative;
+}
+
+body[data-theme="luxury"] .music-page .section::before,
+body[data-theme="luxury"] .tech-page .section::before {
+  content: "";
+  display: block;
+  width: 70px;
+  height: 1px;
+  margin-bottom: 34px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      #d9b15a,
+      transparent
+    );
+
+  opacity: .55;
+}
+
+
+/* ---------------------------------------------------------
+   LUXURY HEADINGS
+--------------------------------------------------------- */
+
+body[data-theme="luxury"] .music-page h2,
+body[data-theme="luxury"] .music-page h3,
+body[data-theme="luxury"] .tech-page h2,
+body[data-theme="luxury"] .tech-page h3 {
+  color: #f3e5c2;
+}
+
+body[data-theme="luxury"] .music-page p,
+body[data-theme="luxury"] .tech-page p {
+  color: #cdbb8c;
+}
+
+
+/* ---------------------------------------------------------
+   MOBILE
+--------------------------------------------------------- */
+
+@media (max-width: 720px) {
+
+  body[data-theme="luxury"] .music-page .feature-card,
+  body[data-theme="luxury"] .tech-page .feature-card {
+    box-shadow:
+      0 18px 38px rgba(0,0,0,.25);
+  }
+
+  body[data-theme="luxury"] .music-page .music-visual,
+  body[data-theme="luxury"] .tech-page .tech-visual {
+    height: 140px;
+  }
+
+}
+

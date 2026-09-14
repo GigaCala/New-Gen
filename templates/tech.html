@@ -1,42 +1,514 @@
-{% extends 'base.html' %}
 
-{% block title %}New Gen | Tech{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Tech | New Gen{% endblock %}
 
 {% block content %}
-<main class="page-main">
-  <section class="page-hero tech-page reveal">
+
+<main class="page-main tech-page">
+
+  <!-- =====================================================
+       HERO
+  ====================================================== -->
+
+  <section class="page-hero tech-hero reveal">
+
     <div class="container hero-split">
-      <div>
-        <span class="eyebrow">Tech</span>
-        <h1>Build ideas that shape tomorrow.</h1>
-        <p>From coding to digital creativity, our tech section helps students solve problems, learn new tools, and turn innovation into action.</p>
+
+      <div class="hero-copy">
+
+        <span class="eyebrow">
+          NEW GEN / TECH
+        </span>
+
+        <h1>
+          We don't just use
+          <span class="gradient-text">technology.</span>
+          <br>
+          We create with it.
+        </h1>
+
+        <p>
+          A space for students who want to build, experiment,
+          solve real problems and use technology to create
+          something meaningful.
+        </p>
+
+        <div class="hero-actions">
+
+          <a href="{{ url_for('contact') }}"
+             class="btn btn-primary">
+            Join the movement
+          </a>
+
+          <a href="#tech-world"
+             class="btn btn-secondary">
+            Explore Tech
+          </a>
+
+        </div>
+
       </div>
-      <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80" alt="Students working on tech project" class="page-image" />
+
+
+      <!-- TECH VISUAL -->
+
+      <div class="feature-visual tech-visual">
+
+        <div class="tech-screen">
+
+          <div class="tech-screen-top">
+
+            <span></span>
+            <span></span>
+            <span></span>
+
+          </div>
+
+          <div class="tech-code">
+
+            <span>&gt; new_gen.init()</span>
+
+            <span>&gt; build(problem)</span>
+
+            <span>&gt; create(solution)</span>
+
+            <span>&gt; impact = true</span>
+
+            <strong>&gt; african_child.must_speak()</strong>
+
+          </div>
+
+        </div>
+
+        <div class="tech-orbit"></div>
+
+      </div>
+
     </div>
+
   </section>
 
-  <section class="container content-section reveal">
-    <div class="info-grid">
-      <div class="info-card">
-        <h2>We explore</h2>
-        <ul>
-          <li>Web design and development</li>
-          <li>Coding challenge projects</li>
-          <li>Robotics and innovation labs</li>
-          <li>Digital media and content creation</li>
-        </ul>
+
+  <!-- =====================================================
+       TECH WORLD
+  ====================================================== -->
+
+  <section class="content-section reveal"
+           id="tech-world">
+
+    <div class="container">
+
+      <div class="section-heading">
+
+        <span class="eyebrow">
+          THE TECH WORLD
+        </span>
+
+        <h2>
+          Learn it.
+          Build it.
+          <span class="gradient-text">Share it.</span>
+        </h2>
+
+        <p>
+          Tech at New Gen is about more than learning how to code.
+          It is about turning curiosity into useful things.
+        </p>
+
       </div>
-      <div class="info-card highlight">
-        <h2>Future focus</h2>
-        <p>New Gen tech inspires students to think creatively, build confidently, and lead with digital skills that matter.</p>
+
+
+      <div class="feature-grid">
+
+
+        <!-- CODING -->
+
+        <article class="feature-card">
+
+          <div class="mini-badges">
+
+            <span>01</span>
+            <span>BUILD</span>
+
+          </div>
+
+          <div class="feature-card-content">
+
+            <h3>
+              Coding & Development
+            </h3>
+
+            <p>
+              Learn how websites, applications and digital
+              experiences are created from the ground up.
+            </p>
+
+            <a href="{{ url_for('contact') }}"
+               class="read-more">
+              Explore development →
+            </a>
+
+          </div>
+
+        </article>
+
+
+        <!-- CYBER -->
+
+        <article class="feature-card">
+
+          <div class="mini-badges">
+
+            <span>02</span>
+            <span>DEFEND</span>
+
+          </div>
+
+          <div class="feature-card-content">
+
+            <h3>
+              Cybersecurity
+            </h3>
+
+            <p>
+              Explore how systems are protected, how attacks
+              happen and how responsible security researchers
+              think.
+            </p>
+
+            <a href="{{ url_for('contact') }}"
+               class="read-more">
+              Explore cybersecurity →
+            </a>
+
+          </div>
+
+        </article>
+
+
+        <!-- ENGINEERING -->
+
+        <article class="feature-card">
+
+          <div class="mini-badges">
+
+            <span>03</span>
+            <span>CREATE</span>
+
+          </div>
+
+          <div class="feature-card-content">
+
+            <h3>
+              Engineering & Innovation
+            </h3>
+
+            <p>
+              Turn ideas into practical solutions for problems
+              around school, Ghana and our communities.
+            </p>
+
+            <a href="{{ url_for('contact') }}"
+               class="read-more">
+              Explore innovation →
+            </a>
+
+          </div>
+
+        </article>
+
+
+        <!-- DIGITAL CREATIVITY -->
+
+        <article class="feature-card">
+
+          <div class="mini-badges">
+
+            <span>04</span>
+            <span>CREATE</span>
+
+          </div>
+
+          <div class="feature-card-content">
+
+            <h3>
+              Digital Creativity
+            </h3>
+
+            <p>
+              Combine technology with art, music, storytelling
+              and design to create experiences people remember.
+            </p>
+
+            <a href="{{ url_for('contact') }}"
+               class="read-more">
+              Explore digital creativity →
+            </a>
+
+          </div>
+
+        </article>
+
       </div>
+
     </div>
 
-    <div class="gallery-strip">
-      <img src="https://images.unsplash.com/photo-1526379095098-d400fd0bf935?auto=format&fit=crop&w=700&q=80" alt="Laptop coding workspace" />
-      <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=700&q=80" alt="Technology teamwork" />
-      <img src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=700&q=80" alt="Coding and program screens" />
-    </div>
   </section>
+
+
+  <!-- =====================================================
+       WHY TECH
+  ====================================================== -->
+
+  <section class="content-section reveal">
+
+    <div class="container">
+
+      <div class="info-grid">
+
+
+        <div class="info-card highlight">
+
+          <span class="eyebrow">
+            WHY IT MATTERS
+          </span>
+
+          <h2>
+            Technology should
+            solve real problems.
+          </h2>
+
+          <p>
+            New Gen encourages students to look around them,
+            identify problems and ask one important question:
+            <strong>“Can we build something better?”</strong>
+          </p>
+
+        </div>
+
+
+        <div class="info-card">
+
+          <h3>
+            Think beyond the classroom.
+          </h3>
+
+          <p>
+            School gives us knowledge. Tech gives us another
+            way to turn that knowledge into action.
+          </p>
+
+          <ul class="feature-list">
+
+            <li>
+              <span>01</span>
+              Identify a problem.
+            </li>
+
+            <li>
+              <span>02</span>
+              Research the problem.
+            </li>
+
+            <li>
+              <span>03</span>
+              Design a solution.
+            </li>
+
+            <li>
+              <span>04</span>
+              Build and test it.
+            </li>
+
+          </ul>
+
+        </div>
+
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       NEW GEN TECH MINDSET
+  ====================================================== -->
+
+  <section class="content-section reveal">
+
+    <div class="container">
+
+      <div class="section-heading">
+
+        <span class="eyebrow">
+          THE MINDSET
+        </span>
+
+        <h2>
+          Curiosity is the
+          <span class="gradient-text">starting point.</span>
+        </h2>
+
+        <p>
+          You do not have to know everything before you start.
+          You only need the courage to ask questions and keep
+          learning.
+        </p>
+
+      </div>
+
+
+      <div class="feature-grid mindset-grid">
+
+        <article class="feature-card">
+
+          <div class="feature-number">
+            01
+          </div>
+
+          <h3>
+            Question
+          </h3>
+
+          <p>
+            Challenge assumptions and ask why something works
+            the way it does.
+          </p>
+
+        </article>
+
+
+        <article class="feature-card">
+
+          <div class="feature-number">
+            02
+          </div>
+
+          <h3>
+            Experiment
+          </h3>
+
+          <p>
+            Try ideas, make mistakes, test again and discover
+            what actually works.
+          </p>
+
+        </article>
+
+
+        <article class="feature-card">
+
+          <div class="feature-number">
+            03
+          </div>
+
+          <h3>
+            Build
+          </h3>
+
+          <p>
+            Turn what you learn into something real that another
+            person can use.
+          </p>
+
+        </article>
+
+
+        <article class="feature-card">
+
+          <div class="feature-number">
+            04
+          </div>
+
+          <h3>
+            Share
+          </h3>
+
+          <p>
+            Your knowledge becomes more powerful when you use it
+            to help someone else grow.
+          </p>
+
+        </article>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       CTA
+  ====================================================== -->
+
+  <section class="content-section reveal">
+
+    <div class="container">
+
+      <div class="cta-band">
+
+        <div>
+
+          <span class="eyebrow">
+            YOUR TURN
+          </span>
+
+          <h2>
+            Have an idea?
+            <span class="gradient-text">Let's build.</span>
+          </h2>
+
+          <p>
+            Bring your curiosity, your problem, or your crazy
+            idea. New Gen is a place to turn it into something.
+          </p>
+
+        </div>
+
+        <a href="{{ url_for('contact') }}"
+           class="btn btn-primary">
+          Connect with New Gen
+        </a>
+
+      </div>
+
+    </div>
+
+  </section>
+
 </main>
+
 {% endblock %}
+
+
+### Why this version works with the themes
+
+The HTML **doesn't contain fixed colors**. It relies on:
+
+* `.tech-page`
+* `.tech-visual`
+* `.feature-card`
+* `.info-card`
+* `.mini-badges`
+* `.gradient-text`
+* `.btn-primary`
+* `.btn-secondary`
+* `var(--bg)`
+* `var(--surface)`
+* `var(--line)`
+* `var(--muted)`
+* the `body[data-theme]` system
+
+So:
+
+**Dark** → strong dark New Gen identity
+**Clean** → lighter, cleaner academic feel
+**Luxury** → black/champagne-gold premium innovation-lab feel
+
+And the Luxury override we added previously will now actually have the correct `.tech-page` structure to work against.
+
+One thing I **did not** do is hard-code a phone number, email, social account, or fake Tech-specific route. The page uses your existing `contact` route so we don't create another broken endpoint.

@@ -484,31 +484,3 @@
 
 {% endblock %}
 
-
-### Why this version works with the themes
-
-The HTML **doesn't contain fixed colors**. It relies on:
-
-* `.tech-page`
-* `.tech-visual`
-* `.feature-card`
-* `.info-card`
-* `.mini-badges`
-* `.gradient-text`
-* `.btn-primary`
-* `.btn-secondary`
-* `var(--bg)`
-* `var(--surface)`
-* `var(--line)`
-* `var(--muted)`
-* the `body[data-theme]` system
-
-So:
-
-**Dark** → strong dark New Gen identity
-**Clean** → lighter, cleaner academic feel
-**Luxury** → black/champagne-gold premium innovation-lab feel
-
-And the Luxury override we added previously will now actually have the correct `.tech-page` structure to work against.
-
-One thing I **did not** do is hard-code a phone number, email, social account, or fake Tech-specific route. The page uses your existing `contact` route so we don't create another broken endpoint.

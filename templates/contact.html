@@ -1,312 +1,266 @@
+
 {% extends "base.html" %}
 
-{% block title %}Executive Application | New Gen{% endblock %}
+{% block title %}Contact Us | New Gen{% endblock %}
 
 {% block content %}
 
-<main class="executive-apply-page">
+<main class="contact-page">
 
-  <!-- HERO -->
+    <!-- HERO -->
 
-  <section class="executive-apply-hero">
+    <section class="contact-hero">
+        <div class="container contact-hero-inner">
 
-```
-<div class="container executive-apply-hero-inner">
+            <div class="contact-hero-copy">
 
-  <div>
+                <span class="auth-kicker">
+                    NEW GEN / CONNECTION
+                </span>
 
-    <span class="auth-kicker">
-      NEW GEN / LEADERSHIP
-    </span>
+                <h1>
+                    Let's<br>
+                    <span>connect.</span>
+                </h1>
 
-    <h1>
-      Don't just<br>
-      <span>join.</span><br>
-      Lead.
-    </h1>
+                <p>
+                    Have an idea, a question, a collaboration,
+                    or something you want New Gen to hear?
+                    Reach out.
+                </p>
 
-    <p>
-      New Gen executives help turn ideas into action.
-      If you believe you can serve, organize, create
-      and inspire others, this is your opportunity.
-    </p>
+            </div>
 
-  </div>
+            <div class="contact-hero-mark">
 
+                <span>OUR</span>
 
-  <div class="executive-emblem">
+                <strong>VOICE</strong>
 
-    <span>NG</span>
+                <small>
+                    AFRICAN CHILDREN MUST SPEAK.
+                </small>
 
-    <small>
-      LEADERSHIP<br>
-      APPLICATION
-    </small>
+            </div>
 
-  </div>
-
-</div>
-```
-
-  </section>
-
-  <!-- APPLICATION -->
-
-  <section class="executive-apply-content">
-
-```
-<div class="container executive-apply-grid">
+        </div>
+    </section>
 
 
-  <!-- INFORMATION -->
-  <div class="executive-apply-info">
+    <!-- CONTACT OPTIONS -->
 
-    <span class="auth-label">
-      BEFORE YOU APPLY
-    </span>
+    <section class="contact-hub">
 
-    <h2>
-      Leadership is<br>
-      <em>service.</em>
-    </h2>
+        <div class="container">
 
-    <p>
-      Being a New Gen executive is more than having
-      a title. Executives are trusted to help members,
-      organize activities, protect the values of the
-      club and help turn student ideas into real projects.
-    </p>
+            <div class="contact-heading">
 
+                <span class="auth-label">
+                    CONTACT US
+                </span>
 
-    <div class="leadership-principle">
+                <h2>
+                    Choose your connection.
+                </h2>
 
-      <span>01</span>
+                <p>
+                    We're building the movement together.
+                    Pick a way to reach New Gen.
+                </p>
 
-      <div>
-        <strong>Serve</strong>
-        <small>
-          Put the community before the title.
-        </small>
-      </div>
-
-    </div>
+            </div>
 
 
-    <div class="leadership-principle">
+            <div class="contact-grid">
 
-      <span>02</span>
+                <!-- EMAIL -->
 
-      <div>
-        <strong>Create</strong>
-        <small>
-          Turn ideas into meaningful projects.
-        </small>
-      </div>
+                <a
+                    href="mailto:newgenclub@proton.me"
+                    class="contact-card contact-card-active"
+                >
 
-    </div>
+                    <div class="contact-icon">
+                        ✉
+                    </div>
 
+                    <div class="contact-card-content">
 
-    <div class="leadership-principle">
+                        <span>
+                            DIRECT CONTACT
+                        </span>
 
-      <span>03</span>
+                        <h3>
+                            Email
+                        </h3>
 
-      <div>
-        <strong>Lead</strong>
-        <small>
-          Help other young people find their voice.
-        </small>
-      </div>
+                        <p>
+                            newgenclub@proton.me
+                        </p>
 
-    </div>
+                    </div>
 
-  </div>
+                    <div class="contact-arrow">
+                        →
+                    </div>
 
-
-  <!-- FORM -->
-  <div class="auth-card executive-apply-card">
-
-    <div class="auth-card-header">
-
-      <span class="auth-label">
-        EXECUTIVE APPLICATION
-      </span>
-
-      <h2>
-        Tell us why you.
-      </h2>
-
-      <p>
-        Your application will be reviewed by a New Gen
-        administrator.
-      </p>
-
-    </div>
+                </a>
 
 
-    <div class="applicant-summary">
+                <!-- TIKTOK -->
 
-      <span>APPLYING AS</span>
+                <div class="contact-card contact-card-disabled">
 
-      <strong>
-        {{ member.first_name }} {{ member.last_name }}
-      </strong>
+                    <div class="contact-icon">
+                        ♪
+                    </div>
 
-      <small>
-        @{{ member.username }}
-      </small>
+                    <div class="contact-card-content">
 
-    </div>
+                        <span>
+                            SOCIAL
+                        </span>
+
+                        <h3>
+                            TikTok
+                        </h3>
+
+                        <p>
+                            Coming soon
+                        </p>
+
+                    </div>
+
+                    <div class="contact-status">
+                        SOON
+                    </div>
+
+                </div>
 
 
-    <form
-      method="POST"
-      action="{{ url_for('executive_apply') }}"
-      class="auth-form"
-    >
+                <!-- INSTAGRAM -->
 
-      <!-- POSITION -->
-      <div class="form-group">
+                <div class="contact-card contact-card-disabled">
 
-        <label for="position">
-          Position
-        </label>
+                    <div class="contact-icon">
+                        ◎
+                    </div>
 
-        <select
-          id="position"
-          name="position"
-          required
+                    <div class="contact-card-content">
+
+                        <span>
+                            SOCIAL
+                        </span>
+
+                        <h3>
+                            Instagram
+                        </h3>
+
+                        <p>
+                            Coming soon
+                        </p>
+
+                    </div>
+
+                    <div class="contact-status">
+                        SOON
+                    </div>
+
+                </div>
+
+
+                <!-- WHATSAPP -->
+
+                <div class="contact-card contact-card-disabled">
+
+                    <div class="contact-icon">
+                        ◌
+                    </div>
+
+                    <div class="contact-card-content">
+
+                        <span>
+                            MESSAGING
+                        </span>
+
+                        <h3>
+                            WhatsApp
+                        </h3>
+
+                        <p>
+                            Not available yet
+                        </p>
+
+                    </div>
+
+                    <div class="contact-status">
+                        SOON
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- MESSAGE -->
+
+    <section class="contact-message">
+
+        <div class="container">
+
+            <div class="contact-message-inner">
+
+                <span>
+                    NEW GEN / OUR VOICE
+                </span>
+
+                <h2>
+                    Your idea could<br>
+                    <em>be the next movement.</em>
+                </h2>
+
+                <p>
+                    Don't wait for permission to create.
+                    Speak. Build. Share.
+                </p>
+
+                <a
+                    href="mailto:newgenclub@proton.me?subject=New%20Gen%20Inquiry"
+                    class="auth-submit"
+                >
+                    Email New Gen →
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- BOTTOM -->
+
+    <div class="container contact-footer">
+
+        <a
+            href="{{ url_for('home') }}"
+            class="auth-link"
         >
+            ← Back to New Gen
+        </a>
 
-          <option
-            value=""
-            selected
-            disabled
-          >
-            Select a position
-          </option>
-
-          <option value="President">
-            President
-          </option>
-
-          <option value="Vice President">
-            Vice President
-          </option>
-
-          <option value="Secretary">
-            Secretary
-          </option>
-
-          <option value="Treasurer">
-            Treasurer
-          </option>
-
-          <option value="Public Relations">
-            Public Relations
-          </option>
-
-          <option value="Group Leader">
-            Group Leader
-          </option>
-
-          <option value="Creative Director">
-            Creative Director
-          </option>
-
-          <option value="Tech Lead">
-            Tech Lead
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <!-- REASON -->
-      <div class="form-group">
-
-        <label for="reason">
-          Why should you be an executive?
-        </label>
-
-        <textarea
-          id="reason"
-          name="reason"
-          rows="8"
-          placeholder="Tell us about your leadership experience, ideas for New Gen, what you can contribute and why you want this position..."
-          required
-        ></textarea>
-
-      </div>
-
-
-      <!-- AGREEMENT -->
-      <label class="auth-checkbox">
-
-        <input
-          type="checkbox"
-          required
+        <a
+            href="{{ url_for('signup') }}"
+            class="dashboard-logout"
         >
-
-        <span>
-          I understand that submitting this application
-          does not automatically make me an executive.
-          My application must be reviewed and approved.
-        </span>
-
-      </label>
-
-
-      <!-- SUBMIT -->
-      <button
-        type="submit"
-        class="auth-submit"
-      >
-        Submit Application
-        <span>→</span>
-      </button>
-
-    </form>
-
-
-    <div class="auth-footer">
-
-      <a
-        href="{{ url_for('member_dashboard') }}"
-        class="auth-link"
-      >
-        ← Return to dashboard
-      </a>
+            Join the movement →
+        </a>
 
     </div>
-
-  </div>
-
-</div>
-```
-
-  </section>
-
-  <!-- STATEMENT -->
-
-  <section class="executive-statement">
-
-```
-<div class="container">
-
-  <span>
-    NEW GEN / LEADERSHIP
-  </span>
-
-  <h2>
-    A title is given.<br>
-    <em>Leadership is earned.</em>
-  </h2>
-
-</div>
-```
-
-  </section>
 
 </main>
 

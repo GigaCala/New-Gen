@@ -3402,3 +3402,252 @@ body[data-theme="luxury"] .tech-page p {
 
 }
 
+
+/* =========================================================
+   MUSIC & DANCE — FINAL THEME FINISH
+========================================================= */
+
+.music-page .music-hero-visual {
+  position: relative;
+  min-height: 430px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.music-page .music-image-frame {
+  position: relative;
+  width: 100%;
+  height: 430px;
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: 0 25px 60px rgba(0,0,0,.18);
+}
+
+.music-page .music-image-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      135deg,
+      transparent 45%,
+      var(--glow-1)
+    );
+  opacity: .25;
+  pointer-events: none;
+}
+
+.music-page .music-image-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.music-page .music-floating-card {
+  position: absolute;
+  right: -18px;
+  bottom: 25px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface-strong);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 18px 45px rgba(0,0,0,.22);
+}
+
+.music-page .music-floating-card strong {
+  display: block;
+}
+
+.music-page .music-floating-card small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+}
+
+.music-page .floating-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  font-size: 1.3rem;
+}
+
+.music-page .card-number {
+  margin-bottom: 18px;
+  color: var(--gold);
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+}
+
+.music-page .feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 0;
+}
+
+.music-page .feature-list li {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.music-page .feature-list li:last-child {
+  border-bottom: 0;
+}
+
+.music-page .feature-list li span {
+  flex: 0 0 auto;
+  font-size: .72rem;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+
+/* ---------------------------------------------------------
+   LUXURY MUSIC
+--------------------------------------------------------- */
+
+body[data-theme="luxury"] .music-page {
+  background:
+    radial-gradient(
+      circle at 12% 8%,
+      rgba(217,177,90,.12),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 88% 45%,
+      rgba(217,177,90,.06),
+      transparent 30%
+    ),
+    linear-gradient(
+      180deg,
+      #080808,
+      #0d0b08 55%,
+      #12100c
+    );
+}
+
+body[data-theme="luxury"] .music-page .music-image-frame {
+  border-color: rgba(217,177,90,.22);
+  box-shadow:
+    0 30px 70px rgba(0,0,0,.45),
+    0 0 45px rgba(217,177,90,.04);
+}
+
+body[data-theme="luxury"] .music-page .music-image-frame::after {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(217,177,90,.18),
+      transparent 45%,
+      rgba(217,177,90,.06)
+    );
+  opacity: .45;
+}
+
+body[data-theme="luxury"] .music-page .music-floating-card {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(35,29,18,.94),
+      rgba(17,15,11,.94)
+    );
+  border-color: rgba(217,177,90,.25);
+  box-shadow:
+    0 20px 50px rgba(0,0,0,.45);
+}
+
+body[data-theme="luxury"] .music-page .floating-icon {
+  background: rgba(217,177,90,.07);
+  border-color: rgba(217,177,90,.22);
+  color: #e5c878;
+}
+
+body[data-theme="luxury"] .music-page .feature-card,
+body[data-theme="luxury"] .music-page .info-card {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.045),
+      rgba(217,177,90,.018)
+    );
+  border-color: rgba(217,177,90,.17);
+  box-shadow:
+    0 20px 50px rgba(0,0,0,.22);
+}
+
+body[data-theme="luxury"] .music-page .feature-card:hover,
+body[data-theme="luxury"] .music-page .info-card:hover {
+  border-color: rgba(217,177,90,.38);
+}
+
+body[data-theme="luxury"] .music-page .mini-badges span {
+  background: rgba(217,177,90,.045);
+  border-color: rgba(217,177,90,.19);
+  color: #d8c38e;
+}
+
+body[data-theme="luxury"] .music-page .gallery-item {
+  border-color: rgba(217,177,90,.18);
+  box-shadow: 0 20px 50px rgba(0,0,0,.30);
+}
+
+body[data-theme="luxury"] .music-page .gallery-overlay {
+  background:
+    linear-gradient(
+      transparent,
+      rgba(0,0,0,.88)
+    );
+}
+
+
+/* ---------------------------------------------------------
+   CLEAN MUSIC
+--------------------------------------------------------- */
+
+body[data-theme="clean"] .music-page .music-image-frame {
+  box-shadow: 0 18px 40px rgba(0,0,0,.08);
+}
+
+body[data-theme="clean"] .music-page .feature-card,
+body[data-theme="clean"] .music-page .info-card {
+  box-shadow: 0 10px 25px rgba(0,0,0,.05);
+}
+
+
+/* ---------------------------------------------------------
+   MOBILE
+--------------------------------------------------------- */
+
+@media (max-width: 760px) {
+
+  .music-page .music-hero-visual {
+    min-height: 320px;
+    margin-top: 20px;
+  }
+
+  .music-page .music-image-frame {
+    height: 320px;
+  }
+
+  .music-page .music-floating-card {
+    right: 10px;
+    bottom: 15px;
+  }
+
+}
+

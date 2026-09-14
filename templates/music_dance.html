@@ -1,42 +1,442 @@
+
 {% extends 'base.html' %}
 
 {% block title %}New Gen | Music & Dance{% endblock %}
 
 {% block content %}
-<main class="page-main">
-  <section class="page-hero music-page reveal">
+
+<main class="page-main music-page">
+
+  <!-- =====================================================
+       HERO
+  ====================================================== -->
+
+  <section class="page-hero music-hero reveal">
+
     <div class="container hero-split">
-      <div>
-        <span class="eyebrow">Music & Dance</span>
-        <h1>Feel the beat. Own the stage.</h1>
-        <p>From choir rehearsals to high-energy dance routines, New Gen turns rhythm into connection and movement into confidence.</p>
+
+      <div class="hero-copy">
+
+        <span class="eyebrow">
+          NEW GEN / MUSIC & DANCE
+        </span>
+
+        <h1>
+          Feel the beat.
+          <span class="gradient-text">Own the stage.</span>
+        </h1>
+
+        <p>
+          From choir rehearsals to high-energy dance routines,
+          New Gen turns rhythm into connection and movement
+          into confidence.
+        </p>
+
+        <div class="hero-actions">
+
+          <a href="{{ url_for('contact') }}"
+             class="btn btn-primary">
+            Join the movement
+          </a>
+
+          <a href="#music-world"
+             class="btn btn-secondary">
+            Explore the club
+          </a>
+
+        </div>
+
       </div>
-       <img src="{{ url_for('static', filename='images/New_Gen_Dancers.jpeg') }}" alt="New Gen students gathered at a dance and music event" class="page-image" />
+
+
+      <!-- HERO IMAGE -->
+
+      <div class="music-hero-visual">
+
+        <div class="music-image-frame">
+
+          <img
+            src="{{ url_for('static', filename='images/New_Gen_Dancers.jpeg') }}"
+            alt="New Gen students gathered at a dance and music event"
+            class="page-image"
+          />
+
+        </div>
+
+        <div class="music-floating-card">
+
+          <span class="floating-icon">♫</span>
+
+          <div>
+            <strong>Creative energy</strong>
+            <small>Music • Dance • Performance</small>
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
+
   </section>
 
-  <section class="container content-section reveal">
-    <div class="info-grid">
-      <div class="info-card">
-        <h2>What we do</h2>
-        <ul>
-          <li>Weekly music practice and vocal sessions</li>
-          <li>Dance choreography and team routines</li>
-          <li>Stage performances at school events</li>
-          <li>Open mic and showcase nights</li>
-        </ul>
+
+  <!-- =====================================================
+       MUSIC WORLD
+  ====================================================== -->
+
+  <section
+    class="content-section reveal"
+    id="music-world"
+  >
+
+    <div class="container">
+
+      <div class="section-heading">
+
+        <span class="eyebrow">
+          THE MUSIC & DANCE WORLD
+        </span>
+
+        <h2>
+          More than
+          <span class="gradient-text">performance.</span>
+        </h2>
+
+        <p>
+          Music and dance give students a space to discover
+          confidence, discipline, teamwork and their own voice.
+        </p>
+
       </div>
-      <div class="info-card highlight">
-        <h2>Club energy</h2>
-        <p>We create safe, uplifting spaces where every student can express themselves through sound, movement, and performance.</p>
+
+
+      <div class="info-grid">
+
+        <!-- WHAT WE DO -->
+
+        <article class="info-card">
+
+          <div class="card-number">
+            01
+          </div>
+
+          <h2>
+            What we do
+          </h2>
+
+          <ul class="feature-list">
+
+            <li>
+              <span>01</span>
+              Weekly music practice and vocal sessions
+            </li>
+
+            <li>
+              <span>02</span>
+              Dance choreography and team routines
+            </li>
+
+            <li>
+              <span>03</span>
+              Stage performances at school events
+            </li>
+
+            <li>
+              <span>04</span>
+              Open mic and showcase nights
+            </li>
+
+          </ul>
+
+        </article>
+
+
+        <!-- CLUB ENERGY -->
+
+        <article class="info-card highlight">
+
+          <div class="card-number">
+            02
+          </div>
+
+          <span class="eyebrow">
+            CLUB ENERGY
+          </span>
+
+          <h2>
+            Find your
+            <span class="gradient-text">rhythm.</span>
+          </h2>
+
+          <p>
+            We create safe, uplifting spaces where every student
+            can express themselves through sound, movement,
+            and performance.
+          </p>
+
+          <p>
+            You don't have to be the best singer or dancer.
+            You just have to be willing to learn, participate,
+            and grow.
+          </p>
+
+        </article>
+
       </div>
+
     </div>
 
-    <div class="gallery-strip">
-      <img src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=700&q=80" alt="Dancers rehearsing" />
-      <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=700&q=80" alt="Singer performing" />
-      <img src="https://images.unsplash.com/photo-1501612780327-45045538702b?auto=format&fit=crop&w=700&q=80" alt="Music performance stage" />
-    </div>
   </section>
+
+
+  <!-- =====================================================
+       THE FOUR SIDES OF MUSIC & DANCE
+  ====================================================== -->
+
+  <section class="content-section reveal">
+
+    <div class="container">
+
+      <div class="section-heading">
+
+        <span class="eyebrow">
+          FIND YOUR SPACE
+        </span>
+
+        <h2>
+          There is a place
+          <span class="gradient-text">for you.</span>
+        </h2>
+
+      </div>
+
+
+      <div class="feature-grid">
+
+        <article class="feature-card">
+
+          <div class="mini-badges">
+            <span>01</span>
+            <span>VOICE</span>
+          </div>
+
+          <h3>
+            Choir
+          </h3>
+
+          <p>
+            Build vocal confidence, learn harmonies and create
+            something powerful together.
+          </p>
+
+        </article>
+
+
+        <article class="feature-card">
+
+          <div class="mini-badges">
+            <span>02</span>
+            <span>MOVEMENT</span>
+          </div>
+
+          <h3>
+            Dance Crew
+          </h3>
+
+          <p>
+            Learn choreography, sharpen your movement and bring
+            energy to every performance.
+          </p>
+
+        </article>
+
+
+        <article class="feature-card">
+
+          <div class="mini-badges">
+            <span>03</span>
+            <span>EXPRESSION</span>
+          </div>
+
+          <h3>
+            Open Mic
+          </h3>
+
+          <p>
+            Sing, perform, experiment and discover what happens
+            when you step onto the stage.
+          </p>
+
+        </article>
+
+
+        <article class="feature-card">
+
+          <div class="mini-badges">
+            <span>04</span>
+            <span>TEAMWORK</span>
+          </div>
+
+          <h3>
+            Performances
+          </h3>
+
+          <p>
+            Work with other students to create performances that
+            represent the spirit of New Gen.
+          </p>
+
+        </article>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       GALLERY
+  ====================================================== -->
+
+  <section class="content-section reveal">
+
+    <div class="container">
+
+      <div class="section-heading">
+
+        <span class="eyebrow">
+          THE MOMENTS
+        </span>
+
+        <h2>
+          Energy you can
+          <span class="gradient-text">feel.</span>
+        </h2>
+
+      </div>
+
+
+      <div class="gallery-strip">
+
+        <div class="gallery-item">
+
+          <img
+            src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=700&q=80"
+            alt="Dancers rehearsing"
+            loading="lazy"
+          />
+
+          <div class="gallery-overlay">
+
+            <strong>
+              Dance rehearsals
+            </strong>
+
+            <span>
+              Rhythm. Discipline. Teamwork.
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="gallery-item">
+
+          <img
+            src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=700&q=80"
+            alt="Singer performing"
+            loading="lazy"
+          />
+
+          <div class="gallery-overlay">
+
+            <strong>
+              Find your voice
+            </strong>
+
+            <span>
+              Confidence through expression.
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="gallery-item">
+
+          <img
+            src="https://images.unsplash.com/photo-1501612780327-45045538702b?auto=format&fit=crop&w=700&q=80"
+            alt="Music performance stage"
+            loading="lazy"
+          />
+
+          <div class="gallery-overlay">
+
+            <strong>
+              Own the stage
+            </strong>
+
+            <span>
+              Every performance tells a story.
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       CTA
+  ====================================================== -->
+
+  <section class="content-section reveal">
+
+    <div class="container">
+
+      <div class="cta-band">
+
+        <div>
+
+          <span class="eyebrow">
+            YOUR TURN
+          </span>
+
+          <h2>
+            Ready to
+            <span class="gradient-text">make some noise?</span>
+          </h2>
+
+          <p>
+            Bring your voice, your rhythm, your ideas and your
+            energy. There is a place for you in New Gen.
+          </p>
+
+        </div>
+
+        <a
+          href="{{ url_for('contact') }}"
+          class="btn btn-primary"
+        >
+          Connect with New Gen
+        </a>
+
+      </div>
+
+    </div>
+
+  </section>
+
 </main>
+
 {% endblock %}
+```

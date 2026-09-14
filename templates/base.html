@@ -1,1145 +1,317 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>{% block title %}New Gen{% endblock %}</title>
 
-<meta
- name="description"
- content="New Gen — a student movement for music, dance, art, poetry, fashion and technology."
-/>
+  <meta name="description"
+        content="New Gen — African child must speak.">
 
-  <meta name="theme-color" content="#070b14" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-    rel="stylesheet"
-  />
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}">
 
-  <link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='css/style.css') }}"
-  />
-
-{% block head %}{% endblock %}
-
+  {% block head %}{% endblock %}
 </head>
 
 <body>
 
-  <!-- =====================================================
-       THEME SELECTOR
-  ====================================================== -->
+  <!-- Theme Toggle -->
 
   <div class="theme-toggle-wrap">
 
-```
-<button
-  class="theme-toggle"
-  id="themeToggle"
-  aria-label="Open theme settings"
-  aria-expanded="false"
-  type="button"
->
-  Theme
-</button>
-
-<div
-  class="theme-panel"
-  id="themePanel"
-  aria-label="Theme settings"
->
-
-  <p>Choose a mode</p>
-
-  <div class="theme-options">
-
-    <button
-      class="theme-option active"
-      data-theme-option="dark"
-      type="button"
-    >
-      Dark
+    <button class="theme-toggle" type="button">
+      Theme
     </button>
 
-    <button
-      class="theme-option"
-      data-theme-option="clean"
-      type="button"
-    >
-      Clean
-    </button>
+    <div class="theme-panel" id="themePanel">
 
-    <button
-      class="theme-option"
-      data-theme-option="luxury"
-      type="button"
-    >
-      Luxury
-    </button>
+      <p>Choose a mode</p>
+
+      <div class="theme-options">
+
+        <button class="theme-option active"
+                data-theme-option="dark"
+                type="button">
+          Dark
+        </button>
+
+        <button class="theme-option"
+                data-theme-option="clean"
+                type="button">
+          Clean
+        </button>
+
+        <button class="theme-option"
+                data-theme-option="luxury"
+                type="button">
+          Luxury
+        </button>
+
+      </div>
+
+    </div>
 
   </div>
 
-</div>
-```
-
-  </div>
-
-  <!-- =====================================================
-       NAVIGATION
-  ====================================================== -->
+  <!-- Navigation -->
 
   <header class="topbar">
 
-```
-<div class="container nav">
+    <div class="container nav">
 
-  <!-- BRAND -->
+      <a href="{{ url_for('home') }}" class="brand">
 
-  <a
-    href="{{ url_for('home') }}"
-    class="brand"
-    aria-label="New Gen home"
-  >
+        <img src="{{ url_for('static', filename='images/logo.jpeg') }}"
+             class="brand-logo"
+             alt="New Gen">
 
-    <img
-      src="{{ url_for('static', filename='images/logo.jpeg') }}"
-      alt="New Gen logo"
-      class="brand-logo"
-    />
+        <span>New Gen</span>
 
-    <span class="brand-text">
-      New Gen
-    </span>
-
-  </a>
-
-
-  <!-- MAIN NAVIGATION -->
-
-  <nav
-    class="nav-links"
-    aria-label="Main navigation"
-  >
-
-    <a href="{{ url_for('home') }}">
-      Home
-    </a>
-
-    <a href="{{ url_for('music_dance') }}">
-      Music &amp; Dance
-    </a>
-
-    <a href="{{ url_for('art') }}">
-      Art
-    </a>
-
-    <a href="{{ url_for('poetry') }}">
-      Poetry
-    </a>
-
-    <a href="{{ url_for('tech') }}">
-      Tech
-    </a>
-
-    <a href="{{ url_for('fashion') }}">
-      Fashion
-    </a>
-
-    <a href="{{ url_for('calendar') }}">
-      Events
-    </a>
-
-    <a href="{{ url_for('contact') }}">
-      Contact
-    </a>
-
-  </nav>
-
-
-  <!-- =================================================
-       ACCOUNT NAVIGATION
-       IMPORTANT:
-       Admins NEVER use member_dashboard.
-  ================================================== -->
-
-  <div class="nav-account">
-
-    {% if is_admin %}
-
-      <!-- =============================================
-           ADMIN
-      ============================================== -->
-
-      <a
-        href="{{ url_for('admin_portal') }}"
-        class="nav-account-link"
-      >
-        Dashboard
       </a>
 
-      <a
-        href="{{ url_for('admin_members') }}"
-        class="nav-account-link"
-      >
-        Members
-      </a>
+      <nav class="nav-links">
 
-      <a
-        href="{{ url_for('admin_logout') }}"
-        class="nav-logout"
-      >
-        Logout
-      </a>
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('music_dance') }}">Music & Dance</a>
+        <a href="{{ url_for('art') }}">Art</a>
+        <a href="{{ url_for('poetry') }}">Poetry</a>
+        <a href="{{ url_for('tech') }}">Tech</a>
+        <a href="{{ url_for('fashion') }}">Fashion</a>
+        <a href="{{ url_for('calendar') }}">Events</a>
+        <a href="{{ url_for('contact') }}">Contact</a>
 
+      </nav>
 
-    {% elif member and member.role == "executive" %}
+      <!-- ACCOUNT -->
 
-      <!-- =============================================
-           EXECUTIVE
-      ============================================== -->
+      <div class="nav-account">
 
-      <a
-        href="{{ url_for('member_dashboard') }}"
-        class="nav-account-link"
-      >
-        My Dashboard
-      </a>
+        <!-- ADMIN ALWAYS FIRST -->
 
-      <a
-        href="{{ url_for('executive_dashboard') }}"
-        class="nav-executive"
-      >
-        Executive
-      </a>
+        {% if session.get("admin_logged_in") %}
 
-      <a
-        href="{{ url_for('logout') }}"
-        class="nav-logout"
-      >
-        Logout
-      </a>
+          <a href="{{ url_for('admin_portal') }}"
+             class="nav-account-link">
+            Dashboard
+          </a>
 
+          <a href="{{ url_for('admin_logout') }}"
+             class="nav-logout">
+            Logout
+          </a>
 
-    {% elif member %}
+        {% elif session.get("member_id") %}
 
-      <!-- =============================================
-           NORMAL MEMBER
-      ============================================== -->
+          <a href="{{ url_for('member_dashboard') }}"
+             class="nav-account-link">
+            Dashboard
+          </a>
 
-      <a
-        href="{{ url_for('member_dashboard') }}"
-        class="nav-account-link"
-      >
-        Dashboard
-      </a>
+          {% if member and member.role == "executive" %}
 
-      <a
-        href="{{ url_for('logout') }}"
-        class="nav-logout"
-      >
-        Logout
-      </a>
+            <a href="{{ url_for('executive_dashboard') }}"
+               class="nav-executive">
+              Executive
+            </a>
 
+          {% endif %}
 
-    {% else %}
+          <a href="{{ url_for('logout') }}"
+             class="nav-logout">
+            Logout
+          </a>
 
-      <!-- =============================================
-           VISITOR
-      ============================================== -->
+        {% else %}
 
-      <a
-        href="{{ url_for('login') }}"
-        class="nav-login"
-      >
-        Login
-      </a>
+          <a href="{{ url_for('login') }}"
+             class="nav-login">
+            Login
+          </a>
 
-      <a
-        href="{{ url_for('signup') }}"
-        class="nav-cta"
-      >
-        Join New Gen
-      </a>
+          <a href="{{ url_for('signup') }}"
+             class="nav-cta">
+            Join New Gen
+          </a>
 
-    {% endif %}
+        {% endif %}
 
-  </div>
+      </div>
 
+      <button class="menu-toggle"
+              id="menuToggle"
+              type="button">
+        Menu
+      </button>
 
-  <!-- MOBILE MENU BUTTON -->
-
-  <button
-    class="menu-toggle"
-    id="menuToggle"
-    aria-label="Open navigation menu"
-    aria-expanded="false"
-    type="button"
-  >
-    Menu
-  </button>
-
-</div>
-```
+    </div>
 
   </header>
 
-  <!-- =====================================================
-       MOBILE NAVIGATION
-  ====================================================== -->
+  <!-- Flash -->
 
-  <div
-    class="mobile-nav"
-    id="mobileNav"
-    aria-hidden="true"
-  >
-
-```
-<div
-  class="mobile-nav-backdrop"
-  id="mobileNavBackdrop"
-></div>
-
-
-<aside
-  class="mobile-nav-panel"
-  aria-label="Mobile navigation"
->
-
-  <div class="mobile-nav-top">
-
-    <strong>
-      NEW GEN
-    </strong>
-
-    <button
-      class="mobile-close"
-      id="mobileClose"
-      type="button"
-      aria-label="Close navigation"
-    >
-      ×
-    </button>
-
-  </div>
-
-
-  <div class="mobile-links">
-
-    <a href="{{ url_for('home') }}">
-      Home
-    </a>
-
-    <a href="{{ url_for('music_dance') }}">
-      Music &amp; Dance
-    </a>
-
-    <a href="{{ url_for('art') }}">
-      Art
-    </a>
-
-    <a href="{{ url_for('poetry') }}">
-      Poetry
-    </a>
-
-    <a href="{{ url_for('tech') }}">
-      Tech
-    </a>
-
-    <a href="{{ url_for('fashion') }}">
-      Fashion
-    </a>
-
-    <a href="{{ url_for('calendar') }}">
-      Events
-    </a>
-
-    <a href="{{ url_for('contact') }}">
-      Contact
-    </a>
-
-
-    <div class="mobile-nav-divider"></div>
-
-
-    {% if is_admin %}
-
-      <a href="{{ url_for('admin_portal') }}">
-        Admin Dashboard
-      </a>
-
-      <a href="{{ url_for('admin_members') }}">
-        Manage Members
-      </a>
-
-      <a href="{{ url_for('admin_logout') }}">
-        Logout
-      </a>
-
-
-    {% elif member and member.role == "executive" %}
-
-      <a href="{{ url_for('member_dashboard') }}">
-        My Dashboard
-      </a>
-
-      <a href="{{ url_for('executive_dashboard') }}">
-        Executive Portal
-      </a>
-
-      <a href="{{ url_for('logout') }}">
-        Logout
-      </a>
-
-
-    {% elif member %}
-
-      <a href="{{ url_for('member_dashboard') }}">
-        My Dashboard
-      </a>
-
-      <a href="{{ url_for('logout') }}">
-        Logout
-      </a>
-
-
-    {% else %}
-
-      <a href="{{ url_for('login') }}">
-        Login
-      </a>
-
-      <a href="{{ url_for('signup') }}">
-        Join New Gen
-      </a>
-
-    {% endif %}
-
-  </div>
-
-
-  <div class="mobile-nav-footer">
-
-    <p>
-      African child must speak.
-    </p>
-
-    {% if is_admin %}
-
-      <a
-        href="{{ url_for('admin_portal') }}"
-        class="btn btn-primary"
-      >
-        Open Control Center
-      </a>
-
-    {% elif member %}
-
-      <a
-        href="{{ url_for('member_dashboard') }}"
-        class="btn btn-primary"
-      >
-        Open My Dashboard
-      </a>
-
-    {% else %}
-
-      <a
-        href="{{ url_for('signup') }}"
-        class="btn btn-primary"
-      >
-        Join New Gen
-      </a>
-
-    {% endif %}
-
-  </div>
-
-</aside>
-```
-
-  </div>
-
-  <!-- =====================================================
-       FLASH MESSAGES
-  ====================================================== -->
-
-{% with messages = get_flashed_messages(with_categories=true) %}
-
-```
-{% if messages %}
-
-  <div
-    class="flash-container"
-    aria-live="polite"
-  >
-
-    {% for category, message in messages %}
-
-      <div
-        class="flash-message {{ category }}"
-        role="alert"
-      >
-        {{ message }}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category,message in messages %}
+          <div class="flash-message {{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
       </div>
+    {% endif %}
+  {% endwith %}
 
-    {% endfor %}
+  <!-- Page -->
 
-  </div>
+  {% block content %}{% endblock %}
 
-{% endif %}
-```
-
-{% endwith %}
-
-  <!-- =====================================================
-       PAGE CONTENT
-  ====================================================== -->
-
-{% block content %}{% endblock %}
-
-  <!-- =====================================================
-       NEW GEN FOOTER
-  ====================================================== -->
+  <!-- Footer -->
 
   <footer class="site-footer">
 
-```
-<div
-  class="footer-pattern"
-  aria-hidden="true"
-></div>
+    <div class="footer-pattern"></div>
 
+    <div class="container footer-main">
 
-<div class="container footer-main">
+      <div class="footer-identity">
 
+        <img src="{{ url_for('static', filename='images/logo.jpeg') }}"
+             class="footer-mark">
 
-  <!-- BRAND STATEMENT -->
+        <div class="footer-identity-text">
 
-  <div class="footer-identity">
+          <span class="footer-kicker">
+            NEW GEN | OUR VOICE
+          </span>
 
-    <img
-      src="{{ url_for('static', filename='images/logo.jpeg') }}"
-      alt="New Gen logo"
-      class="footer-mark"
-    />
+          <h2>
+            African child
+            <span>must speak.</span>
+          </h2>
 
-    <div class="footer-identity-text">
+          <p>Our voices. Our stories. Our future.</p>
 
-      <span class="footer-kicker">
-        NEW GEN | OUR VOICE
-      </span>
+        </div>
 
-      <h2>
-        African child
-        <span>must speak.</span>
-      </h2>
+      </div>
 
-      <p>
-        Our voices. Our stories. Our future.
-      </p>
+      <div class="footer-column">
+
+        <span class="footer-column-title">Explore</span>
+
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('calendar') }}">Events</a>
+        <a href="{{ url_for('contact') }}">Contact</a>
+
+        {% if session.get("member_id") or session.get("admin_logged_in") %}
+          <a href="{{ url_for('members') }}">Members</a>
+        {% endif %}
+
+      </div>
+
+      <div class="footer-column">
+
+        <span class="footer-column-title">Our Worlds</span>
+
+        <a href="{{ url_for('music_dance') }}">Music & Dance</a>
+        <a href="{{ url_for('art') }}">Art</a>
+        <a href="{{ url_for('poetry') }}">Poetry</a>
+        <a href="{{ url_for('tech') }}">Tech</a>
+        <a href="{{ url_for('fashion') }}">Fashion</a>
+
+      </div>
+
+      <div class="footer-column">
+
+        <span class="footer-column-title">Access</span>
+
+        {% if session.get("admin_logged_in") %}
+
+          <a href="{{ url_for('admin_portal') }}">
+            Admin Dashboard
+          </a>
+
+          <a href="{{ url_for('admin_members') }}">
+            Manage Members
+          </a>
+
+          <a href="{{ url_for('admin_logout') }}">
+            Logout
+          </a>
+
+        {% elif session.get("member_id") %}
+
+          <a href="{{ url_for('member_dashboard') }}">
+            My Dashboard
+          </a>
+
+          {% if member and member.role=="executive" %}
+
+            <a href="{{ url_for('executive_dashboard') }}">
+              Executive Portal
+            </a>
+
+          {% endif %}
+
+          <a href="{{ url_for('logout') }}">
+            Logout
+          </a>
+
+        {% else %}
+
+          <a href="{{ url_for('login') }}">
+            Member Login
+          </a>
+
+          <a href="{{ url_for('signup') }}">
+            Become a Member
+          </a>
+
+          <a href="{{ url_for('admin_login') }}">
+            Admin
+          </a>
+
+        {% endif %}
+
+      </div>
 
     </div>
 
-  </div>
+    <div class="footer-bottom">
 
+      <div class="container footer-bottom-inner">
 
-  <!-- =================================================
-       EXPLORE
-  ================================================== -->
+        <div class="footer-origin">
 
-  <div class="footer-column">
+          <span class="footer-star">✦</span>
 
-    <span class="footer-column-title">
-      Explore
-    </span>
+          <span>Made in Africa</span>
 
-    <a href="{{ url_for('home') }}">
-      Home
-    </a>
+        </div>
 
-    <a href="{{ url_for('calendar') }}">
-      Events
-    </a>
+        <span class="footer-copyright">
+          © 2026 New Gen
+        </span>
 
-    <a href="{{ url_for('contact') }}">
-      Contact
-    </a>
+        <span class="footer-slogan">
+          African child must speak.
+        </span>
 
-    {% if member or is_admin %}
-
-      <a href="{{ url_for('members') }}">
-        Members
-      </a>
-
-    {% endif %}
-
-  </div>
-
-
-  <!-- =================================================
-       CREATIVE WORLDS
-  ================================================== -->
-
-  <div class="footer-column">
-
-    <span class="footer-column-title">
-      Our Worlds
-    </span>
-
-    <a href="{{ url_for('music_dance') }}">
-      Music &amp; Dance
-    </a>
-
-    <a href="{{ url_for('art') }}">
-      Art
-    </a>
-
-    <a href="{{ url_for('poetry') }}">
-      Poetry
-    </a>
-
-    <a href="{{ url_for('tech') }}">
-      Tech
-    </a>
-
-    <a href="{{ url_for('fashion') }}">
-      Fashion
-    </a>
-
-  </div>
-
-
-  <!-- =================================================
-       ACCOUNT
-  ================================================== -->
-
-  <div class="footer-column">
-
-    <span class="footer-column-title">
-      Access
-    </span>
-
-
-    {% if is_admin %}
-
-      <!-- ADMIN -->
-
-      <a href="{{ url_for('admin_portal') }}">
-        Admin Control Center
-      </a>
-
-      <a href="{{ url_for('admin_members') }}">
-        Manage Members
-      </a>
-
-      <a href="{{ url_for('admin_logout') }}">
-        Logout
-      </a>
-
-
-    {% elif member and member.role == "executive" %}
-
-      <!-- EXECUTIVE -->
-
-      <a href="{{ url_for('member_dashboard') }}">
-        My Dashboard
-      </a>
-
-      <a href="{{ url_for('executive_dashboard') }}">
-        Executive Portal
-      </a>
-
-      <a href="{{ url_for('logout') }}">
-        Logout
-      </a>
-
-
-    {% elif member %}
-
-      <!-- MEMBER -->
-
-      <a href="{{ url_for('member_dashboard') }}">
-        My Dashboard
-      </a>
-
-      <a href="{{ url_for('logout') }}">
-        Logout
-      </a>
-
-
-    {% else %}
-
-      <!-- VISITOR -->
-
-      <a href="{{ url_for('login') }}">
-        Member Login
-      </a>
-
-      <a href="{{ url_for('signup') }}">
-        Become a Member
-      </a>
-
-      <a href="{{ url_for('admin_login') }}">
-        Admin
-      </a>
-
-    {% endif %}
-
-  </div>
-
-</div>
-
-
-<!-- =====================================================
-     FOOTER BOTTOM
-====================================================== -->
-
-<div class="footer-bottom">
-
-  <div class="container footer-bottom-inner">
-
-    <div class="footer-origin">
-
-      <span class="footer-star">
-        ✦
-      </span>
-
-      <span>
-        Made in Africa
-      </span>
+      </div>
 
     </div>
-
-    <span class="footer-copyright">
-      © 2026 New Gen
-    </span>
-
-    <span class="footer-slogan">
-      African child must speak.
-    </span>
-
-  </div>
-
-</div>
-```
 
   </footer>
 
-  <!-- =====================================================
-       JAVASCRIPT
-  ====================================================== -->
-
-  <script>
-    /*
-     * =====================================================
-     * THEME SYSTEM
-     * =====================================================
-     *
-     * The stylesheet uses:
-     *
-     *   body[data-theme="dark"]
-     *   body[data-theme="clean"]
-     *   body[data-theme="luxury"]
-     *
-     * We therefore store the selected theme as a data
-     * attribute instead of relying on unrelated body classes.
-     */
-
-    (function () {
-
-      const body = document.body;
-
-      const themeToggle =
-        document.getElementById("themeToggle");
-
-      const themePanel =
-        document.getElementById("themePanel");
-
-      const themeOptions =
-        document.querySelectorAll(
-          "[data-theme-option]"
-        );
-
-
-      function applyTheme(theme) {
-
-        const allowedThemes = [
-          "dark",
-          "clean",
-          "luxury"
-        ];
-
-        if (!allowedThemes.includes(theme)) {
-          theme = "dark";
-        }
-
-        body.setAttribute(
-          "data-theme",
-          theme
-        );
-
-        themeOptions.forEach(function (button) {
-
-          const active =
-            button.dataset.themeOption === theme;
-
-          button.classList.toggle(
-            "active",
-            active
-          );
-
-          button.setAttribute(
-            "aria-pressed",
-            active ? "true" : "false"
-          );
-
-        });
-
-        localStorage.setItem(
-          "newgen-theme",
-          theme
-        );
-
-      }
-
-
-      const savedTheme =
-        localStorage.getItem("newgen-theme");
-
-      applyTheme(
-        savedTheme || "dark"
-      );
-
-
-      themeOptions.forEach(function (button) {
-
-        button.addEventListener(
-          "click",
-          function () {
-
-            applyTheme(
-              button.dataset.themeOption
-            );
-
-          }
-        );
-
-      });
-
-
-      if (themeToggle && themePanel) {
-
-        themeToggle.addEventListener(
-          "click",
-          function (event) {
-
-            event.stopPropagation();
-
-            const isOpen =
-              themePanel.classList.toggle(
-                "open"
-              );
-
-            themeToggle.setAttribute(
-              "aria-expanded",
-              isOpen ? "true" : "false"
-            );
-
-          }
-        );
-
-
-        document.addEventListener(
-          "click",
-          function (event) {
-
-            if (
-              !themePanel.contains(event.target) &&
-              !themeToggle.contains(event.target)
-            ) {
-
-              themePanel.classList.remove(
-                "open"
-              );
-
-              themeToggle.setAttribute(
-                "aria-expanded",
-                "false"
-              );
-
-            }
-
-          }
-        );
-
-      }
-
-    })();
-
-
-    /*
-     * =====================================================
-     * MOBILE NAVIGATION
-     * =====================================================
-     */
-
-    (function () {
-
-      const menuToggle =
-        document.getElementById("menuToggle");
-
-      const mobileNav =
-        document.getElementById("mobileNav");
-
-      const mobileClose =
-        document.getElementById("mobileClose");
-
-      const mobileBackdrop =
-        document.getElementById(
-          "mobileNavBackdrop"
-        );
-
-
-      function openMobileNav() {
-
-        if (!mobileNav) {
-          return;
-        }
-
-        mobileNav.classList.add("open");
-
-        mobileNav.setAttribute(
-          "aria-hidden",
-          "false"
-        );
-
-        if (menuToggle) {
-
-          menuToggle.setAttribute(
-            "aria-expanded",
-            "true"
-          );
-
-        }
-
-        document.body.classList.add(
-          "mobile-nav-open"
-        );
-
-      }
-
-
-      function closeMobileNav() {
-
-        if (!mobileNav) {
-          return;
-        }
-
-        mobileNav.classList.remove("open");
-
-        mobileNav.setAttribute(
-          "aria-hidden",
-          "true"
-        );
-
-        if (menuToggle) {
-
-          menuToggle.setAttribute(
-            "aria-expanded",
-            "false"
-          );
-
-        }
-
-        document.body.classList.remove(
-          "mobile-nav-open"
-        );
-
-      }
-
-
-      if (menuToggle) {
-
-        menuToggle.addEventListener(
-          "click",
-          openMobileNav
-        );
-
-      }
-
-
-      if (mobileClose) {
-
-        mobileClose.addEventListener(
-          "click",
-          closeMobileNav
-        );
-
-      }
-
-
-      if (mobileBackdrop) {
-
-        mobileBackdrop.addEventListener(
-          "click",
-          closeMobileNav
-        );
-
-      }
-
-
-      if (mobileNav) {
-
-        mobileNav
-          .querySelectorAll("a")
-          .forEach(function (link) {
-
-            link.addEventListener(
-              "click",
-              closeMobileNav
-            );
-
-          });
-
-      }
-
-
-      document.addEventListener(
-        "keydown",
-        function (event) {
-
-          if (
-            event.key === "Escape"
-          ) {
-
-            closeMobileNav();
-
-          }
-
-        }
-      );
-
-    })();
-
-
-    /*
-     * =====================================================
-     * AUTO-HIDE FLASH MESSAGES
-     * =====================================================
-     */
-
-    (function () {
-
-      const flashMessages =
-        document.querySelectorAll(
-          ".flash-message"
-        );
-
-      flashMessages.forEach(
-        function (message) {
-
-          setTimeout(
-            function () {
-
-              message.classList.add(
-                "flash-hide"
-              );
-
-            },
-            5000
-          );
-
-        }
-      );
-
-    })();
-
-
-    /*
-     * =====================================================
-     * SCROLL REVEAL
-     * =====================================================
-     */
-
-    (function () {
-
-      const revealElements =
-        document.querySelectorAll(
-          ".reveal"
-        );
-
-      if (
-        !("IntersectionObserver" in window)
-      ) {
-
-        revealElements.forEach(
-          function (element) {
-
-            element.classList.add(
-              "show"
-            );
-
-          }
-        );
-
-        return;
-
-      }
-
-
-      const observer =
-        new IntersectionObserver(
-          function (entries) {
-
-            entries.forEach(
-              function (entry) {
-
-                if (
-                  entry.isIntersecting
-                ) {
-
-                  entry.target.classList.add(
-                    "show"
-                  );
-
-                  observer.unobserve(
-                    entry.target
-                  );
-
-                }
-
-              }
-            );
-
-          },
-          {
-            threshold: 0.12
-          }
-        );
-
-
-      revealElements.forEach(
-        function (element) {
-
-          observer.observe(
-            element
-          );
-
-        }
-      );
-
-    })();
-
-  </script>
-
-{% block scripts %}{% endblock %}
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
 </body>
 </html>
